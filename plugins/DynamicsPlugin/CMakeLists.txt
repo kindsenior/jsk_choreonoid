@@ -2,7 +2,7 @@ message("This is DynamicsPlugin")
 
 set(PLUGIN_NAME DynamicsPlugin)
 set(TARGET Cnoid${PLUGIN_NAME})
-set(headers DynamicsPlugin.h)
+set(headers DynamicsPlugin.h Jacobian.h)
 
 add_library(${TARGET} SHARED DynamicsPlugin Jacobian)
 
