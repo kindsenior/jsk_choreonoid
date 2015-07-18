@@ -82,7 +82,6 @@ foreach(_plugin_dir ${_plugin_dirs})
 	add_subdirectory(${_plugin_dir})
 
 endforeach()
-return()
 
 
 # execute_process(
