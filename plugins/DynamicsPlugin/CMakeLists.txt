@@ -13,7 +13,7 @@ execute_process(
 # install(FILES ${headers} DESTINATION ${INCLUDE_DEST_DIR})
 foreach(header ${headers})
 	execute_process(
-		COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${headers} ${INCLUDE_DEST_DIR}
+		COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${header} ${INCLUDE_DEST_DIR}
 		RESULT_VARIABLE _copy_failed)
 endforeach()
 
