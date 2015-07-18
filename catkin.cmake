@@ -83,6 +83,11 @@ foreach(_plugin_dir ${_plugin_dirs})
 
 endforeach()
 
+# install(FILES jsk_choreonoid.pc
+#   DESTINATION lib/pkgconfig)
+execute_process(
+	COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/jsk_choreonoid.pc ${CATKIN_DEVEL_PREFIX}/lib/pkgconfig
+	RESULT_VARIABLE _copy_failed)
 
 # execute_process(
 # 	  COMMAND cmake -E chdir ${PROJECT_SOURCE_DIR}
