@@ -1,0 +1,14 @@
+# pkg-config source file
+
+prefix=/home/kunio/ros/hydro/devel
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/jsk_choreonoid
+
+Name: jsk_choreonoid
+Description: Robotics application framework
+Version: 1.5.0
+Requires: QtCore >= 4.7.0 QtGui >= 4.7.0 QtOpenGL >= 4.7.0 eigen3 >= 3.0.0
+Conflicts:
+Libs: -L${libdir} -lCnoidUtil -lCnoidBase
+Cflags: -I${includedir} -DQT_NO_KEYWORDS
