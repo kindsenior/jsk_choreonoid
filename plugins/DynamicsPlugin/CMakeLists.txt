@@ -6,6 +6,9 @@ set(headers DynamicsPlugin.h Jacobian.h)
 
 add_library(${TARGET} SHARED DynamicsPlugin Jacobian)
 
+set_target_properties(${TARGET}
+  PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/choreonoid-${choreonoid_VER})
+
 set(INCLUDE_DEST_DIR ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${PLUGIN_NAME})
 execute_process(
   COMMAND cmake -E make_directory ${INCLUDE_DEST_DIR}
