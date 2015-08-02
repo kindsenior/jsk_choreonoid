@@ -443,10 +443,11 @@ void RMControlPlugin::RMControl(){
     mJpr = getCustomJointPath( mBody, mBody->rootLink(), mRFootLink );
 
     // PoseSeqItem loop
-    Item* pChildItem = bodyItems[0]->childItem();
+    // Item* pChildItem = bodyItems[0]->childItem();
     for(int i = 0; i < 1; ++i){
         // for(Item* pChildItem = bodyItems[0]->childItem(); pChildItem; pChildItem = pChildItem->nextItem()){
-        PoseSeqItem* pPoseSeqItem = dynamic_cast<PoseSeqItem*>(pChildItem);
+        // PoseSeqItem* pPoseSeqItem = dynamic_cast<PoseSeqItem*>(pChildItem);
+        PoseSeqItemPtr pPoseSeqItem = ItemTreeView::mainInstance()->selectedItems<PoseSeqItem>()[0];
         mPoseSeqPath = boost::filesystem::path(pPoseSeqItem->filePath());
 
         if( pPoseSeqItem ){
