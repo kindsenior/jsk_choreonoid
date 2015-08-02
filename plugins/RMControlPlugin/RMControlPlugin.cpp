@@ -353,6 +353,46 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
     ofs.close();
 }
 
+void RMControlPlugin::loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
+                                        const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
+                                        Vector3Seq& refPSeq, Vector3Seq& refLSeq){
+
+    // BodyItem* bodyItem = motionItem->findOwnerItem<BodyItem>(true);// motionItemからbodyItemを見つける
+    const BodyMotionPtr motion = motionItem->motion();
+
+    stringstream ss,fnamess;
+    // fnamess << "/home/kunio/Dropbox/log/choreonoid/refPL_" << motion->frameRate() << ".dat";
+    fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion->frameRate() << "fps.dat";
+    ofstream ofs(fnamess.str().c_str());
+    const double dt = 1.0/motion->frameRate();
+    const double g = 9.80665;
+    const double m = mBody->mass();
+
+    // Vector3Seq refCMSeq(motion->numFrames());
+    refPSeq = Vector3Seq(motion->numFrames());
+    refLSeq = Vector3Seq(motion->numFrames());
+
+    // 目標重心位置
+    Vector3SeqPtr refCMSeq = motionItem->findSubItem<Vector3SeqItem>("refCM")->seq();
+
+    // 目標運動量 motion loop
+    for(int i = 0; i < motion->numFrames(); ++i){
+        refLSeq[i] = Vector3d::Zero();
+
+        int nextFrame = std::min( i + 1, motion->numFrames() - 1 );
+        refPSeq[i] = ( refCMSeq->at(nextFrame) - refCMSeq->at(i) ) / dt;
+
+        ofs << i*dt ;
+        ofs <<  " " << ( refCMSeq->at(i)/m ).transpose();// 重心 2,3,4
+        ofs <<  " " << refPSeq[i].transpose();// 運動量 5,6,7
+        ofs << endl;
+
+    }// end motion loop
+
+    MessageView::instance()->putln(ss.str());
+    ofs.close();
+}
+
 // 分解運動量制御
 void RMControlPlugin::RMControl(){
     stringstream ss,fnamess;
@@ -433,7 +473,8 @@ void RMControlPlugin::RMControl(){
             // 目標運動量軌道作成
             Vector3Seq refPSeq,refLSeq;
             Vector3d initP,endP,initL,endL;
-            generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initP, endP, initL, endL, refPSeq, refLSeq );
+            // generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initP, endP, initL, endL, refPSeq, refLSeq );
+            loadRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initP, endP, initL, endL, refPSeq, refLSeq );
             cout << " Generated ref P/L" << endl;
 
 
