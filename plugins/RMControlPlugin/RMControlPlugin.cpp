@@ -1,14 +1,13 @@
 /**
    @author Kunio Kojima
 */
+#include "RMControlPlugin.h"
 
 #define BASE_LINK "LLEG_JOINT5"
 
 using namespace boost;
 using namespace cnoid;
 using namespace std;
-
-enum Constraint { Free , LLEG , RLEG };// 拘束条件
 
 MatrixXd pinv(const MatrixXd A){
   if(A.rows() < A.cols()){
@@ -30,20 +29,9 @@ Matrix3d D(Vector3d r)
     return r_cross.transpose() * r_cross;
 }
 
-struct SubMass
-{
-    double m;
-    Vector3 mwc;
-    Matrix3d Iw;
-    SubMass& operator+=(const SubMass& rhs){
-        m += rhs.m;
-        mwc += rhs.mwc;
-        Iw += rhs.Iw;
-        return *this;
-    }
-};
+}
 
-void calcSubMass(Link* link, vector<SubMass>& subMasses)
+void RMControlPlugin::calcSubMass(Link* link, vector<SubMass>& subMasses)
 {
     Matrix3d R = link->R();
     SubMass& sub = subMasses[link->index()];
@@ -63,12 +51,6 @@ void calcSubMass(Link* link, vector<SubMass>& subMasses)
         sub.Iw += childSub.Iw + childSub.m * D( childSub.mwc/childSub.m - sub.mwc/sub.m );
     }
 }
-
-}
-
-
-
-
 
 // ロボットモデル依存の部分あり
 // 各種行列を計算
