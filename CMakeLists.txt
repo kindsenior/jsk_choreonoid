@@ -20,6 +20,7 @@ execute_process(COMMAND pkg-config --variable=plugindir choreonoid
   RESULT_VARIABLE RESULT
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
 catkin_package(
 	INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}
 	DEPENDS eigen)
