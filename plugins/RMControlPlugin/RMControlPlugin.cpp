@@ -178,6 +178,8 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
     // fnamess << "/home/kunio/Dropbox/log/choreonoid/refPL_" << motion->frameRate() << ".dat";
     fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion->frameRate() << "fps.dat";
     ofstream ofs(fnamess.str().c_str());
+    ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
+
     const double dt = 1.0/motion->frameRate();
     const double g = 9.80665;
     const double m = mBody->mass();
@@ -327,6 +329,7 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
         ofs << i*dt ;
         ofs <<  " " << (refCMSeq[i]/m).transpose();// 重心 2,3,4
         ofs <<  " " << refPSeq[i].transpose();// 運動量 5,6,7
+        ofs <<  " " << refLSeq[i].transpose();// 角運動量 8,9,10
         ofs << endl;
 
     }// end motion loop
@@ -346,6 +349,7 @@ void RMControlPlugin::loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr
     // fnamess << "/home/kunio/Dropbox/log/choreonoid/refPL_" << motion->frameRate() << ".dat";
     fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion->frameRate() << "fps.dat";
     ofstream ofs(fnamess.str().c_str());
+    ofs << "time refCMx refCMy refCMz refPx refPy refPz" << endl;
     const double dt = 1.0/motion->frameRate();
     const double g = 9.80665;
     const double m = mBody->mass();
