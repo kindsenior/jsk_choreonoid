@@ -454,6 +454,7 @@ void RMControlPlugin::RMControl(){
             fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_PL_" << motion->frameRate() << "fps.dat";
             ofstream ofs( fnamess.str().c_str() );
             if( !ofs ){ cerr << "File Open Error" << endl; return;}
+            ofs << "time CMx CMy CMz Px Py Pz Lx Ly Lz" << endl;
 
             double dt = 1.0/motion->frameRate();
 
