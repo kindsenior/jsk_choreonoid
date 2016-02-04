@@ -17,49 +17,55 @@
 #include <cnoid/src/PoseSeqPlugin/PoseSeqItem.h>
 #include <cnoid/Vector3Seq>
 #include <cnoid/LeggedBodyHelper>
+#include <cnoid/src/Body/Jacobian.h>
 
 namespace cnoid{
 
-    // 2つのPose間の接触状態を2進数で表す
-    // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
-    int getContactState( const PosePtr pose1, const PosePtr pose2, const int linkId );
+// 2つのPose間の接触状態を2進数で表す
+// 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
+int getContactState( const PosePtr pose1, const PosePtr pose2, const int linkId );
 
-    // どちらの足でもいいので次の接触ポーズにイテレータを進める
-    // end()を返すこともある
-    void incContactPose( PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body );
+// どちらの足でもいいので次の接触ポーズにイテレータを進める
+// end()を返すこともある
+void incContactPose( PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body );
 
-    // 特定のリンクの次のポーズを求める
-    PoseSeq::iterator getNextPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId );
+// 特定のリンクの次のポーズを求める
+PoseSeq::iterator getNextPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId );
 
-    // 特定リンクの前のポーズを求める
-    PoseSeq::iterator getPrevPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId );
+// 特定リンクの前のポーズを求める
+PoseSeq::iterator getPrevPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId );
 
-    // poseIterが最後のポーズの時は-1を返す
-    int getNextContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId );
+// poseIterが最後のポーズの時は-1を返す
+int getNextContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId );
 
-    int getPrevContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId );
+int getPrevContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId );
 
-    bool isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body );
+bool isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body );
 
+void updateBodyState( BodyMotionPtr& motion, BodyPtr& body, const int currentFrame );
 
-  class UtilPlugin : public Plugin
-  {
-  public:
+void calcDifferential(const BodyMotionPtr& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq);
+
+void calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& Iw, const VectorXd& dq);
+
+class UtilPlugin : public Plugin
+{
+public:
     
-  UtilPlugin() : Plugin("Util")
-      {
-        require("Body");
-        require("PoseSeq");
-      }
+UtilPlugin() : Plugin("Util")
+{
+require("Body");
+require("PoseSeq");
+}
     
-    virtual bool initialize()
-    {
-      return true;
-    }
+virtual bool initialize()
+{
+return true;
+}
 
-    static void getFootLink( Link** lFootLink, Link** rFootLink, const BodyPtr& body );
+static void getFootLink( Link** lFootLink, Link** rFootLink, const BodyPtr& body );
 
-  };
+};
 
 }
 

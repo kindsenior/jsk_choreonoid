@@ -165,5 +165,58 @@ void UtilPlugin::getFootLink( Link** plFootLink, Link** prFootLink, const BodyPt
   cout << "Finished setting foot links" << endl;
 }
 
+void cnoid::updateBodyState( BodyMotionPtr& motion, BodyPtr& body, const int currentFrame ){
+    int prevFrame = max(currentFrame-1, 0);
+    int nextFrame = min(currentFrame+1, motion->numFrames()-1);
+
+    const double dt = 1.0/motion->frameRate();
+
+    motion->frame(currentFrame) >> *body;
+
+		Vector3d v,w;
+		VectorXd dq,ddq;
+		calcDifferential(motion, currentFrame, v, w, dq, ddq);
+
+    // dq,ddq更新
+    for(int k=0; k < motion->numJoints(); ++k){
+        Link* joint = body->joint(k);
+        // joint->q() = q[k];
+        joint->dq() = dq[k];
+        joint->ddq() = ddq[k];
+    }
+
+		// rootLink v,x更新
+    body->rootLink()->v() = v;
+    body->rootLink()->w() = w;
+}
+
+void cnoid::calcDifferential(const BodyMotionPtr& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq){
+    int prevFrame = max(currentFrame-1, 0);
+    int nextFrame = min(currentFrame+1, motion->numFrames()-1);
+
+    const double dt = 1.0/motion->frameRate();
+
+    // dq,ddq計算
+    dq = VectorXd(motion->numJoints());
+    ddq = VectorXd(motion->numJoints());
+    MultiValueSeq::Frame q0 = motion->jointPosSeq()->frame(prevFrame);
+    MultiValueSeq::Frame q1 = motion->jointPosSeq()->frame(currentFrame);
+    MultiValueSeq::Frame q2 = motion->jointPosSeq()->frame(nextFrame);
+    for(int k=0; k < motion->numJoints(); ++k){
+        // Link* joint = mBody->joint(k);
+        // joint->q() = q1[k];
+        dq[k] = (q2[k] - q1[k]) / dt;
+        ddq[k] = (q2[k] - 2.0 * q1[k] + q0[k]) / (dt * dt);
+    }
+
+    // rootLink v,x計算
+    SE3 currentWaistSE3 = motion->linkPosSeq()->frame(currentFrame)[0];
+    SE3 nextWaistSE3 = motion->linkPosSeq()->frame(nextFrame)[0];
+    v = nextWaistSE3.translation() - currentWaistSE3.translation();
+    v /= dt;
+    Matrix3d R = nextWaistSE3.rotation().toRotationMatrix() * nextWaistSE3.rotation().toRotationMatrix().inverse();
+    AngleAxis aa = AngleAxis(R);
+    w = aa.axis() * aa.angle()/dt;
+}
 
 CNOID_IMPLEMENT_PLUGIN_ENTRY(UtilPlugin)
