@@ -42,6 +42,8 @@
 // #include <DynamicsPlugin/DynamicsPlugin.h>
 #include <cnoid/FileUtil>
 
+#include <UtilPlugin/UtilPlugin.h>
+
 namespace cnoid{
 
     enum Constraint { Free , LLEG , RLEG };// 拘束条件
