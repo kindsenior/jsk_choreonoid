@@ -219,4 +219,16 @@ void cnoid::calcDifferential(const BodyMotionPtr& motion, const int currentFrame
     w = aa.axis() * aa.angle()/dt;
 }
 
+void cnoid::calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& Iw, const VectorXd& dq){
+    MatrixXd M,H,M_tmp,H_tmp;
+    calcCMJacobian(body, NULL, M_tmp);// 運動量ヤコビアン、角運動量ヤコビアン(重心基準)
+    calcAngularMomentumJacobian(body, NULL, H_tmp);
+    M = body->mass() * M_tmp.block( 0,0, 3, body->numJoints() );
+    H = H_tmp.block( 0,0, 3, body->numJoints() );
+
+    Vector3d r = body->calcCenterOfMass() - body->rootLink()->p();
+    P = body->mass() * ( body->rootLink()->v() - r.cross( body->rootLink()->w() ) ) + M * dq;
+    L = Iw * body->rootLink()->w() + H * dq;
+}
+
 CNOID_IMPLEMENT_PLUGIN_ENTRY(UtilPlugin)
