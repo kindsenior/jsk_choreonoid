@@ -168,7 +168,7 @@ void RMControlPlugin::splineInterpolation(const Vector3d f0, const Vector3d v0, 
 // 目標運動量・角運動量軌道生成
 // void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
 void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
-                                        const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
+                                        const Vector3d initDCM, const Vector3d endDCM, const Vector3d initL, const Vector3d endL, 
                                         Vector3Seq& refPSeq, Vector3Seq& refLSeq){
 
     // BodyItem* bodyItem = motionItem->findOwnerItem<BodyItem>(true);// motionItemからbodyItemを見つける
@@ -242,10 +242,10 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
     const Vector3d landingCM = mBody->calcCenterOfMass();
 
     // 離陸運動量
-    Vector3d takeoffP = m * (landingCM - takeoffCM) / jumptime;
-    Vector3d landingP = takeoffP;
-    takeoffP.z() = (0.5 * g * jumptime + (landingCM.z() - takeoffCM.z()) / jumptime) * m;
-    landingP.z() = takeoffP.z() - m * g * jumptime;
+    Vector3d takeoffDCM = (landingCM - takeoffCM) / jumptime;
+    Vector3d landingDCM = takeoffDCM;
+    takeoffDCM.z() = 0.5 * g * jumptime + (landingCM.z() - takeoffCM.z()) / jumptime;
+    landingDCM.z() = takeoffDCM.z() - g * jumptime;
 
     // 跳躍期角運動量
     Vector3d jumpL = Vector3d::Zero();// 重心回り
@@ -265,6 +265,12 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
     refPSeq = Vector3Seq(motion->numFrames());
     refLSeq = Vector3Seq(motion->numFrames());
 
+    cout << endl;
+    cout << "takeoffCM: " << takeoffCM.transpose() << endl;
+    cout << "landingCM: " << landingCM.transpose() << endl;
+    cout << "initCM: "  << initCM.transpose() << endl;
+    cout << "endCM: " << endCM.transpose() << endl;
+    cout << endl;
 
     // 目標重心位置
     for(int i = 0; i < motion->numFrames(); ++i){
@@ -298,30 +304,30 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
 
         // 運動量
         if( takeoffFrame < i && i < landingFrame){// 跳躍期
-            refCMSeq[i] = (takeoffCM + (landingCM - takeoffCM) * (i-takeoffFrame)*dt /jumptime) * m;
-            refCMSeq[i].z() = - 0.5 * m*g * (i-takeoffFrame)*dt * (i-landingFrame)*dt
-                + (landingCM.z()* (i-takeoffFrame)*dt - takeoffCM.z()* (i-landingFrame)*dt) * m / jumptime;
-            refPSeq[i] = takeoffP;
-            refPSeq[i].z() = - m * g * (i - takeoffFrame)*dt + takeoffP.z();
+            refCMSeq[i] = takeoffCM + (landingCM - takeoffCM) * (i-takeoffFrame)*dt /jumptime;
+            refCMSeq[i].z() = - 0.5 * g * (i-takeoffFrame)*dt * (i-landingFrame)*dt
+                + (landingCM.z()* (i-takeoffFrame)*dt - takeoffCM.z()* (i-landingFrame)*dt) / jumptime;
+            refPSeq[i] = m * takeoffDCM;
+            refPSeq[i].z() = - m * g * (i - takeoffFrame)*dt + m * takeoffDCM.z();
         }else if ( initRMCFrame <= i && i <= endRMCFrame ){// 接地期
             int startFrame,endFrame;
             Vector3d f0,v0,f1,v1;
             if( i <= takeoffFrame ){
                 startFrame = initRMCFrame;
                 endFrame = takeoffFrame;
-                f0 = m * initCM; v0 = initP;
-                f1 = m * takeoffCM; v1 = takeoffP;
+                f0 = initCM; v0 = initDCM;
+                f1 = takeoffCM; v1 = takeoffDCM;
             }else if( landingFrame <= i ){
                 startFrame = landingFrame;
                 endFrame = endRMCFrame;
-                f0 = m * landingCM; v0 = landingP;
-                f1 = m * endCM; v1 = endP;
+                f0 = landingCM; v0 = landingDCM;
+                f1 = endCM; v1 = endDCM;
             }
             double tau = (endFrame - startFrame) * dt;
             Vector3d a0,a1,a2,a3;
             splineInterpolation(f0, v0, f1, v1, tau, a0, a1, a2, a3);// スプライン補間
             refCMSeq[i] = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
-            refPSeq[i] = a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 );
+            refPSeq[i] = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
 
             // 境界条件表示
             if( i == initRMCFrame || i == landingFrame){
@@ -342,11 +348,11 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
 
         }else{// 非制御期
             int nextFrame = std::min(i + 1, motion->numFrames() - 1);
-            refPSeq[i] = (refCMSeq[nextFrame] - refCMSeq[i]) /dt;
+            refPSeq[i] = m * (refCMSeq[nextFrame] - refCMSeq[i]) /dt;
         }
 
         ofs << i*dt ;
-        ofs <<  " " << (refCMSeq[i]/m).transpose();// 重心 2,3,4
+        ofs <<  " " << refCMSeq[i].transpose();// 重心 2,3,4
         ofs <<  " " << refPSeq[i].transpose();// 運動量 5,6,7
         ofs <<  " " << refLSeq[i].transpose();// 角運動量 8,9,10
         ofs << endl;
