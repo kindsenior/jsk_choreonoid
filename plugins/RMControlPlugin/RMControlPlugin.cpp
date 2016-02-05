@@ -454,42 +454,38 @@ void RMControlPlugin::RMControl(){
     mJpr = getCustomJointPath( mBody, mBody->rootLink(), mRFootLink );
 
     // PoseSeqItem loop
-    // Item* pChildItem = bodyItems[0]->childItem();
-    for(int i = 0; i < 1; ++i){
-        // for(Item* pChildItem = bodyItems[0]->childItem(); pChildItem; pChildItem = pChildItem->nextItem()){
-        // PoseSeqItem* pPoseSeqItem = dynamic_cast<PoseSeqItem*>(pChildItem);
-        PoseSeqItemPtr pPoseSeqItem = ItemTreeView::mainInstance()->selectedItems<PoseSeqItem>()[0];
-        mPoseSeqPath = boost::filesystem::path(pPoseSeqItem->filePath());
+    // for(Item* pChildItem = bodyItems[0]->childItem(); pChildItem; pChildItem = pChildItem->nextItem()){
+    // PoseSeqItem* pPoseSeqItem = dynamic_cast<PoseSeqItem*>(pChildItem);
+    PoseSeqItemPtr pPoseSeqItem = ItemTreeView::mainInstance()->selectedItems<PoseSeqItem>()[0];
+    mPoseSeqPath = boost::filesystem::path(pPoseSeqItem->filePath());
+    if( pPoseSeqItem ){
+        cout << "  PoseSeqName: " << pPoseSeqItem->name() << endl;
 
-        if( pPoseSeqItem ){
-            cout << "  PoseSeqName: " << pPoseSeqItem->name() << endl;
+        BodyMotionItem* bodyMotionItem = pPoseSeqItem->bodyMotionItem();
+        BodyMotionPtr motion = bodyMotionItem->motion();
 
-            BodyMotionItem* bodyMotionItem = pPoseSeqItem->bodyMotionItem();
-            BodyMotionPtr motion = bodyMotionItem->motion();
+        // BodyMotion作成
+        BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();// インスタンス生成
+        PoseProvider* provider = pPoseSeqItem->interpolator().get();
+        bmgb->shapeBodyMotion(mBody, provider, bodyMotionItem, true);
+        cout << " Generated motion" << endl;
 
-            // BodyMotion作成
-            BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();// インスタンス生成
-            PoseProvider* provider = pPoseSeqItem->interpolator().get();
-            bmgb->shapeBodyMotion(mBody, provider, bodyMotionItem, true);
-            cout << " Generated motion" << endl;
+        // 目標運動量軌道作成
+        Vector3Seq refPSeq,refLSeq;
+        Vector3d initDCM,endDCM,initL,endL;// initDCMとendPを明示的に0で初期化していない
+        generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
+        // loadRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initP, endP, initL, endL, refPSeq, refLSeq );
+        cout << " Generated ref P/L" << endl;
 
-
+        // Item* pChildItem = bodyItems[0]->childItem();
+        for(int i = 0; i < 3; ++i){
             fnamess.str("");
-            // fnamess << "/home/kunio/Copy/Documents/log/choreonoid/RMControl_"  << motion->frameRate() << ".dat";
-            fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_PL_" << motion->frameRate() << "fps.dat";
+            fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_PL_" << motion->frameRate() << "fps_" << i << ".dat";
             ofstream ofs( fnamess.str().c_str() );
             if( !ofs ){ cerr << "File Open Error" << endl; return;}
             ofs << "time CMx CMy CMz Px Py Pz Lx Ly Lz" << endl;
 
             double dt = 1.0/motion->frameRate();
-
-            // 目標運動量軌道作成
-            Vector3Seq refPSeq,refLSeq;
-            Vector3d initP,endP,initL,endL;
-            // generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initP, endP, initL, endL, refPSeq, refLSeq );
-            loadRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initP, endP, initL, endL, refPSeq, refLSeq );
-            cout << " Generated ref P/L" << endl;
-
 
             // 運動量ヤコビアンが正しいかどうかの確認
             motion->frame(0) >> *mBody;// 腰座標、q更新 body更新
@@ -515,24 +511,14 @@ void RMControlPlugin::RMControl(){
 
             Vector3 P_world;Vector3 L_world;// 運動量、角運動量(世界座標原点)
             mBody->calcTotalMomentum(P_world,L_world);
-            MatrixXd M__,H__,M__tmp,H__tmp;
-            calcCMJacobian(mBody, NULL, M__tmp);// 運動量ヤコビアン、角運動量ヤコビアン(重心基準)
-            calcAngularMomentumJacobian(mBody, NULL, H__tmp);
-            M__ = mBody->mass() * M__tmp.block( 0,0, 3, mBody->numJoints() );
-            H__ = H__tmp.block( 0,0, 3, mBody->numJoints() );
-            Vector3 L__,P__,L_tmp;
-            Vector3d r__ = mBody->centerOfMass() - mBody->rootLink()->p();
-            P__ = mBody->mass() * ( mBody->rootLink()->v() - r__.cross( mBody->rootLink()->w() ) ) + M__ * dq_;
+            Vector3 L_g,P_g;// 運動量ヤコビアン、角運動量ヤコビアン(重心基準)
             calcSubMass( mBody->rootLink(), mSubMasses);
-            Matrix3 I__ = mSubMasses[mBody->rootLink()->index()].Iw;
-            // Matrix3 I__ = body->rootLink()->subIw;
-            L_tmp = I__ * mBody->rootLink()->w() + H__ * dq_;
-            L__ = mBody->centerOfMass().cross(P__) + L_tmp; // 原点回りに変換
+            calcTotalMomentum(P_g, L_g, mBody, mSubMasses[mBody->rootLink()->index()].Iw, dq_);
 
             cout << "correct P " << P_world.transpose() << endl;
-            cout << "my P " << P__.transpose() << endl;
+            cout << "my P " << P_g.transpose() << endl;
             cout << "correct L " << L_world.transpose() << endl;
-            cout << "my L " << L__.transpose() << endl;
+            cout << "my L " << (mBody->centerOfMass().cross(P_g) + L_g).transpose() << endl << endl;// 原点回りに変換
             // ss << "root w " << body->rootLink()->w().transpose() << endl;
 
 
@@ -605,34 +591,9 @@ void RMControlPlugin::RMControl(){
                 lw = laa.axis() * laa.angle()/dt;
                 rw = raa.axis() * raa.angle()/dt;
 
-
-                // 腰座標、q更新  (body更新)
-                motion->frame(currentFrame) >> *mBody;
-
-                // dq,ddq更新
-                MultiValueSeq::Frame q0 = motion->jointPosSeq()->frame(prevFrame);
-                MultiValueSeq::Frame q1 = motion->jointPosSeq()->frame(currentFrame);
-                MultiValueSeq::Frame q2 = motion->jointPosSeq()->frame(nextFrame);
-                for(int k=0; k < motion->numJoints(); ++k){
-                    Link* joint = mBody->joint(k);
-                    joint->q() = q1[k];
-                    joint->dq() = (q2[k] - q1[k]) / dt;
-                    joint->ddq() = (q2[k] - 2.0 * q1[k] + q0[k]) / (dt * dt);
-                }
-
-                // rootLink v,x更新
-                SE3 nextWaistSE3 = motion->linkPosSeq()->frame(nextFrame)[0];
-                Vector3d v_ = nextWaistSE3.translation();
-                Matrix3d R_ = nextWaistSE3.rotation().toRotationMatrix();
-                v_ -= mBody->rootLink()->p(); v_ /= dt;
-                R_ *= mBody->rootLink()->R().inverse();
-                AngleAxis aa = AngleAxis(R_);
-                Vector3d w_ = aa.axis() * aa.angle()/dt;
-
-                mBody->rootLink()->v() = v_;
-                mBody->rootLink()->w() = w_;
-                // mBody->link(BASE_LINK)->v() = v_;
-                // mBody->link(BASE_LINK)->w() = w_;
+                
+                // q,dq,ddq,rootLink p,R,v,w更新
+                updateBodyState(motion, mBody, currentFrame);
 
                 mBody->calcForwardKinematics(true,true);// 状態更新
                 calcSubMass(mBody->rootLink(), mSubMasses);
@@ -859,28 +820,20 @@ void RMControlPlugin::RMControl(){
 
 
                 // 計画後重心軌道をファイル書き出し
-                motion->frame(currentFrame) >> *mBody;// 腰・q更新
-                mBody->calcForwardKinematics();
-                v_ = xib.block(0,0, 3,1);
-                w_ = xib.block(3,0, 3,1);
-                MatrixXd M_,H_,M_tmp,H_tmp;
-                calcCMJacobian(mBody, NULL, M_tmp);
-                calcAngularMomentumJacobian(mBody, NULL, H_tmp);// 運動量ヤコビアン、角運動量ヤコビアン(重心基準)
-                M_ = mBody->mass() * M_tmp.block( 0,0, 3, mBody->numJoints() );
-                H_ = H_tmp.block( 0,0, 3, mBody->numJoints() );
-                calcSubMass(mBody->rootLink(), mSubMasses);// リンク先重心・慣性行列更新
-                Vector3d L_,P_;
-                Vector3d r_ = mBody->calcCenterOfMass() - mBody->rootLink()->p();
-                // cout << "M:" << M << endl;
-                // cout << "H:" << H << endl;
-                // cout << "Iw:" << mSubMasses[mBody->rootLink()->index()].Iw << endl;
-                // cout << "mwc:" << mSubMasses[mBody->rootLink()->index()].mwc << endl;
-                // cout << "m:" << mSubMasses[mBody->rootLink()->index()].m << endl;
-                P_ = mBody->mass() * ( v_ - r_.cross( w_ ) ) + M_ * dq;
-                L_ = mSubMasses[mBody->rootLink()->index()].Iw * w_ + H_ * dq;
-                ofs << " "  << mBody->calcCenterOfMass().transpose();// 重心 2,3,4
-                ofs << " " << P_.transpose() << " " << L_.transpose();// 運動量 5,6,7 角運動量 8,9,10
-                ofs << endl;
+                {
+                    motion->frame(currentFrame) >> *mBody;// 腰・q更新
+                    mBody->calcForwardKinematics();
+
+                    mBody->rootLink()->v() = xib.block(0,0, 3,1);
+                    mBody->rootLink()->w() = xib.block(3,0, 3,1);
+                    Vector3d P,L;
+                    calcSubMass(mBody->rootLink(), mSubMasses);// リンク先重心・慣性行列更新
+                    calcTotalMomentum(P, L, mBody, mSubMasses[mBody->rootLink()->index()].Iw, dq);
+
+                    ofs << " "  << mBody->calcCenterOfMass().transpose();// 重心 2,3,4
+                    ofs << " " << P.transpose() << " " << L.transpose();// 運動量 5,6,7 角運動量 8,9,10
+                    ofs << endl;
+                }
             
             }// end motion loop
 
