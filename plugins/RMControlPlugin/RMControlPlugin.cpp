@@ -17,41 +17,6 @@ MatrixXd pinv(const MatrixXd A){
   }
 }
 
-namespace {
-
-Matrix3d D(Vector3d r)
-{
-    Matrix3d r_cross;
-    r_cross <<
-        0.0,  -r(2), r(1),
-        r(2),    0.0,  -r(0),
-        -r(1), r(0),    0.0;
-    return r_cross.transpose() * r_cross;
-}
-
-}
-
-void RMControlPlugin::calcSubMass(Link* link, vector<SubMass>& subMasses)
-{
-    Matrix3d R = link->R();
-    SubMass& sub = subMasses[link->index()];
-    sub.m = link->m();
-    sub.mwc = link->m() * link->wc();
-
-    for(Link* child = link->child(); child; child = child->sibling()){
-        calcSubMass(child, subMasses);
-        SubMass& childSub = subMasses[child->index()];
-        sub.m += childSub.m;
-        sub.mwc += childSub.mwc;
-    }
-
-    sub.Iw = R * link->I() * R.transpose() + link->m() * D( link->wc() - sub.mwc/sub.m );
-    for(Link* child = link->child(); child; child = child->sibling()){
-        SubMass& childSub = subMasses[child->index()];
-        sub.Iw += childSub.Iw + childSub.m * D( childSub.mwc/childSub.m - sub.mwc/sub.m );
-    }
-}
-
 // ロボットモデル依存の部分あり
 // 各種行列を計算
 void RMControlPlugin::calcMatrixies( MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,

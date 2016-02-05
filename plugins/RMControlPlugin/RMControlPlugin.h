@@ -50,20 +50,6 @@ namespace cnoid{
 
     class RMControlPlugin : public Plugin
     {
-    private:
-        struct SubMass
-        {
-            double m;
-            Vector3 mwc;
-            Matrix3d Iw;
-            SubMass& operator+=(const SubMass& rhs){
-                m += rhs.m;
-                mwc += rhs.mwc;
-                Iw += rhs.Iw;
-                return *this;
-            }
-        };
-
     public:
         std::vector<SubMass> mSubMasses;
         BodyPtr mBody;
@@ -91,8 +77,6 @@ namespace cnoid{
 
             return true;
         }
-
-        void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
 
         // ロボットモデル依存の部分あり
         // 各種行列を計算

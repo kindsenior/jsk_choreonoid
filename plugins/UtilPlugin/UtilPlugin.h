@@ -21,6 +21,19 @@
 
 namespace cnoid{
 
+struct SubMass
+{
+    double m;
+    Vector3 mwc;
+    Matrix3d Iw;
+    SubMass& operator+=(const SubMass& rhs){
+        m += rhs.m;
+        mwc += rhs.mwc;
+        Iw += rhs.Iw;
+        return *this;
+    }
+};
+
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
 int getContactState( const PosePtr pose1, const PosePtr pose2, const int linkId );
@@ -47,6 +60,10 @@ void updateBodyState( BodyMotionPtr& motion, BodyPtr& body, const int currentFra
 void calcDifferential(const BodyMotionPtr& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq);
 
 void calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& Iw, const VectorXd& dq);
+
+Matrix3d D(Vector3d r);
+
+void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
 
 class UtilPlugin : public Plugin
 {
