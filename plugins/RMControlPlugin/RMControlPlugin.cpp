@@ -175,10 +175,14 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
     const BodyMotionPtr motion = motionItem->motion();
 
     stringstream ss,fnamess;
-    // fnamess << "/home/kunio/Dropbox/log/choreonoid/refPL_" << motion->frameRate() << ".dat";
     fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion->frameRate() << "fps.dat";
     ofstream ofs(fnamess.str().c_str());
     ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
+
+    fnamess.str("");
+    fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_initPL_" << motion->frameRate() << "fps.dat";
+    ofstream ofs1(fnamess.str().c_str());
+    ofs1 << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
 
     const double dt = 1.0/motion->frameRate();
     const double g = 9.80665;
@@ -266,8 +270,23 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
     for(int i = 0; i < motion->numFrames(); ++i){
         motion->frame(i) >> *mBody;
         mBody->calcForwardKinematics();
-        refCMSeq[i] = m * mBody->calcCenterOfMass();
-        // ss << "refCM " << refCMSeq[i].transpose() << endl;
+        refCMSeq[i] = mBody->calcCenterOfMass();
+
+        Vector3d v,w;
+        VectorXd dq,ddq;
+        calcDifferential(motion, i, v, w, dq, ddq);
+        mBody->rootLink()->v() = v;
+        mBody->rootLink()->w() = w;
+        Vector3d P,L;
+        calcSubMass(mBody->rootLink(), mSubMasses);// リンク先重心・慣性行列更新
+        calcTotalMomentum(P, L, mBody, mSubMasses[mBody->rootLink()->index()].Iw, dq);
+
+        ofs1 << dt*i;
+        ofs1 << " " << refCMSeq[i].transpose();//重心 2,3,4
+        ofs1 << " " << P.transpose();// 運動量 5,6,7
+        ofs1 << " " << L.transpose();// 角運動量 8,9,10
+        ofs1 << endl;
+        if(i == 1000)cout << "refCM " << refCMSeq[i].transpose() << endl;
     }
 
     // 目標運動量 motion loop
