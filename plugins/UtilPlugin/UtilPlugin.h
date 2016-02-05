@@ -68,19 +68,18 @@ void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
 class UtilPlugin : public Plugin
 {
 public:
+    UtilPlugin() : Plugin("Util")
+    {
+        require("Body");
+        require("PoseSeq");
+    }
     
-UtilPlugin() : Plugin("Util")
-{
-require("Body");
-require("PoseSeq");
-}
-    
-virtual bool initialize()
-{
-return true;
-}
+    virtual bool initialize()
+    {
+        return true;
+    }
 
-static void getFootLink( Link** lFootLink, Link** rFootLink, const BodyPtr& body );
+    static void getFootLink( Link** lFootLink, Link** rFootLink, const BodyPtr& body );
 
 };
 
