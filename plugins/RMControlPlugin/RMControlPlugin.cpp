@@ -495,8 +495,7 @@ void RMControlPlugin::RMControl(){
             for(int k=0; k < motion->numJoints(); ++k){
                 Link* joint = mBody->joint(k);
                 joint->q() = q[k];
-                joint->dq() = 0.1;
-                // joint->dq() = 0;
+                joint->dq() = -0.3;
                 joint->ddq() = 0;
                 dq_[k] = joint->dq();
             }
@@ -519,9 +518,6 @@ void RMControlPlugin::RMControl(){
             cout << "my P " << P_g.transpose() << endl;
             cout << "correct L " << L_world.transpose() << endl;
             cout << "my L " << (mBody->centerOfMass().cross(P_g) + L_g).transpose() << endl << endl;// 原点回りに変換
-            // ss << "root w " << body->rootLink()->w().transpose() << endl;
-
-
 
             // // 脚のヤコビアンが正しいかどうかの確認
             // motion->frame(0) >> *body;// 腰座標、q更新 body更新
@@ -550,7 +546,6 @@ void RMControlPlugin::RMControl(){
             // motion loop 計算 step 2 〜 6
             // for(int currentFrame = 0; currentFrame < 1; ++currentFrame){
             for(int currentFrame = 0; currentFrame < motion->numFrames(); ++currentFrame){
-                // for(int currentFrame = 0; currentFrame < 3; ++currentFrame){
 
                 ofs << currentFrame * dt;
                 // ss << "###########################################################" << endl;
@@ -559,7 +554,6 @@ void RMControlPlugin::RMControl(){
                 // prevFrame,nextFrame設定
                 int prevFrame = std::max(currentFrame - 1, 0);
                 int nextFrame = std::min(currentFrame + 1, motion->numFrames() - 1);
-
 
                 // // 足先更新
                 // Vector3d v_,w_;
@@ -591,22 +585,11 @@ void RMControlPlugin::RMControl(){
                 lw = laa.axis() * laa.angle()/dt;
                 rw = raa.axis() * raa.angle()/dt;
 
-                
                 // q,dq,ddq,rootLink p,R,v,w更新
                 updateBodyState(motion, mBody, currentFrame);
 
                 mBody->calcForwardKinematics(true,true);// 状態更新
                 calcSubMass(mBody->rootLink(), mSubMasses);
-                // cout << "mSubMasses" << endl;
-                // for(int i=0; i < mBody->numJoints(); ++i){
-                //     Link* joint = mBody->joint(i);
-                //     cout << mSubMasses[joint->jointId()].Iw << endl;
-                // }
-
-                // bodyItems[0]->calcForwardKinematics(true,true);
-                // ss << "root v from motion " << v_.transpose() << endl;
-                // ss << "root w from motion " << w_.transpose() << endl;
-
 
                 VectorXd xib(6);// xib
                 xib.block(0,0, 3,1) = mBody->rootLink()->v();
@@ -621,20 +604,12 @@ void RMControlPlugin::RMControl(){
                 // ss << "arm w" << endl << mBody->link("LARM_JOINT3")->w() << endl;
                 // ss << "leg w" << endl << mBody->link("LLEG_JOINT5")->w() << endl;
 
-
-
                 // step 2
                 // cout << " step2";
                 MatrixXd A,A_,Jl,Jr,Fl,Fr,M,H,Mb,Mfree,Hb,Hfree,Ml,Mr,Hl,Hr;
                 vector<Constraint> jointConstraintVec;
                 calcMatrixies( A_, Jl, Jr, Fl, Fr,M,H,Mb,Mfree,Hb,Hfree, Ml, Mr, Hl, Hr, jointConstraintVec);
                 A = S * A_;
-
-                // Matrix3d I_ = mBody->rootLink()->subIw;
-                // vector<SubMassInertia> subMassInertias(mBody->numLinks());
-                // calcSubMassInertia(mBody->rootLink(), mSubMassInertias);
-                Matrix3d I_ = mSubMasses[mBody->rootLink()->index()].Iw;
-
 
                 int dof = 0;// free関節の数
                 for(int i = 0; i < jointConstraintVec.size(); ++i)if(jointConstraintVec[i] == Free)++dof;
@@ -645,13 +620,9 @@ void RMControlPlugin::RMControl(){
                 // cout << " step3";
                 // 目標足先速度
                 VectorXd xil(6);// xil
-                // xil.block(0,0, 3,1) = mBody->link("LLEG_JOINT5")->v();
-                // xil.block(3,0, 3,1) = mBody->link("LLEG_JOINT5")->w();
                 xil.block(0,0, 3,1) = lv;
                 xil.block(3,0, 3,1) = lw;
                 VectorXd xir(6);// xir
-                // xir.block(0,0, 3,1) = mBody->link("RLEG_JOINT5")->v();
-                // xir.block(3,0, 3,1) = mBody->link("RLEG_JOINT5")->w();
                 xir.block(0,0, 3,1) = rv;
                 xir.block(3,0, 3,1) = rw;
 
@@ -664,7 +635,6 @@ void RMControlPlugin::RMControl(){
                 MHr.block(0,0, 3,6) = Mr; MHr.block(3,0, 3,6) = Hr;
                 VectorXd y(numSelects);
                 y = S * (refM  - MHl * xil - MHr * xir);
-                // cout << "refM " << refM.transpose() << endl;
 
                 // cout << " Finished Step 3" << endl;
 
@@ -746,12 +716,12 @@ void RMControlPlugin::RMControl(){
                 // ss << "dqfree " << dqfree.transpose() << endl;
                 // cout << "dq " << dq.transpose() << endl;
 
-
-
                 // RootLink位置更新
+                motion->frame(currentFrame) >> *mBody;
                 mBody->rootLink()->p() += xib.block(0,0, 3,1) * dt;
                 Vector3d omega = xib.block(3,0, 3,1);
                 if( omega.norm() != 0 ) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
+                else cout << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
 
 
                 // // BaseLink更新
@@ -766,8 +736,6 @@ void RMControlPlugin::RMControl(){
                 mBody->calcForwardKinematics();// 状態更新
                 // bodyItems[0]->calcForwardKinematics();// 状態更新
 
-
-
                 // 足先修正
                 // mJpl->calcInverseKinematics(lp,lR);
                 // mJpr->calcInverseKinematics(rp,rR);
@@ -775,49 +743,6 @@ void RMControlPlugin::RMControl(){
                 motion->frame(nextFrame) << *mBody;// frame更新
             
                 // cout << " Finished Step 6" << endl;
-
-                // ss << endl;
-                // ss << "leg vel " << mBody->link("LLEG_JOINT5")->v().transpose() << endl;
-                // ss << "leg w " << mBody->link("LLEG_JOINT5")->w().transpose() << endl;
-                // ss << "rleg vel " << mBody->link("RLEG_JOINT5")->v().transpose() << endl;
-                // ss << "rleg w " << mBody->link("RLEG_JOINT5")->w().transpose() << endl;
-
-
-                // MultiValueSeq::Frame q = motion->jointPosSeq()->frame(nextFrame);
-                // ss << "q " ;
-                // for(int i = 0; i < mBody->numJoints(); ++i)ss << q[i] << " " ;
-                // ss << endl;
-
-
-                // // matrixファイル書き出し
-                // static bool writeFlg = true;
-                // bool nanFlg = false;
-                // double nowt = currentFrame * dt;
-                // for(int i = 0; i < xib.size(); ++i)if(isnan(abs(xib[i])))nanFlg = true;
-                // for(int i = 0; i < dq.size(); ++i)if(isnan(abs(dq[i])))nanFlg = true;
-                // // if(nanFlg && writeFlg){
-                // // if(true){
-                // if (nowt == 1.1 || nowt == 1.5 || nowt == 2){
-                //   writeFlg = false;
-                //   MatrixXd Hlleg = H.block(0,mLFootLink->jointId(), 3,mJpl->numJoints());
-                //   MatrixXd Hrleg = H.block(0,mRFootLink->jointId(), 3,mJpr->numJoints());
-                //   MatrixXd matrixList[] = {A,A_,Jl,Jr,Fl,Fr,M,H,Mb,Mfree,Hb,Hfree,Ml,Mr,Hl,Hr,MHl,MHr,Hlleg,Hrleg,I_,S,xib,xil,xir,dqfree};
-                //   string nameList[] = {"A", "A_", "Jl", "Jr", "Fl", "Fr", "M", "H", "Mb", "Mfree", "Hb", "Hfree",
-                //                        "Ml", "Mr", "Hl", "Hr", "MHl", "MHr", "Hlleg", "Hrleg", "I", "S", "xib", "xil", "xir", "dqfree"};
-                //   stringstream matrixss;
-                //   matrixss << "/home/kunio/matricies_" << nowt;
-                //   ofstream matfs(matrixss.str().c_str());
-                //   for(int i = 0; i < 26; ++i){
-                //     matfs << "# name: " << nameList[i] <<endl;
-                //     matfs << "# type: matrix" << endl;
-                //     matfs << "# rows: " << matrixList[i].rows() << endl;
-                //     matfs << "# columns: " << matrixList[i].cols() << endl;
-                //     matfs << matrixList[i] << endl;
-                //   }
-                //   matfs.close();
-                // }
-                // cout << " Finished writing matrix files" << endl;
-
 
                 // 計画後重心軌道をファイル書き出し
                 {
