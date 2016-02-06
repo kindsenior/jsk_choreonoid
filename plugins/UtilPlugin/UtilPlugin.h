@@ -55,7 +55,7 @@ int getPrevContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr pose
 
 bool isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body );
 
-void updateBodyState( BodyMotionPtr& motion, BodyPtr& body, const int currentFrame );
+void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame );
 
 void calcDifferential(const BodyMotionPtr& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq);
 

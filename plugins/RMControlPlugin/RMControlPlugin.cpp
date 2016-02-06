@@ -551,7 +551,7 @@ void RMControlPlugin::RMControl(){
                 rw = raa.axis() * raa.angle()/dt;
 
                 // q,dq,ddq,rootLink p,R,v,w更新
-                updateBodyState(motion, mBody, currentFrame);
+                updateBodyState(mBody, motion, currentFrame);
 
                 mBody->calcForwardKinematics(true,true);// 状態更新
                 calcSubMass(mBody->rootLink(), mSubMasses);

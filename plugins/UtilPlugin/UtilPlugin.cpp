@@ -165,7 +165,7 @@ void UtilPlugin::getFootLink( Link** plFootLink, Link** prFootLink, const BodyPt
   cout << "Finished setting foot links" << endl;
 }
 
-void cnoid::updateBodyState( BodyMotionPtr& motion, BodyPtr& body, const int currentFrame ){
+void cnoid::updateBodyState( BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame ){
     int prevFrame = max(currentFrame-1, 0);
     int nextFrame = min(currentFrame+1, motion->numFrames()-1);
 
