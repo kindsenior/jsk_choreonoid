@@ -18,6 +18,7 @@
 #include <cnoid/Vector3Seq>
 #include <cnoid/LeggedBodyHelper>
 #include <cnoid/src/Body/Jacobian.h>
+#include <cnoid/Vector3SeqItem>
 
 namespace cnoid{
 
@@ -64,6 +65,8 @@ void calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& 
 Matrix3d D(Vector3d r);
 
 void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
+
+void setSubItem(std::string seqName, const Vector3SeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem);
 
 class UtilPlugin : public Plugin
 {

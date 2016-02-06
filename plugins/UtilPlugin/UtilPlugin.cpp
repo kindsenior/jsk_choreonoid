@@ -261,4 +261,15 @@ void cnoid::calcSubMass(Link* link, vector<SubMass>& subMasses){
     }
 }
 
+void cnoid::setSubItem(std::string seqName, const Vector3SeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem){
+    Vector3SeqItemPtr seqItemPtr = pBodyMotionItem->findSubItem<Vector3SeqItem>(seqName);
+    if(!seqItemPtr){
+        seqItemPtr = new Vector3SeqItem(seqPtr);
+        seqItemPtr->setName(seqName);
+        pBodyMotionItem->addSubItem(seqItemPtr);
+    }else{
+        seqItemPtr->seq() = seqPtr;
+    }
+}
+
 CNOID_IMPLEMENT_PLUGIN_ENTRY(UtilPlugin)
