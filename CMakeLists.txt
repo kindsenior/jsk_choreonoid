@@ -73,14 +73,15 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/lib/choreonoid-${choreonoid_VER})
 
-if ( CLEAN )
+option(CLEAN "Clean" OFF)
+if(CLEAN)
 	message("clean")
 	execute_process(
 		COMMAND cmake -E chdir ${PROJECT_SOURCE_DIR}
 		make clean -f Makefile.plugins
 		)
 	return()
-endif( CLEAN )
+endif(CLEAN)
 
 
 message("Build by cmake")
