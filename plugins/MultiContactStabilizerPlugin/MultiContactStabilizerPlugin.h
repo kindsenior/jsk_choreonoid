@@ -42,6 +42,8 @@
 // #include <DynamicsPlugin/DynamicsPlugin.h>
 #include <UtilPlugin/UtilPlugin.h>
 
+#include "Controller.h"
+
 namespace cnoid{
 
     class MultiContactStabilizerPlugin : public Plugin
