@@ -8,7 +8,8 @@ using namespace cnoid;
 using namespace std;
 using namespace qpOASES;
 
-void MultiContactStabilizerPlugin::generateSeq(){
+void MultiContactStabilizerPlugin::generateSeq()
+{
     stringstream ss;
     ss << mPoseSeqPath.stem().string() << "_MCS_initPL_" << frameRate << "fps.dat";
     ofstream ofs( ((filesystem::path) mPoseSeqPath.parent_path() / ss.str()).string().c_str() );
@@ -39,7 +40,8 @@ void MultiContactStabilizerPlugin::generateSeq(){
     ofs.close();
 }
 
-void MultiContactStabilizerPlugin::MultiContactStabilizer(){
+void MultiContactStabilizerPlugin::MultiContactStabilizer()
+{
     stringstream ss,fnamess;
     MessageView::instance()->putln("MultiContactStabilizer called !");
     cout << "MultiContactStabilizer()" << endl;
