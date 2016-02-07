@@ -6,6 +6,9 @@ set(headers UtilPlugin.h)
 
 add_library(${TARGET} SHARED UtilPlugin)
 
+# -l
+target_link_libraries(${TARGET} CnoidPoseSeqPlugin)
+
 set_target_properties(${TARGET}
   PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/choreonoid-${choreonoid_VER})
 
