@@ -21,9 +21,9 @@ void MultiContactStabilizerPlugin::MultiContactStabilizer(){
     cout << pPoseSeqItem->name() << endl;
     mPoseSeqPath = boost::filesystem::path(pPoseSeqItem->filePath());
 
-    PoseSeqPtr poseSeq = pPoseSeqItem->poseSeq();
     BodyMotionItem* pBodyMotionItem = pPoseSeqItem->bodyMotionItem();
     BodyMotionPtr motion = pBodyMotionItem->motion();
+    PoseSeqPtr poseSeqPtr = pPoseSeqItem->poseSeq();
 
     // BodyMotion作成
     BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();
