@@ -15,8 +15,8 @@ void MultiContactStabilizerPlugin::MultiContactStabilizer(){
     ItemList<PoseSeqItem> selectedItemList = ItemTreeView::mainInstance()->selectedItems<Item>();
     if(selectedItemList.empty()){cout << "Select PoseSeqItem!!" << endl; return;}
     BodyItem* pBodyItem = selectedItemList[0]->findOwnerItem<BodyItem>();
-    mBody = pBodyItem->body();
-    cout << "Robot:" << mBody->name() << endl;
+    body = pBodyItem->body();
+    cout << "Robot:" << body->name() << endl;
     PoseSeqItem* pPoseSeqItem = selectedItemList[0];
     cout << pPoseSeqItem->name() << endl;
     mPoseSeqPath = boost::filesystem::path(pPoseSeqItem->filePath());
@@ -28,8 +28,8 @@ void MultiContactStabilizerPlugin::MultiContactStabilizer(){
     // BodyMotion作成
     BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();
     PoseProvider* provider = pPoseSeqItem->interpolator().get();
-    bmgb->shapeBodyMotion(mBody, provider, pBodyMotionItem, true);
-    cout << " Generated motion" << endl;
+    bmgb->shapeBodyMotion(body, provider, mBodyMotionItem, true);
+    cout << "Generated motion" << endl;
 
     frameRate = motion->frameRate();
     dt = 1.0/frameRate;
@@ -38,8 +38,8 @@ void MultiContactStabilizerPlugin::MultiContactStabilizer(){
 
 
     // 左右足Pathを設定
-    // mJpl = getCustomJointPath( mBody, mBody->rootLink(), mLFootLink );
-    // mJpr = getCustomJointPath( mBody, mBody->rootLink(), mRFootLink );
+    // mJpl = getCustomJointPath( body, body->rootLink(), mLFootLink );
+    // mJpr = getCustomJointPath( body, body->rootLink(), mRFootLink );
 
     //     BodyMotionItem* bodyMotionItem = pPoseSeqItem->bodyMotionItem();
     //     BodyMotionPtr motion = bodyMotionItem->motion();
@@ -47,7 +47,7 @@ void MultiContactStabilizerPlugin::MultiContactStabilizer(){
     //     // BodyMotion作成
     //     BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();// インスタンス生成
     //     PoseProvider* provider = pPoseSeqItem->interpolator().get();
-    //     bmgb->shapeBodyMotion(mBody, provider, bodyMotionItem, true);
+    //     bmgb->shapeBodyMotion(body, provider, bodyMotionItem, true);
     //     cout << " Generated motion" << endl;
 
     //     // 目標運動量軌道作成
@@ -74,10 +74,10 @@ void MultiContactStabilizerPlugin::MultiContactStabilizer(){
     //             int prevFrame = std::max(currentFrame - 1, 0);
     //             int nextFrame = std::min(currentFrame + 1, motion->numFrames() - 1);
 
-    //             // motion->frame(nextFrame) >> *mBody;
-    //             // mBody->calcForwardKinematics();
+    //             // motion->frame(nextFrame) >> *body;
+    //             // body->calcForwardKinematics();
 
-    //             motion->frame(nextFrame) << *mBody;// frame更新
+    //             motion->frame(nextFrame) << *body;// frame更新
             
     //         }// end motion loop
 

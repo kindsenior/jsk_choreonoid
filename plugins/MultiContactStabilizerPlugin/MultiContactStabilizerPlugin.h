@@ -48,7 +48,7 @@ namespace cnoid{
     class MultiContactStabilizerPlugin : public Plugin
     {
     public:
-        BodyPtr mBody;
+        BodyPtr body;
         boost::filesystem::path mPoseSeqPath;
         int frameRate;
         double dt;
