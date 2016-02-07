@@ -83,15 +83,19 @@ if(CLEAN)
 	return()
 endif(CLEAN)
 
+message("Build 3rdparty")
+file(GLOB _3rdparty_dirs "${PROJECT_SOURCE_DIR}/3rdparty/*")
+foreach(_3rdparty_dir ${_3rdparty_dirs})
+	message("Build: ${_3rdparty_dir}")
+	add_subdirectory(${_3rdparty_dir})
+endforeach()
 
-message("Build by cmake")
+message("Build plugins")
 # file(GLOB plugins RELATIVE  ${PROJECT_SOURCE_DIR}/plugins "${PROJECT_SOURCE_DIR}/plugins/*Plugin")
 file(GLOB _plugin_dirs "${PROJECT_SOURCE_DIR}/plugins/*Plugin")
 # message("Found Plugins: ${plugins}")	
 foreach(_plugin_dir ${_plugin_dirs})
-
 	message("Build: ${_plugin_dir}")
 	add_subdirectory(${_plugin_dir})
-
 endforeach()
 
