@@ -69,6 +69,16 @@ void MultiContactStabilizerPlugin::MultiContactStabilizer(){
 
     generateSeq();
 
+    // 接触候補セットの作成
+    std::set<Link*> contactLinkCantidateSet;
+    for(PoseSeq::iterator poseIter = (++poseSeqPtr->begin()); poseIter != poseSeqPtr->end(); incContactPose(poseIter,poseSeqPtr,body)){
+        cout << endl << endl;
+        if(!isContactStateChanging(poseIter, poseSeqPtr, body))continue;
+        PosePtr curPosePtr = poseIter->get<Pose>();
+        for(Pose::LinkInfoMap::iterator linkInfoIter = curPosePtr->ikLinkBegin(); linkInfoIter != curPosePtr->ikLinkEnd(); ++linkInfoIter){
+            if(linkInfoIter->second.isTouching() && !linkInfoIter->second.isSlave())contactLinkCantidateSet.insert(body->link(linkInfoIter->first));//接触している且つslaveでない
+        }
+    }
 
     // 左右足Pathを設定
     // mJpl = getCustomJointPath( body, body->rootLink(), mLFootLink );
