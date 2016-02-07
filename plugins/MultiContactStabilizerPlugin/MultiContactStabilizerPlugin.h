@@ -49,6 +49,9 @@ namespace cnoid{
     {
     public:
         BodyPtr body;
+        BodyMotionItem* mBodyMotionItem;
+        BodyMotionPtr motion;
+
         boost::filesystem::path mPoseSeqPath;
         int frameRate;
         double dt;
