@@ -77,6 +77,7 @@ namespace cnoid{
             return true;
         }
 
+        void generateSeq();
         void MultiContactStabilizer();
 
     };
