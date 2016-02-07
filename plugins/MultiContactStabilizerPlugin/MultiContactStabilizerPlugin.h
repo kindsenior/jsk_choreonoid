@@ -6,41 +6,40 @@
 #include <sstream>
 #include <fstream>
 #include <map>
+// #include <set>
 
-#include <unistd.h>
+// #include <unistd.h>
+
+// #include <boost/format.hpp>
+#include <boost/bind.hpp>
 
 #include <cnoid/Plugin>
 #include <cnoid/ItemTreeView>
 #include <cnoid/BodyItem>
-#include <cnoid/ToolBar>
-#include <boost/bind.hpp>
+// #include <cnoid/ToolBar>
 #include <cnoid/MessageView>
-#include <cnoid/YAMLReader>
+// #include <cnoid/YAMLReader>
 
-#include <cnoid/src/Body/Jacobian.h>
+// #include <cnoid/src/Body/Jacobian.h>
 #include <cnoid/src/PoseSeqPlugin/PoseSeqItem.h>
-#include <cnoid/src/PoseSeqPlugin/gettext.h>
+// #include <cnoid/src/PoseSeqPlugin/gettext.h>
 #include <cnoid/src/PoseSeqPlugin/BodyMotionGenerationBar.h>
-#include <cnoid/Vector3SeqItem>
-
-#include <cnoid/PoseProvider>
-#include <cnoid/BodyMotionPoseProvider>
-#include <cnoid/PoseProviderToBodyMotionConverter>
-#include <cnoid/BodyMotionUtil>
-#include <cnoid/TimeBar>
-#include <cnoid/Archive>
-#include <cnoid/MenuManager>
-#include <cnoid/MainWindow>
-#include <cnoid/SpinBox>
-#include <cnoid/Button>
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <boost/format.hpp>
-#include <set>
+// #include <cnoid/Vector3SeqItem>
+// #include <cnoid/PoseProvider>
+// #include <cnoid/BodyMotionPoseProvider>
+// #include <cnoid/PoseProviderToBodyMotionConverter>
+#include <cnoid/FileUtil>
+// #include <cnoid/BodyMotionUtil>
+// #include <cnoid/TimeBar>
+// #include <cnoid/Archive>
+// #include <cnoid/MenuManager>
+// #include <cnoid/MainWindow>
+// #include <cnoid/SpinBox>
+// #include <cnoid/Button>
+// #include <QDialog>
+// #include <QDialogButtonBox>
 
 // #include <DynamicsPlugin/DynamicsPlugin.h>
-#include <cnoid/FileUtil>
-
 #include <UtilPlugin/UtilPlugin.h>
 
 namespace cnoid{
