@@ -24,10 +24,7 @@
 /* #include <DynamicsPlugin/DynamicsPlugin.h> */
 #include <UtilPlugin/UtilPlugin.h>
 
-
-using namespace boost;
-using namespace cnoid;
-using namespace std;
+namespace cnoid{
 
 class HrpsysSequenceFileExportPlugin : public Plugin
 {
@@ -43,7 +40,7 @@ class HrpsysSequenceFileExportPlugin : public Plugin
   virtual bool initialize()
   {
     ToolBar* bar = new ToolBar("HrpsysSequenceFileExportPlugin");
-    bar->addButton("Export")->sigClicked().connect(bind(&HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport, this));
+    bar->addButton("Export")->sigClicked().connect(boost::bind(&HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport, this));
     /* bar->setVisibleByDefault(true); */ /* 関係ない?? */
 
     addToolBar(bar);
@@ -54,3 +51,5 @@ class HrpsysSequenceFileExportPlugin : public Plugin
   void HrpsysSequenceFileExport();
 
 };
+
+}

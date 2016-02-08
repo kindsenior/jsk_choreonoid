@@ -24,9 +24,7 @@
 
 #include "PreviewController.h"
 
-using namespace boost;
-using namespace cnoid;
-using namespace std;
+namespace cnoid{
 
 class PreviewControlPlugin : public Plugin
 {
@@ -42,7 +40,7 @@ class PreviewControlPlugin : public Plugin
   virtual bool initialize()
   {
     ToolBar* bar = new ToolBar("PreviewControl");
-    bar->addButton("PreviewControl")->sigClicked().connect(bind(&PreviewControlPlugin::PreviewControl, this));
+    bar->addButton("PreviewControl")->sigClicked().connect(boost::bind(&PreviewControlPlugin::PreviewControl, this));
     /* bar->setVisibleByDefault(true); */ /* 関係ない?? */
     addToolBar(bar);
 
@@ -59,3 +57,5 @@ class PreviewControlPlugin : public Plugin
   void PreviewControl();
 
 };
+
+}
