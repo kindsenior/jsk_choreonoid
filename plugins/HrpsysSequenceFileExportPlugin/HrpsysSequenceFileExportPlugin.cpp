@@ -43,7 +43,7 @@ void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport(){
 
       // 同じ時刻のキーポーズが連続するとダメ
       for( int i = (int) (prevPoseIter->time()*frameRate); i < poseIter->time()*frameRate; ++i ){
-          fprintf( fp,"%lf %d %d 0 0   5 5 5 5\n", (double)i/frameRate, contactStates[0], contactStates[1] );
+          fprintf(fp,"%lf %d %d 0 0   5 5 5 5\n", (double)i/frameRate, contactStates[0] > 0 ? 0 : 1, contactStates[1] > 0 ? 0 : 1);// hrpsys-baseの実装に合わせて静止接触だけ1
       }
       cout << endl << endl;
   }
