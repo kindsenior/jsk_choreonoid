@@ -37,7 +37,7 @@ typedef struct
     dmatrix systemMat;// A
     dmatrix inputMat;// B
     // dmatrix outputMat;
-}MPCParam;
+}ModelPreviewControllerParam;
 
 class ModelPreviewControl
 {
@@ -55,7 +55,7 @@ typedef struct
     Vector3 CM;
     Vector3 P;
     Vector3 L;
-}MCSParam;
+}MultiContactStabilizerParam;
 
 class MultiContactStabilizer : public ModelPreviewControl
 {
