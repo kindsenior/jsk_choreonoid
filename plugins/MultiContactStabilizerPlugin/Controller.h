@@ -39,7 +39,7 @@ typedef struct
     // dmatrix outputMat;
 }ModelPreviewControllerParam;
 
-class ModelPreviewControl
+class CNOID_EXPORT ModelPreviewController
 {
 public:
     int numWindows;// N
@@ -57,7 +57,7 @@ typedef struct
     Vector3 L;
 }MultiContactStabilizerParam;
 
-class MultiContactStabilizer : public ModelPreviewControl
+class CNOID_EXPORT MultiContactStabilizer : public ModelPreviewController
 {
 public:
     std::vector<MCSParam> MCSParamVec;
