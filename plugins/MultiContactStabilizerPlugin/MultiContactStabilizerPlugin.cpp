@@ -40,7 +40,7 @@ void MultiContactStabilizerPlugin::generateSeq()
     ofs.close();
 }
 
-void MultiContactStabilizerPlugin::MultiContactStabilizer()
+void MultiContactStabilizerPlugin::execControl()
 {
     stringstream ss,fnamess;
     MessageView::instance()->putln("MultiContactStabilizer called !");

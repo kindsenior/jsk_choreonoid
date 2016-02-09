@@ -70,7 +70,7 @@ namespace cnoid{
             ToolBar* bar = new ToolBar("MultiContactStabilizer");
 
             bar->addButton("MCS")
-                ->sigClicked().connect(boost::bind(&MultiContactStabilizerPlugin::MultiContactStabilizer, this));
+                ->sigClicked().connect(boost::bind(&MultiContactStabilizerPlugin::execControl, this));
 
             bar->setVisibleByDefault(true);// 効かない?
             addToolBar(bar);
@@ -79,7 +79,7 @@ namespace cnoid{
         }
 
         void generateSeq();
-        void MultiContactStabilizer();
+        void execControl();
 
     };
 
