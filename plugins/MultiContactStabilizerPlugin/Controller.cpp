@@ -14,18 +14,19 @@ MultiContactStabilizer::MultiContactStabilizer()
     stateDim = 6;
 }
 
-void MultiContactStabilizer::calcSystemMatrix(dmatrix& systemMat, MultiContactStabilizerParam& mcsParam)
+void MultiContactStabilizerParam::calcSystemMatrix(dmatrix& systemMat)
 {
-    double Fz = mcsParam.F.z();
+    const double m = controller->m;
+    double Fz = F.z();
     systemMat(0,1) = dt;
     systemMat(2,3) = dt;
     systemMat(4,2) = -dt*Fz/m;
     systemMat(5,0) = dt*Fz/m;
 }
 
-void MultiContactStabilizer::calcInputMatrix(dmatrix& inputMat, MultiContactStabilizerParam& mcsParam)
+void MultiContactStabilizerParam::calcInputMatrix(dmatrix& inputMat)
 {
-    std::vector<ContactConstraintParam> ccParamVec = mcsParam.ccParamVec;
+    const int stateDim = controller->stateDim;
 
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
@@ -37,7 +38,7 @@ void MultiContactStabilizer::calcInputMatrix(dmatrix& inputMat, MultiContactStab
         R2.block(3,3,3,3) = R;
         dmatrix unitInputMat = dmatrix(stateDim,unitInputDim);
         double T2_2 = dt*dt/2;
-        double beta = dt*(p.z()-mcsParam.CM.z());
+        double beta = dt*(p.z()-CM.z());
         unitInputMat <<
             T2_2,0, 0,        0, 0,0,
             dt,  0, 0,        0, 0,0,
@@ -49,10 +50,8 @@ void MultiContactStabilizer::calcInputMatrix(dmatrix& inputMat, MultiContactStab
     }
 }
 
-void MultiContactStabilizer::calcEqualMatrix(dmatrix& equalMat, MultiContactStabilizerParam& mcsParam)
+void MultiContactStabilizerParam::calcEqualMatrix(dmatrix& equalMat)
 {
-    std::vector<ContactConstraintParam> ccParamVec = mcsParam.ccParamVec;
-
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
         Matrix33 R = (*iter).R;
@@ -62,20 +61,16 @@ void MultiContactStabilizer::calcEqualMatrix(dmatrix& equalMat, MultiContactStab
     }
 }
 
-void MultiContactStabilizer::calcEqualVector(dvector& equalVec, MultiContactStabilizerParam& mcsParam)
+void MultiContactStabilizerParam::calcEqualVector(dvector& equalVec)
 {
-    std::vector<ContactConstraintParam> ccParamVec = mcsParam.ccParamVec;
-
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
-        equalVec((*iter).numEquals*idx) = mcsParam.F.z();
+        equalVec((*iter).numEquals*idx) = F.z();
     }
 }
 
-void MultiContactStabilizer::calcInequalMatrix(dmatrix& inequalMat, MultiContactStabilizerParam& mcsParam)
+void MultiContactStabilizerParam::calcInequalMatrix(dmatrix& inequalMat)
 {
-    std::vector<ContactConstraintParam> ccParamVec = mcsParam.ccParamVec;
-
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
         Matrix33 R = (*iter).R;
@@ -91,10 +86,8 @@ void MultiContactStabilizer::calcInequalMatrix(dmatrix& inequalMat, MultiContact
     }
 }
 
-void MultiContactStabilizer::calcMinimumVector(dvector& minVec, MultiContactStabilizerParam& mcsParam)
+void MultiContactStabilizerParam::calcMinimumVector(dvector& minVec)
 {
-    std::vector<ContactConstraintParam> ccParamVec = mcsParam.ccParamVec;
-
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
 

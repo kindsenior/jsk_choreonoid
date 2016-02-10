@@ -60,23 +60,14 @@ public:
 
     ModelPreviewController();
 
-    virtual void calcInputMatrix(){};
-    virtual void calcSystemMatrix(){};
-    virtual void calcEqualMatrix(){};
-    virtual void calcEqualVector(){};
-    virtual void calcInequalMatrix(){};
-    virtual void calcMinimumVector(){};
-    virtual void calcInputVector(){};
+    // virtual void calcInputMatrix(){};
+    // virtual void calcSystemMatrix(){};
+    // virtual void calcEqualMatrix(){};
+    // virtual void calcEqualVector(){};
+    // virtual void calcInequalMatrix(){};
+    // virtual void calcMinimumVector(){};
+    // virtual void calcInputVector(){};
 };
-
-typedef struct
-{
-    std::vector<ContactConstraintParam> ccParamVec;
-    Vector3 CM;
-    Vector3 P;
-    Vector3 L;
-    Vector3 F;
-}MultiContactStabilizerParam;
 
 class CNOID_EXPORT MultiContactStabilizer : public ModelPreviewController
 {
@@ -85,13 +76,38 @@ public:
     int unitInputDim;// 接触点ごとの入力次元
 
     MultiContactStabilizer();
+};
 
-    void calcInputMatrix(dmatrix& inputMat, MultiContactStabilizerParam& mcsParam);
-    void calcSystemMatrix(dmatrix& systemMat, MultiContactStabilizerParam& mcsParam);
-    void calcEqualMatrix(dmatrix& equalMat, MultiContactStabilizerParam& mcsParam);
-    void calcEqualVector(dvector& equalVec, MultiContactStabilizerParam& mcsParam);
-    void calcInequalMatrix(dmatrix& inequalMat, MultiContactStabilizerParam& mcsParam);
-    void calcMinimumVector(dvector& minVec, MultiContactStabilizerParam& mcsParam);
+class MultiContactStabilizerParam
+{
+private:
+    MultiContactStabilizer* controller;
+    int unitInputDim;
+    double dt;
+
+public:
+    std::vector<ContactConstraintParam> ccParamVec;
+    int numEquals;
+    int numInequals;
+    Vector3 CM;
+    Vector3 P;
+    Vector3 L;
+    Vector3 F;
+
+    MultiContactStabilizerParam(MultiContactStabilizer* mcs){
+        controller = mcs;
+        unitInputDim = controller->unitInputDim;
+        dt = controller->dt;
+        numEquals = 0;
+        numInequals = 0;
+    }
+
+    void calcInputMatrix(dmatrix& inputMat);
+    void calcSystemMatrix(dmatrix& systemMat);
+    void calcEqualMatrix(dmatrix& equalMat);
+    void calcEqualVector(dvector& equalVec);
+    void calcInequalMatrix(dmatrix& inequalMat);
+    void calcMinimumVector(dvector& minVec);
     void calcInputVector();
 };
 
