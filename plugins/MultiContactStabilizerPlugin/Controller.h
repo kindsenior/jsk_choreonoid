@@ -21,7 +21,7 @@
 
 namespace hrp {
 
-typedef struct
+typedef struct CONTACTCONSTRAINTPARAM
 {
     int contactState;
     int numEquals;
@@ -33,7 +33,7 @@ typedef struct
     double mu;
 }ContactConstraintParam;
 
-typedef struct
+typedef struct MODELPREVIEWCONTROLLERPARAM
 {
     int inputDim;
     dmatrix systemMat;// A
