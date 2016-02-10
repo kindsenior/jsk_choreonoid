@@ -53,32 +53,26 @@ class CNOID_EXPORT ModelPreviewController
 public:
     int numWindows;// N
     int stateDim;
-    std::vector<ModelPreviewControllerParam> mpcParamVec;
+    std::deque<ModelPreviewControllerParam> mpcParamDeque;
     dvector x0;
     dmatrix psiMat;
     dmatrix phiMat;
 
     ModelPreviewController();
-
-    // virtual void calcInputMatrix(){};
-    // virtual void calcSystemMatrix(){};
-    // virtual void calcEqualMatrix(){};
-    // virtual void calcEqualVector(){};
-    // virtual void calcInequalMatrix(){};
-    // virtual void calcMinimumVector(){};
-    // virtual void calcInputVector(){};
 };
 
+class MultiContactStabilizerParam;
 class CNOID_EXPORT MultiContactStabilizer : public ModelPreviewController
 {
 public:
+    std::deque<MultiContactStabilizerParam> mcsParamDeque;
     double m,dt;
     int unitInputDim;// 接触点ごとの入力次元
 
     MultiContactStabilizer();
 };
 
-class MultiContactStabilizerParam
+class CNOID_EXPORT MultiContactStabilizerParam
 {
 private:
     MultiContactStabilizer* controller;
@@ -109,6 +103,7 @@ public:
     void calcInequalMatrix(dmatrix& inequalMat);
     void calcMinimumVector(dvector& minVec);
     void calcInputVector();
+    void convertToMPCParam(ModelPreviewControllerParam& mpcParam);
 };
 
 }

@@ -40,6 +40,63 @@ void MultiContactStabilizerPlugin::generateSeq()
     ofs.close();
 }
 
+void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector<ContactConstraintParam>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
+{
+    for(std::set<Link*>::iterator linkIter = contactLinkCantidateSet.begin(); linkIter != contactLinkCantidateSet.end(); ++linkIter){
+        int linkIdx = (*linkIter)->index();
+        int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
+        if(contactState < 2){// 接触フラグが0か1 要改良
+            ContactConstraintParam ccParam;
+            ccParam.contactState = contactState;
+            ccParam.linkName = (*linkIter)->name();
+
+            ccParam.numEquals = 1;
+
+            // 接触点座標で変化しないローカルな値は代入できる
+            ccParam.mu = 0.5;// 要改良
+            ccParam.numInequals = 4;// 静止摩擦制約式数
+
+            Vector3 edge;// 要改良 直線の係数a,b,cを代入
+            edge << -1, 0, 0.05;
+            ccParam.edgeVec.push_back(edge);
+            edge << 1, 0, -0.05;
+            ccParam.edgeVec.push_back(edge);
+            edge << 0, -1, 0.1;
+            ccParam.edgeVec.push_back(edge);
+            edge << 0, 1, -0.1;
+            ccParam.edgeVec.push_back(edge);
+
+            ccParam.numInequals += ccParam.edgeVec.size();// cop制約式数
+
+            ccParamVec.push_back(ccParam);
+        }
+    }
+}
+
+void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiContactStabilizerParam& mcsParam, BodyPtr body, std::vector<ContactConstraintParam>& ccParamVec, Vector3& lastP)
+{
+    // CM,P,L
+    Vector3d CM,P,L,F;
+    CM = body->calcCenterOfMass();
+    body->calcTotalMomentum(P,L);
+    L -= CM.cross(P);// convert to around CoM
+    mcsParam.CM = CM;
+    mcsParam.P = P;
+    mcsParam.L = L;
+    mcsParam.F = (P - lastP)/dt;
+
+    // 接触点座標系の更新 等式と不等式数の合計
+    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+        (*iter).p = body->link((*iter).linkName)->p();
+        (*iter).R =  body->link((*iter).linkName)->R();
+        mcsParam.numEquals += (*iter).numEquals;
+        mcsParam.numInequals += (*iter).numInequals;
+    }
+    mcsParam.ccParamVec = ccParamVec;
+
+    lastP = P;
+}
+
 void MultiContactStabilizerPlugin::execControl()
 {
     stringstream ss,fnamess;
@@ -83,6 +140,56 @@ void MultiContactStabilizerPlugin::execControl()
         }
     }
 
+    MultiContactStabilizer* mcs = new MultiContactStabilizer();
+    mcs->m = body->mass();
+    mcs->dt = dt;
+    mcs->numWindows = 10;
+
+    // preview window作成
+    Vector3d lastP;
+    {
+        Vector3d tmpL;
+        updateBodyState(body, motion, 0);
+        body->calcForwardKinematics(true, true);
+        body->calcCenterOfMass();
+        body->calcTotalMomentum(lastP,tmpL);
+    }
+    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
+        if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
+
+        // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
+        std::vector<ContactConstraintParam> ccParamVec;
+        generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
+
+        for(int i = backPoseIter->time()/dt; i < frontPoseIter->time()/dt; ++i){
+            cout << endl << "turn:" << i << endl;
+
+            updateBodyState(body, motion, i);
+            body->calcForwardKinematics(true, true);
+
+            MultiContactStabilizerParam mcsParam = MultiContactStabilizerParam(mcs);
+            // 動作軌道に依存するパラメータの設定
+            generateMultiContactStabilizerParam(mcsParam, body, ccParamVec, lastP);
+
+            if(mcs->mpcParamDeque.size() == mcs->numWindows){
+                // 処理
+                mcs->mpcParamDeque.pop_front();
+            }
+            ModelPreviewControllerParam mpcParam;
+            mcsParam.convertToMPCParam(mpcParam);
+
+            mcs->mcsParamDeque.push_back(mcsParam);
+            mcs->mpcParamDeque.push_back(mpcParam);
+
+            if(i == 0){
+                cout << "inequalMat:" << endl << mpcParam.inequalMat << endl;
+                cout << "inputMat:" << endl << mpcParam.inputMat << endl;
+            }
+        }
+        // numWindows回数 Dequeの最後を取り出して最後に追加しながらproc
+    }
+
+    free(mcs);
 
     cout << "Finished MultiContactStabilizer" << endl;
 }
