@@ -1,6 +1,5 @@
 #include "Controller.h"
 
-using namespace cnoid;
 using namespace hrp;
 
 ModelPreviewController::ModelPreviewController()

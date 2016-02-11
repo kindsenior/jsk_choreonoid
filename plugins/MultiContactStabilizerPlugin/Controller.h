@@ -2,22 +2,12 @@
 #include <sstream>
 #include <fstream>
 #include <map>
+#include <vector>
+#include <deque>
 
-#include <boost/bind.hpp>
+#include <hrpUtil/EigenTypes.h>
 
-#include <qpOASES.hpp>
-
-#include <cnoid/Plugin>
-#include <cnoid/ItemTreeView>
-#include <cnoid/BodyItem>
-#include <cnoid/MessageView>
-
-#include <cnoid/src/PoseSeqPlugin/PoseSeqItem.h>
-#include <cnoid/src/PoseSeqPlugin/BodyMotionGenerationBar.h>
-#include <cnoid/FileUtil>
-
-#include <UtilPlugin/UtilPlugin.h>
-#include "typedef.h"
+#include "QP.h"
 
 namespace hrp {
 
@@ -51,7 +41,7 @@ typedef struct MODELPREVIEWCONTROLLERPARAM
     // dmatrix outputMat;
 }ModelPreviewControllerParam;
 
-class CNOID_EXPORT ModelPreviewController
+class ModelPreviewController
 {
 public:
     int numWindows;// N
@@ -65,7 +55,7 @@ public:
 };
 
 class MultiContactStabilizerParam;
-class CNOID_EXPORT MultiContactStabilizer : public ModelPreviewController
+class MultiContactStabilizer : public ModelPreviewController
 {
 public:
     std::deque<MultiContactStabilizerParam> mcsParamDeque;
@@ -75,7 +65,7 @@ public:
     MultiContactStabilizer();
 };
 
-class CNOID_EXPORT MultiContactStabilizerParam
+class MultiContactStabilizerParam
 {
 private:
     MultiContactStabilizer* controller;
