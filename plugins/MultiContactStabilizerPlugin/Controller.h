@@ -45,6 +45,9 @@ typedef struct MODELPREVIEWCONTROLLERPARAM
     dvector inequalMaxVec;
     dvector minVec;
     dvector maxVec;
+    dvector refStateVec;
+    dvector errorWeightVec;
+    dvector inputWeightVec;
     // dmatrix outputMat;
 }ModelPreviewControllerParam;
 
@@ -102,7 +105,9 @@ public:
     void calcEqualVector(dvector& equalVec);
     void calcInequalMatrix(dmatrix& inequalMat);
     void calcMinimumVector(dvector& minVec);
-    void calcInputVector();
+    void calcRefStateVector(dvector& refStateVec);
+    void calcErrorWeightVector(dvector& errorWeightVec);
+    void calcInputWeightVector(dvector& inputWeightVec);
     void convertToMPCParam(ModelPreviewControllerParam& mpcParam);
 };
 

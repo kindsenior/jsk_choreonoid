@@ -95,6 +95,29 @@ void MultiContactStabilizerParam::calcMinimumVector(dvector& minVec)
     }
 }
 
+void MultiContactStabilizerParam::calcRefStateVector(dvector& refStateVec)
+{
+    refStateVec[0] = CM(0);
+    refStateVec[1] = P(0);
+    refStateVec[2] = CM(1);
+    refStateVec[3] = P(1);
+    refStateVec[4] = L(0);
+    refStateVec[5] = L(1);
+}
+
+void MultiContactStabilizerParam::calcErrorWeightVector(dvector& errorWeightVec)
+{
+    errorWeightVec << 1e1,1e2, 1e1,1e2, 1e3,1e3;
+}
+
+void MultiContactStabilizerParam::calcInputWeightVector(dvector& inputWeightVec)
+{
+    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+        int idx = std::distance(ccParamVec.begin(), iter);
+        inputWeightVec.block(unitInputDim*idx,0, unitInputDim,1) << 1e-3,1e-3,1e-3, 1e4,1e4,1e4;
+    }
+}
+
 void MultiContactStabilizerParam::convertToMPCParam(ModelPreviewControllerParam& mpcParam)
 {
     const int numContact = ccParamVec.size();
@@ -126,4 +149,16 @@ void MultiContactStabilizerParam::convertToMPCParam(ModelPreviewControllerParam&
     // system matrix
     mpcParam.systemMat = dmatrix::Identity(stateDim,stateDim);
     calcSystemMatrix(mpcParam.systemMat);
+
+    // ref state vector
+    mpcParam.refStateVec = dvector(stateDim);
+    calcRefStateVector(mpcParam.refStateVec);
+
+    // error weight Vector
+    mpcParam.errorWeightVec = dvector(stateDim);
+    calcErrorWeightVector(mpcParam.errorWeightVec);
+
+    // input weight vector
+    mpcParam.inputWeightVec = dvector(inputDim);
+    calcInputWeightVector(mpcParam.inputWeightVec);
 }
