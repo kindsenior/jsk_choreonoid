@@ -6,7 +6,7 @@
 using namespace boost;
 using namespace cnoid;
 using namespace std;
-using namespace qpOASES;
+using namespace hrp;
 
 void MultiContactStabilizerPlugin::generateSeq()
 {
