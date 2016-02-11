@@ -294,6 +294,7 @@ void MultiContactStabilizerParam::convertToMPCParam(ModelPreviewControllerParam&
     const int numContact = ccParamVec.size();
     const int stateDim = controller->stateDim;
     const int inputDim = unitInputDim*numContact;
+    static const int maxNum = 1e10;
 
     // equal matrix
     mpcParam.equalMat = dmatrix::Zero(numEquals, inputDim);
@@ -307,12 +308,15 @@ void MultiContactStabilizerParam::convertToMPCParam(ModelPreviewControllerParam&
     calcInequalMatrix(mpcParam.inequalMat);
 
     mpcParam.inequalMinVec = dvector::Zero(numInequals);
-    mpcParam.inequalMaxVec = dvector::Constant(numInequals,INFINITY);
+    // mpcParam.inequalMaxVec = dvector::Constant(numInequals,INFINITY);
+    mpcParam.inequalMaxVec = dvector::Constant(numInequals,maxNum);
 
     // max min
-    mpcParam.minVec     = dvector::Constant(inputDim,-INFINITY);
+    // mpcParam.minVec     = dvector::Constant(inputDim,-INFINITY);
+    mpcParam.minVec     = dvector::Constant(inputDim,-maxNum);
     calcMinimumVector(mpcParam.minVec);
-    mpcParam.maxVec     = dvector::Constant(inputDim,INFINITY);
+    // mpcParam.maxVec     = dvector::Constant(inputDim,INFINITY);
+    mpcParam.maxVec     = dvector::Constant(inputDim,maxNum);
 
     // input matrix
     mpcParam.inputMat = dmatrix::Zero(stateDim,inputDim);
