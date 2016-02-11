@@ -17,7 +17,7 @@ MultiContactStabilizer::MultiContactStabilizer()
 void MultiContactStabilizerParam::calcSystemMatrix(dmatrix& systemMat)
 {
     const double m = controller->m;
-    double Fz = F.z();
+    double Fz = F(2);
     systemMat(0,1) = dt;
     systemMat(2,3) = dt;
     systemMat(4,2) = -dt*Fz/m;
@@ -38,14 +38,14 @@ void MultiContactStabilizerParam::calcInputMatrix(dmatrix& inputMat)
         R2.block(3,3,3,3) = R;
         dmatrix unitInputMat = dmatrix(stateDim,unitInputDim);
         double T2_2 = dt*dt/2;
-        double beta = dt*(p.z()-CM.z());
+        double beta = dt*(p(2)-CM(2));
         unitInputMat <<
             T2_2,0, 0,        0, 0,0,
             dt,  0, 0,        0, 0,0,
             0,T2_2, 0,        0, 0,0,
             0,dt,   0,        0, 0,0,
-            0,-beta,dt*p.y(), dt,0,0,
-            beta,0,-dt*p.x(), 0,dt,0;
+            0,-beta,dt*p(1), dt,0,0,
+            beta,0,-dt*p(0), 0,dt,0;
         inputMat.block(0,unitInputDim*idx, stateDim,unitInputDim) = unitInputMat*R2;
     }
 }
@@ -65,7 +65,7 @@ void MultiContactStabilizerParam::calcEqualVector(dvector& equalVec)
 {
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
-        equalVec((*iter).numEquals*idx) = F.z();
+        equalVec((*iter).numEquals*idx) = F(2);
     }
 }
 
