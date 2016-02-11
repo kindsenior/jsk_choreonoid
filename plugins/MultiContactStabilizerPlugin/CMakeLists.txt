@@ -21,7 +21,7 @@ execute_process(
 string(REGEX REPLACE "-l" "" openhrp3_link_shared_files ${openhrp3_link_shared_files})# remove -l
 string(REGEX REPLACE " " ";" openhrp3_link_shared_files ${openhrp3_link_shared_files})# change string to list
 
-add_library(${TARGET} SHARED MultiContactStabilizerPlugin Controller)
+add_library(${TARGET} SHARED MultiContactStabilizerPlugin Controller QP)
 
 set(libs CnoidUtilPlugin qpOASES ${openhrp3_link_shared_files})
 target_link_libraries(${TARGET} ${libs})

@@ -82,6 +82,8 @@ public:
     ModelPreviewController();
 
     void calcAugmentedMatrix();
+    virtual void setupQP() = 0;
+    virtual void execQP() = 0;
 };
 
 class MultiContactStabilizerParam;
@@ -93,6 +95,9 @@ public:
     int unitInputDim;// 接触点ごとの入力次元
 
     MultiContactStabilizer();
+
+    void setupQP();
+    void execQP();
 };
 
 class MultiContactStabilizerParam

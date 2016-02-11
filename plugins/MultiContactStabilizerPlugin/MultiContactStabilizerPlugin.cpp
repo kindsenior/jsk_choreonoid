@@ -173,6 +173,10 @@ void MultiContactStabilizerPlugin::execControl()
 
             if(mcs->mpcParamDeque.size() == mcs->numWindows){
                 mcs->calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
+                mcs->setupQP();
+                mcs->execQP();
+                // U->u0
+                // x0,u0->x1
                 mcs->mpcParamDeque.pop_front();
             }
             ModelPreviewControllerParam mpcParam;
