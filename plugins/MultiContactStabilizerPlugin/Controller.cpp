@@ -4,6 +4,149 @@ using namespace hrp;
 
 ModelPreviewController::ModelPreviewController()
 {
+    isInitial = true;
+}
+
+void ModelPreviewController::calcPhiMatrix()
+{
+    phiMat = dmatrix(stateDim*numWindows,stateDim);
+    dmatrix lastMat = dmatrix::Identity(stateDim,stateDim);
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+        int idx = std::distance(mpcParamDeque.begin(), iter);
+        lastMat = (*iter).systemMat * lastMat;
+        phiMat.block(stateDim*idx,0, stateDim,stateDim) = lastMat;
+    }
+}
+
+void ModelPreviewController::calcPsiMatrix()
+{
+    psiMat = dmatrix::Zero(stateDim*numWindows,psiCols);
+    int colIdx = 0;
+    for(std::deque<ModelPreviewControllerParam>::iterator Biter = mpcParamDeque.begin(); Biter != mpcParamDeque.end(); ){// Biterは内側のforループでインクリメント
+        dmatrix lastMat = (*Biter).inputMat;
+        int cols = lastMat.cols();
+        int Bidx = std::distance(mpcParamDeque.begin(), Biter);// column index
+        psiMat.block(stateDim*Bidx,colIdx, stateDim,cols) = lastMat;
+        for(std::deque<ModelPreviewControllerParam>::iterator Aiter = ++Biter; Aiter != mpcParamDeque.end(); ++Aiter){
+            int Aidx = std::distance(mpcParamDeque.begin(), Aiter);// row index
+            lastMat = (*Aiter).systemMat * lastMat;
+            psiMat.block(stateDim*Aidx,colIdx, stateDim,cols) = lastMat;
+        }
+        colIdx += cols;
+    }
+}
+
+void ModelPreviewController::calcEqualConstraints()
+{
+    equalMat = dmatrix::Zero(equalMatRows,psiCols);
+    equalVec = dvector(equalMatRows);
+    int rowIdx = 0;
+    int colIdx = 0;
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+        int rows = (*iter).equalMat.rows();
+        int cols = (*iter).equalMat.cols();
+        equalMat.block(rowIdx,colIdx, rows,cols) = (*iter).equalMat;
+        equalVec.block(rowIdx,0,      rows,1) = (*iter).equalVec;
+        rowIdx += rows;
+        colIdx += cols;
+    }
+}
+
+void ModelPreviewController::calcInequalConstraints()
+{
+    inequalMat = dmatrix::Zero(inequalMatRows,psiCols);
+    inequalMinVec = dvector(inequalMatRows);
+    inequalMaxVec = dvector(inequalMatRows);
+    int rowIdx = 0;
+    int colIdx = 0;
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+        int rows = (*iter).inequalMat.rows();
+        int cols = (*iter).inequalMat.cols();
+        inequalMat.block(rowIdx,colIdx, rows,cols) = (*iter).inequalMat;
+        inequalMinVec.block(rowIdx,0,   rows,1) = (*iter).inequalMinVec;
+        inequalMaxVec.block(rowIdx,0,   rows,1) = (*iter).inequalMaxVec;
+        rowIdx += rows;
+        colIdx += cols;
+    }
+}
+
+void ModelPreviewController::calcBoundVectors()
+{
+    minVec = dvector(psiCols);
+    maxVec = dvector(psiCols);
+    int rowIdx = 0;
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+        int rows = (*iter).minVec.rows();
+        minVec.block(rowIdx,0, rows,1) = (*iter).minVec;
+        maxVec.block(rowIdx,0, rows,1) = (*iter).maxVec;
+        rowIdx += rows;
+    }
+}
+
+void ModelPreviewController::calcRefXVector()
+{
+    refX = dvector(stateDim*numWindows);
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+        int idx = std::distance(mpcParamDeque.begin(), iter);
+        refX.block(stateDim*idx,0, stateDim,1) = (*iter).refStateVec;
+    }
+}
+
+void ModelPreviewController::calcErrorWeightMatrix()
+{
+    errorWeightMat = dmatrix::Zero(stateDim*numWindows,stateDim*numWindows);
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+        int idx = std::distance(mpcParamDeque.begin(), iter);
+        errorWeightMat.block(stateDim*idx,stateDim*idx, stateDim,stateDim) = (*iter).errorWeightVec.asDiagonal();
+    }
+}
+
+void ModelPreviewController::calcInputWeightMatrix()
+{
+    inputWeightMat = dmatrix::Zero(psiCols,psiCols);
+    int rowIdx = 0;
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+         int rows = (*iter).inputWeightVec.rows();
+        inputWeightMat.block(rowIdx,rowIdx, rows,rows) = (*iter).inputWeightVec.asDiagonal();
+        rowIdx += rows;
+    }
+}
+
+void ModelPreviewController::calcX0Vector()
+{
+    x0 = dvector(stateDim);
+    if(isInitial){
+        x0 = mpcParamDeque[0].refStateVec;
+        isInitial = false;
+    }else{
+        // U->u0
+        // x0,u0->x1
+        x0 = dvector::Zero(stateDim);
+    }
+}
+
+void ModelPreviewController::calcAugmentedMatrix()
+{
+    psiCols = 0;
+    equalMatRows = 0;
+    inequalMatRows = 0;
+    for(std::deque<ModelPreviewControllerParam>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+        psiCols += (*iter).inputMat.cols();
+        equalMatRows += (*iter).equalMat.rows();
+        inequalMatRows += (*iter).inequalMat.rows();
+    }
+
+    calcPhiMatrix();
+    calcPsiMatrix();
+    calcEqualConstraints();
+    calcInequalConstraints();
+    calcBoundVectors();
+    calcRefXVector();
+    calcErrorWeightMatrix();
+    calcInputWeightMatrix();
+    U = dvector::Zero(psiCols);
+    calcX0Vector();//要改良
+
 }
 
 MultiContactStabilizer::MultiContactStabilizer()

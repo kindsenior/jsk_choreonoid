@@ -43,15 +43,45 @@ typedef struct MODELPREVIEWCONTROLLERPARAM
 
 class ModelPreviewController
 {
+protected:
+    QP qpInterface;
+
+    dmatrix phiMat;
+    dmatrix psiMat;
+    dmatrix equalMat;
+    dvector equalVec;
+    dmatrix inequalMat;
+    dvector inequalMinVec;
+    dvector inequalMaxVec;
+    dvector minVec;
+    dvector maxVec;
+    dvector refX;
+    dmatrix errorWeightMat;// W1
+    dmatrix inputWeightMat;// W2
+    dvector U;
+
+private:
+    void calcPhiMatrix();
+    void calcPsiMatrix();
+    void calcEqualConstraints();
+    void calcInequalConstraints();
+    void calcBoundVectors();
+    void calcRefXVector();
+    void calcErrorWeightMatrix();
+    void calcInputWeightMatrix();
+    void calcX0Vector();
+
 public:
     int numWindows;// N
     int stateDim;
+    int psiCols, equalMatRows, inequalMatRows;
+    bool isInitial;
     std::deque<ModelPreviewControllerParam> mpcParamDeque;
     dvector x0;
-    dmatrix psiMat;
-    dmatrix phiMat;
 
     ModelPreviewController();
+
+    void calcAugmentedMatrix();
 };
 
 class MultiContactStabilizerParam;
