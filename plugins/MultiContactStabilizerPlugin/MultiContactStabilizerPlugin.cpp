@@ -187,11 +187,6 @@ void MultiContactStabilizerPlugin::execControl()
 
             mcs->mcsParamDeque.push_back(mcsParam);
             mcs->mpcParamDeque.push_back(mpcParam);
-
-            if(i == 0){
-                cout << "inequalMat:" << endl << mpcParam.inequalMat << endl;
-                cout << "inputMat:" << endl << mpcParam.inputMat << endl;
-            }
         }
         // numWindows回数 Dequeの最後を取り出して最後に追加しながらproc
     }
