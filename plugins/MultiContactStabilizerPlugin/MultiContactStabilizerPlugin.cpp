@@ -75,6 +75,9 @@ void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector
 
 void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiContactStabilizerParam& mcsParam, BodyPtr body, std::vector<ContactConstraintParam>& ccParamVec, Vector3& lastP)
 {
+    static Vector3 g;
+    g << 0,0,9.8;
+
     // CM,P,L
     Vector3d CM,P,L,F;
     CM = body->calcCenterOfMass();
@@ -83,7 +86,7 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
     mcsParam.CM = CM;
     mcsParam.P = P;
     mcsParam.L = L;
-    mcsParam.F = (P - lastP)/dt;
+    mcsParam.F = (P - lastP)/dt + body->mass()*g;
 
     // 接触点座標系の更新 等式と不等式数の合計
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
