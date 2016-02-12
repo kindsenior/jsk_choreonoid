@@ -194,9 +194,9 @@ void MultiContactStabilizerPlugin::execControl()
                 CM << x0[0],x0[2],0;
                 P << x0[1],x0[3],0;
                 L << x0[4],x0[5],0;
-                refCMSeqPtr->at(i) = CM;
-                refPSeqPtr->at(i) = P;
-                refLSeqPtr->at(i) = L;
+                refCMSeqPtr->at(i-mcs->numWindows) = CM;
+                refPSeqPtr->at(i-mcs->numWindows) = P;
+                refLSeqPtr->at(i-mcs->numWindows) = L;
                 ofs << i*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
 
                 mcs->mpcParamDeque.pop_front();
