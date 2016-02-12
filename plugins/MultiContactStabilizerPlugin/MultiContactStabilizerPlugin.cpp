@@ -148,7 +148,16 @@ void MultiContactStabilizerPlugin::execControl()
     mcs->dt = dt;
     mcs->numWindows = 10;
 
-    // preview window作成
+    // モーション走査
+    fnamess.str("");
+    fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL_" << frameRate << "fps.dat";
+    ofstream ofs( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str() );
+    ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
+
+    Vector3SeqPtr refCMSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
+    Vector3SeqPtr refPSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
+    Vector3SeqPtr refLSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
+
     Vector3d lastP;
     {
         Vector3d tmpL;
@@ -178,6 +187,18 @@ void MultiContactStabilizerPlugin::execControl()
                 mcs->calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
                 mcs->setupQP();
                 mcs->execQP();
+
+                VectorXd x0(mcs->stateDim);
+                x0 = mcs->x0;
+                Vector3d CM,P,L;
+                CM << x0[0],x0[2],0;
+                P << x0[1],x0[3],0;
+                L << x0[4],x0[5],0;
+                refCMSeqPtr->at(i) = CM;
+                refPSeqPtr->at(i) = P;
+                refLSeqPtr->at(i) = L;
+                ofs << i*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
+
                 mcs->mpcParamDeque.pop_front();
             }
             ModelPreviewControllerParam mpcParam;
@@ -190,6 +211,10 @@ void MultiContactStabilizerPlugin::execControl()
     }
 
     free(mcs);
+
+    setSubItem("refCM", refCMSeqPtr, mBodyMotionItem);
+    setSubItem("refP", refPSeqPtr, mBodyMotionItem);
+    setSubItem("refL", refLSeqPtr, mBodyMotionItem);
 
     cout << "Finished MultiContactStabilizer" << endl;
 }
