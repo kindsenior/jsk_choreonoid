@@ -57,13 +57,13 @@ void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector
             ccParam.numInequals = 4;// 静止摩擦制約式数
 
             Vector3 edge;// 要改良 直線の係数a,b,cを代入
-            edge << -1, 0, 0.05;
+            edge << -1, 0, 0.1;
             ccParam.edgeVec.push_back(edge);
-            edge << 1, 0, -0.05;
+            edge << 1, 0, 0.1;
             ccParam.edgeVec.push_back(edge);
-            edge << 0, -1, 0.1;
+            edge << 0, -1, 0.05;
             ccParam.edgeVec.push_back(edge);
-            edge << 0, 1, -0.1;
+            edge << 0, 1, 0.05;
             ccParam.edgeVec.push_back(edge);
 
             ccParam.numInequals += ccParam.edgeVec.size();// cop制約式数
