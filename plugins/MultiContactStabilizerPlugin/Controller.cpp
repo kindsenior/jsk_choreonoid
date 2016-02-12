@@ -116,13 +116,14 @@ void ModelPreviewController::calcInputWeightMatrix()
 void ModelPreviewController::calcX0Vector()
 {
     x0 = dvector(stateDim);
+    ModelPreviewControllerParam mpcParam = mpcParamDeque[0];
     if(isInitial){
-        x0 = mpcParamDeque[0].refStateVec;
+        x0 = mpcParam.refStateVec;
         isInitial = false;
     }else{
         // U->u0
-        // x0,u0->x1
-        x0 = dvector::Zero(stateDim);
+        // x0 = A0*x0 + B'0*u0
+        x0 = mpcParam.systemMat*x0 + U.block(0,0, mpcParam.inputMat.cols(),1);
     }
 }
 
@@ -146,7 +147,7 @@ void ModelPreviewController::calcAugmentedMatrix()
     calcErrorWeightMatrix();
     calcInputWeightMatrix();
     U = dvector::Zero(psiCols);
-    calcX0Vector();//要改良
+    calcX0Vector();// U->x0
 
 }
 

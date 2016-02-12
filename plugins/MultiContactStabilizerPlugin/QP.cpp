@@ -58,8 +58,11 @@ void QP::execQP(dvector& U,
         ubA[inequalDim+i] = equalVec[i];
     }
     init(H,g,A,lb,ub,lbA,ubA, maxCalcCount);
-    // real_t xOpt[2];
-    // example.getPrimalSolution( xOpt );
+    real_t xOpt[valueDim];
+    getPrimalSolution(xOpt);
+    for(int i=0; i < valueDim; ++i){
+        U(i) = xOpt[i];
+    }
     // printf( "\n xOpt = [ %e, %e ]; objVal = %e\n\n", xOpt[0],xOpt[1],example.getObjVal() );
 
 };
