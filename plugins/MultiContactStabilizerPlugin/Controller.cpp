@@ -170,19 +170,20 @@ void MultiContactStabilizer::setupQP()
 void MultiContactStabilizer::execQP()
 {
     static int count = 0;
-    if(count == 0){
+    if(count == 0 && COUT){
         cout << "psi:" << endl << psiMat << endl << endl;
         cout << "phi:" << endl << phiMat << endl << endl;
         cout << "refX:" << endl << refX.transpose() << endl << endl;
         cout << "x0:" << endl << x0.transpose() << endl << endl;
         cout << "W1(error):" << endl << errorWeightMat << endl << endl;
         cout << "W2(input):" << endl << inputWeightMat << endl << endl;
-    }++count;
+    }
     qpInterface.execQP(U,
                        psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat, psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
                        equalMat, equalVec,
                        inequalMat, inequalMinVec, inequalMaxVec,
                        minVec, maxVec);
+    ++count;
 }
 
 void MultiContactStabilizerParam::calcSystemMatrix(dmatrix& systemMat)

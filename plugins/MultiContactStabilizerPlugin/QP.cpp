@@ -14,7 +14,7 @@ void QP::execQP(dvector& U,
                 const dvector& minVec, const dvector& maxVec)
 {
     static int count = 0;
-    if(count == 0){
+    if(count == 0 && COUT){
         cout << "H:" << endl << HMat << endl << endl;
         cout << "g:" << endl << gVec.transpose() << endl << endl;
         cout << "eqMat:" << endl << equalMat << endl << endl;
@@ -24,8 +24,8 @@ void QP::execQP(dvector& U,
         cout << "ineqMaxVec:" << endl << inequalMaxVec.transpose() << endl << endl;
         cout << "lb:" << endl << minVec.transpose() << endl << endl;
         cout << "ub:" << endl << maxVec.transpose() << endl << endl;
+        cout << "U(before):" << endl << U.transpose() << endl << endl;
     }
-    ++count;
 
     int Arows = inequalDim+equalDim;
     real_t H[valueDim*valueDim];
@@ -66,6 +66,10 @@ void QP::execQP(dvector& U,
     for(int i=0; i < valueDim; ++i){
         U(i) = xOpt[i];
     }
+    if(count == 0 && COUT){
+        cout << "U(after):" << endl << U.transpose() << endl << endl;
+        cout << "objVal: " << getObjVal() << endl;
+    }
     // printf( "\n xOpt = [ %e, %e ]; objVal = %e\n\n", xOpt[0],xOpt[1],example.getObjVal() );
-
+    ++count;
 };

@@ -7,6 +7,8 @@
 #include <qpOASES.hpp>
 #include <hrpUtil/EigenTypes.h>
 
+#define COUT true
+
 namespace hrp {
 
 class QP : public qpOASES::QProblem
