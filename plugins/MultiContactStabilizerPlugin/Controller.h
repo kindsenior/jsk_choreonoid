@@ -30,7 +30,7 @@ typedef struct CONTACTCONSTRAINTPARAM
 
 typedef struct MODELPREVIEWCONTROLLERPARAM
 {
-    int inputDim;
+    // int inputDim;
     dmatrix systemMat;// A
     dmatrix inputMat;// B
     dmatrix equalMat;
