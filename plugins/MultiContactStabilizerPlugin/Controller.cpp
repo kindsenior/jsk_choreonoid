@@ -1,3 +1,6 @@
+/**
+   @author Kunio Kojima
+*/
 #include "Controller.h"
 
 using namespace hrp;

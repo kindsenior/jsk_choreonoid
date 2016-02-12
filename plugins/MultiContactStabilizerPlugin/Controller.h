@@ -1,3 +1,6 @@
+/**
+   @author Kunio Kojima
+*/
 #include <iostream>
 #include <sstream>
 #include <fstream>

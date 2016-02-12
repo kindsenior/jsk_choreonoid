@@ -1,3 +1,8 @@
+/**
+   @author Kunio Kojima
+*/
+#pragma once
+
 #include <iostream>
 #include <qpOASES.hpp>
 #include <hrpUtil/EigenTypes.h>

@@ -1,3 +1,6 @@
+/**
+   @author Kunio Kojima
+*/
 #include "QP.h"
 
 using namespace hrp;
