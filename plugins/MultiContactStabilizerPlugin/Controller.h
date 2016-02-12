@@ -125,7 +125,7 @@ public:
         controller = mcs;
         unitInputDim = controller->unitInputDim;
         dt = controller->dt;
-        numEquals = 0;
+        numEquals = 1;//Fzの合計
         numInequals = 0;
     }
 

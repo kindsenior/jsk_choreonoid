@@ -226,18 +226,13 @@ void MultiContactStabilizerParam::calcEqualMatrix(dmatrix& equalMat)
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
         Matrix33 R = (*iter).R;
-        Vector3 p = (*iter).p;
-
-        equalMat.block((*iter).numEquals*idx,unitInputDim*idx, 1,3) = R.block(2,0,1,3);
+        equalMat.block(0,unitInputDim*idx, 1,3) = R.block(2,0,1,3);
     }
 }
 
 void MultiContactStabilizerParam::calcEqualVector(dvector& equalVec)
 {
-    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        int idx = std::distance(ccParamVec.begin(), iter);
-        equalVec((*iter).numEquals*idx) = F(2);
-    }
+    equalVec(0) = F(2);
 }
 
 void MultiContactStabilizerParam::calcInequalMatrix(dmatrix& inequalMat)

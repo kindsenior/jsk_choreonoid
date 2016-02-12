@@ -50,7 +50,7 @@ void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector
             ccParam.contactState = contactState;
             ccParam.linkName = (*linkIter)->name();
 
-            ccParam.numEquals = 1;
+            ccParam.numEquals = 0;// 接触条件ごとの等式条件は0個 Fzの制約は全接触点の合計
 
             // 接触点座標で変化しないローカルな値は代入できる
             ccParam.mu = 0.5;// 要改良
