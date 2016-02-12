@@ -204,7 +204,7 @@ void MultiContactStabilizerParam::calcInputMatrix(dmatrix& inputMat)
         dmatrix R2 = dmatrix::Zero(unitInputDim,unitInputDim);
         R2.block(0,0,3,3) = R;
         R2.block(3,3,3,3) = R;
-        dmatrix unitInputMat = dmatrix(stateDim,unitInputDim);
+        dmatrix unitInputMat = dmatrix(stateDim,unitInputDim);// B_k^i
         double T2_2 = dt*dt/2;
         double beta = dt*(p(2)-CM(2));
         unitInputMat <<

@@ -13,7 +13,7 @@ void MultiContactStabilizerPlugin::generateSeq()
     stringstream ss;
     ss << mPoseSeqPath.stem().string() << "_MCS_initPL_" << frameRate << "fps.dat";
     ofstream ofs( ((filesystem::path) mPoseSeqPath.parent_path() / ss.str()).string().c_str() );
-    ofs << "time initCM initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
+    ofs << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
 
     Vector3SeqPtr initCMSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM");
     Vector3SeqPtr initPSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
