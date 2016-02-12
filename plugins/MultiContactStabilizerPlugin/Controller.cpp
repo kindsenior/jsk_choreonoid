@@ -116,18 +116,12 @@ void ModelPreviewController::calcInputWeightMatrix()
     }
 }
 
-void ModelPreviewController::calcX0Vector()
+void ModelPreviewController::updateX0Vector()
 {
-    x0 = dvector(stateDim);
     ModelPreviewControllerParam mpcParam = mpcParamDeque[0];
-    if(isInitial){
-        x0 = mpcParam.refStateVec;
-        isInitial = false;
-    }else{
-        // U->u0
-        // x0 = A0*x0 + B'0*u0
-        x0 = mpcParam.systemMat*x0 + U.block(0,0, mpcParam.inputMat.cols(),1);
-    }
+    // U->u0
+    // x0 = A0*x0 + B'0*u0
+    x0 = mpcParam.systemMat*x0 + mpcParam.inputMat*U.block(0,0, mpcParam.inputMat.cols(),1);
 }
 
 void ModelPreviewController::calcAugmentedMatrix()
@@ -141,6 +135,12 @@ void ModelPreviewController::calcAugmentedMatrix()
         inequalMatRows += (*iter).inequalMat.rows();
     }
 
+    if(isInitial){
+        x0 = dvector(stateDim);
+        x0 = mpcParamDeque[0].refStateVec;
+        isInitial = false;
+    }
+
     calcPhiMatrix();
     calcPsiMatrix();
     calcEqualConstraints();
@@ -150,7 +150,6 @@ void ModelPreviewController::calcAugmentedMatrix()
     calcErrorWeightMatrix();
     calcInputWeightMatrix();
     U = dvector::Zero(psiCols);
-    calcX0Vector();// U->x0
 
 }
 

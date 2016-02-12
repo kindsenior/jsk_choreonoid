@@ -74,7 +74,6 @@ private:
     void calcRefXVector();
     void calcErrorWeightMatrix();
     void calcInputWeightMatrix();
-    void calcX0Vector();
 
 public:
     int numWindows;// N
@@ -87,6 +86,7 @@ public:
     ModelPreviewController();
 
     void calcAugmentedMatrix();
+    void updateX0Vector();
     virtual void setupQP() = 0;
     virtual void execQP() = 0;
 };
