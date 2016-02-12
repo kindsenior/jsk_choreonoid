@@ -188,6 +188,8 @@ void MultiContactStabilizerPlugin::execControl()
                 mcs->setupQP();
                 mcs->execQP();
 
+                Test::testAugmentedMatrix(mcs);
+
                 VectorXd x0(mcs->stateDim);
                 x0 = mcs->x0;
                 Vector3d CM,P,L;

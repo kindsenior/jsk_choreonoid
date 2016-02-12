@@ -91,9 +91,11 @@ public:
     virtual void execQP() = 0;
 };
 
+class Test;
 class MultiContactStabilizerParam;
 class MultiContactStabilizer : public ModelPreviewController
 {
+    friend class Test;
 public:
     std::deque<MultiContactStabilizerParam> mcsParamDeque;
     double m,dt;

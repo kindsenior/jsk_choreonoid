@@ -44,6 +44,7 @@
 #include <UtilPlugin/UtilPlugin.h>
 
 #include "Controller.h"
+#include "test.h"
 
 namespace cnoid{
 
