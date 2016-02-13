@@ -240,8 +240,8 @@ void MultiContactStabilizerParam::calcInequalMatrix(dmatrix& inequalMat)
 {
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
-        Matrix33 R = (*iter).R;
-        Vector3 p = (*iter).p;
+        // Matrix33 R = (*iter).R;
+        // Vector3 p = (*iter).p;
 
         std::vector<Vector3> edgeVec = (*iter).edgeVec;
         for(std::vector<Vector3>::iterator edgeIter = edgeVec.begin(); edgeIter != edgeVec.end(); ++edgeIter){
