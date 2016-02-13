@@ -71,39 +71,6 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     hbox->addWidget(&saveParameterInFileNameCheck);
     hbox->addStretch();
 
-
-    hbox = newRow(vbox);
-    hbox->addWidget(new QLabel("CM:"));
-    errorCMNameLine.setText("CM");
-    hbox->addWidget(&errorCMNameLine);
-
-    hbox->addStretch(8);
-    hbox->addWidget(new QLabel("P:"));
-    errorMomentumNameLine.setText("P");
-    hbox->addWidget(&errorMomentumNameLine);
-
-    hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("L:"));
-    errorAngularMomentumNameLine.setText("L");
-    hbox->addWidget(&errorAngularMomentumNameLine);
-
-    hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("f:"));
-    inputForceNameLine.setText("f");
-    hbox->addWidget(&inputForceNameLine);
-
-    hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("n:"));
-    inputMomentNameLine.setText("n");
-    hbox->addWidget(&inputMomentNameLine);
-
-    hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("N:"));
-    numWindowsNameLine.setText("N");
-    hbox->addWidget(&numWindowsNameLine);
-    hbox->addStretch();
-
-
     QVBoxLayout* topVBox = new QVBoxLayout();
     topVBox->addLayout(vbox);
 
