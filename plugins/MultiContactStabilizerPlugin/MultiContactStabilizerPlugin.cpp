@@ -202,7 +202,20 @@ void MultiContactStabilizerPlugin::execControl()
 
     // モーション走査
     fnamess.str("");
-    fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL_" << frameRate << "fps.dat";
+    fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL";
+    if(mBar->dialog->saveParameterInFileNameCheck.isChecked()){
+        fnamess << "_" << mBar->dialog->numWindowsSpin.value() << mBar->dialog->numWindowsSpin.accessibleName().toStdString();
+        fnamess << "_" << mBar->dialog->errorCMWeightSpin.value() << mBar->dialog->errorCMWeightSpin.accessibleName().toStdString();
+        fnamess << "_" << mBar->dialog->errorMomentumWeightSpin.value() << mBar->dialog->errorMomentumWeightSpin.accessibleName().toStdString();
+        fnamess << "_" << mBar->dialog->errorAngularMomentumWeightSpin.value() << mBar->dialog->errorAngularMomentumWeightSpin.accessibleName().toStdString();
+        fnamess << "_" << mBar->dialog->inputForceWeightSpin.value() << mBar->dialog->inputForceWeightSpin.accessibleName().toStdString();
+        fnamess << "_" << mBar->dialog->inputMomentWeightSpin.value() << mBar->dialog->inputMomentWeightSpin.accessibleName().toStdString();
+        string s = fnamess.str();
+        replace(s.begin(), s.end(), '.', '-');
+        fnamess.str("");
+        fnamess << s;
+    }
+    fnamess << "_" << frameRate << "fps.dat";
     mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
     mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
 

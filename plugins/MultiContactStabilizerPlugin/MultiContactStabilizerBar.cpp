@@ -13,6 +13,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     QHBoxLayout* hbox = newRow(vbox);
     hbox->addWidget(new QLabel("CM:"));
+    errorCMWeightSpin.setAccessibleName(QString("CM"));
     errorCMWeightSpin.setDecimals(4);
     errorCMWeightSpin.setRange(0.0001, 10000);
     errorCMWeightSpin.setSingleStep(0.0001);
@@ -21,6 +22,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
             
     hbox->addSpacing(8);
     hbox->addWidget(new QLabel("Momentum:"));
+    errorMomentumWeightSpin.setAccessibleName(QString("P"));
     errorMomentumWeightSpin.setDecimals(4);
     errorMomentumWeightSpin.setRange(0.0001, 10000);
     errorMomentumWeightSpin.setSingleStep(0.0001);
@@ -29,6 +31,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
             
     hbox->addSpacing(8);
     hbox->addWidget(new QLabel("AngularMomentum"));
+    errorAngularMomentumWeightSpin.setAccessibleName(QString("L"));
     errorAngularMomentumWeightSpin.setDecimals(4);
     errorAngularMomentumWeightSpin.setRange(0.0001, 10000);
     errorAngularMomentumWeightSpin.setSingleStep(0.0001);
@@ -39,6 +42,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     hbox = newRow(vbox);
     hbox->addWidget(new QLabel("Force:"));
+    inputForceWeightSpin.setAccessibleName(QString("f"));
     inputForceWeightSpin.setDecimals(4);
     inputForceWeightSpin.setRange(0.0001, 10000);
     inputForceWeightSpin.setSingleStep(0.0001);
@@ -47,6 +51,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     hbox->addSpacing(8);
     hbox->addWidget(new QLabel("Moment:"));
+    inputMomentWeightSpin.setAccessibleName(QString("n"));
     inputMomentWeightSpin.setDecimals(4);
     inputMomentWeightSpin.setRange(0.0001, 10000);
     inputMomentWeightSpin.setSingleStep(0.0001);
@@ -57,6 +62,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     hbox = newRow(vbox);
     hbox->addWidget(new QLabel("Window:"));
+    numWindowsSpin.setAccessibleName(QString("N"));
     numWindowsSpin.setDecimals(0);
     numWindowsSpin.setRange(1, 1000);
     numWindowsSpin.setSingleStep(1);
