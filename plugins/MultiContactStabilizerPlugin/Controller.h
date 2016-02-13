@@ -88,7 +88,7 @@ public:
     void calcAugmentedMatrix();
     void updateX0Vector();
     virtual void setupQP() = 0;
-    virtual void execQP() = 0;
+    virtual int execQP() = 0;
 };
 
 class Test;
@@ -104,7 +104,7 @@ public:
     MultiContactStabilizer();
 
     void setupQP();
-    void execQP();
+    int execQP();
 };
 
 class MultiContactStabilizerParam

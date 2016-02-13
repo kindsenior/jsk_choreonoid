@@ -33,7 +33,7 @@ public:
         maxCalcCount = 1000;
     };
 
-    void execQP(dvector& U,
+    int execQP(dvector& U,
                 const dmatrix& HMat, const dvector& gVec,
                 const dmatrix& equalMat, const dvector& equalVec,
                 const dmatrix& inequalMat, const dvector& inequalMinVec, const dvector& inequalMaxVec,

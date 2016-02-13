@@ -158,6 +158,8 @@ void MultiContactStabilizerPlugin::execControl()
     Vector3SeqPtr refPSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
 
+    std::vector<int> failIdxVec;
+
     Vector3d lastP;
     {
         Vector3d tmpL;
@@ -186,7 +188,7 @@ void MultiContactStabilizerPlugin::execControl()
             if(mcs->mpcParamDeque.size() == mcs->numWindows){
                 mcs->calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
                 mcs->setupQP();
-                mcs->execQP();
+                if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows);
 
                 Test::testAugmentedMatrix(mcs);
 
@@ -218,6 +220,9 @@ void MultiContactStabilizerPlugin::execControl()
     setSubItem("refCM", refCMSeqPtr, mBodyMotionItem);
     setSubItem("refP", refPSeqPtr, mBodyMotionItem);
     setSubItem("refL", refLSeqPtr, mBodyMotionItem);
+
+    for(std::vector<int>::iterator iter = failIdxVec.begin(); iter != failIdxVec.end(); ++iter) cout << "Failed in " << *iter << ":(" << (*iter)*dt << " sec)" << endl;
+    if(failIdxVec.empty()) cout << "All QP succeeded" << endl;
 
     cout << "Finished MultiContactStabilizer" << endl;
 }
