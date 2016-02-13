@@ -50,12 +50,22 @@ namespace cnoid{
 
     class MultiContactStabilizerPlugin : public Plugin
     {
+    private:
+        Vector3SeqPtr mRefCMSeqPtr, mRefPSeqPtr, mRefLSeqPtr;
+        std::ofstream mOfs;
+        hrp::MultiContactStabilizer* mcs;
+        Vector3d lastP;
+        std::vector<int> failIdxVec;
+
+        void processCycle(int i, std::vector<hrp::ContactConstraintParam>& ccParamVec);
+
     public:
         BodyPtr body;
         BodyMotionItem* mBodyMotionItem;
         BodyMotionPtr motion;
 
         boost::filesystem::path mPoseSeqPath;
+
         int frameRate;
         double dt;
         int numFrames;
