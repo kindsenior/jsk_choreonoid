@@ -274,16 +274,13 @@ void MultiContactStabilizerParam::calcRefStateVector(dvector& refStateVec)
 
 void MultiContactStabilizerParam::calcErrorWeightVector(dvector& errorWeightVec)
 {
-    static double errorCMWeight = 1e1, errorMomentumWeight = 1e2, errorAngularMomentumWeight = 1e3;// nagasaka
-    // static double errorCMWeight = 1e1, errorMomentumWeight = 1e-1, errorAngularMomentumWeight = 1e3;// nozawa
-    // static double errorCMWeight = 1e-3, errorMomentumWeight = 1e-3, errorAngularMomentumWeight = 1e-3;
+    double errorCMWeight = controller->errorCMWeight, errorMomentumWeight = controller->errorMomentumWeight, errorAngularMomentumWeight = controller->errorAngularMomentumWeight;
     errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight;
 }
 
 void MultiContactStabilizerParam::calcInputWeightVector(dvector& inputWeightVec)
 {
-    static double inputForceWeight = 1e-3, inputMomentWeight = 1e4;// nagasaka
-    // static double inputForceWeight = 1e-4, inputMomentWeight = 1e-2;// nozawa
+    double inputForceWeight = controller->inputForceWeight, inputMomentWeight = controller->inputMomentWeight;
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
         inputWeightVec.block(unitInputDim*idx,0, unitInputDim,1) << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;

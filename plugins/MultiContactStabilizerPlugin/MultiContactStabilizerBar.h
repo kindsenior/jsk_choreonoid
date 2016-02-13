@@ -21,14 +21,42 @@ namespace cnoid {
 class MultiContactStabilizerSetupDialog;
 class MultiContactStabilizerPlugin;
 
+class MultiContactStabilizerSetupDialog : public Dialog
+{
+public:
+    QVBoxLayout* vbox;
+
+    DoubleSpinBox errorCMWeightSpin;
+    DoubleSpinBox errorMomentumWeightSpin;
+    DoubleSpinBox errorAngularMomentumWeightSpin;
+    DoubleSpinBox inputForceWeightSpin;
+    DoubleSpinBox inputMomentWeightSpin;
+
+    LineEdit errorCMNameLine;
+    LineEdit errorMomentumNameLine;
+    LineEdit errorAngularMomentumNameLine;
+    LineEdit inputForceNameLine;
+    LineEdit inputMomentNameLine;
+
+    CheckBox saveParameterInFileNameCheck;
+
+    MultiContactStabilizerSetupDialog();
+
+    QHBoxLayout* newRow(QVBoxLayout* vbox);
+    void storeState(Archive& archive);
+    void restoreState(const Archive& archive);
+};
+
+
 class MultiContactStabilizerBar : public ToolBar
 {
 private:
-    MultiContactStabilizerSetupDialog* dialog;
     bool storeState(Archive& archive);
     bool restoreState(const Archive& archive);
 
 public:
+    MultiContactStabilizerSetupDialog* dialog;
+
     MultiContactStabilizerBar(MultiContactStabilizerPlugin* plugin);
 };
 

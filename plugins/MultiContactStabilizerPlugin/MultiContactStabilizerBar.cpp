@@ -5,163 +5,144 @@
 
 using namespace cnoid;
 
-namespace cnoid {
-
-class MultiContactStabilizerSetupDialog : public Dialog
+MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 {
-public:
-    QVBoxLayout* vbox;
+    setWindowTitle("Multi Contact Stabilizer Setup");
 
-    DoubleSpinBox errorCMWeightSpin;
-    DoubleSpinBox errorMomentumWeightSpin;
-    DoubleSpinBox errorAngularMomentumWeightSpin;
-    DoubleSpinBox inputForceWeightSpin;
-    DoubleSpinBox inputMomentWeightSpin;
+    vbox = new QVBoxLayout();
 
-    LineEdit errorCMNameLine;
-    LineEdit errorMomentumNameLine;
-    LineEdit errorAngularMomentumNameLine;
-    LineEdit inputForceNameLine;
-    LineEdit inputMomentNameLine;
-
-    CheckBox saveParameterInFileNameCheck;
-
-    // void addSeparator(QVBoxLayout* vbox){
-    //     vbox->addSpacing(4);
-    //     vbox->addWidget(new HSeparator());
-    //     vbox->addSpacing(2);
-    // }
-
-    // void addSeparator(QVBoxLayout* vbox, QWidget* widget) {
-    //     vbox->addSpacing(4);
-    //     vbox->addLayout(new HSeparatorBox(widget));
-    //     vbox->addSpacing(2);
-    // }
-
-    QHBoxLayout* newRow(QVBoxLayout* vbox) {
-        QHBoxLayout* hbox = new QHBoxLayout();
-        hbox->setSpacing(2);
-        hbox->setContentsMargins(2, 2, 2, 2);
-        vbox->addLayout(hbox);
-        return hbox;
-    }
-        
-    MultiContactStabilizerSetupDialog()
-    {
-        setWindowTitle("Multi Contact Stabilizer Setup");
-
-        vbox = new QVBoxLayout();
-
-        QHBoxLayout* hbox = newRow(vbox);
-        hbox->addWidget(new QLabel("CM:"));
-        errorCMWeightSpin.setDecimals(4);
-        errorCMWeightSpin.setRange(0.0001, 10000);
-        errorCMWeightSpin.setSingleStep(0.0001);
-        errorCMWeightSpin.setValue(1000);
-        hbox->addWidget(&errorCMWeightSpin);
+    QHBoxLayout* hbox = newRow(vbox);
+    hbox->addWidget(new QLabel("CM:"));
+    errorCMWeightSpin.setDecimals(4);
+    errorCMWeightSpin.setRange(0.0001, 10000);
+    errorCMWeightSpin.setSingleStep(0.0001);
+    errorCMWeightSpin.setValue(1000);
+    hbox->addWidget(&errorCMWeightSpin);
             
-        hbox->addSpacing(8);
-        hbox->addWidget(new QLabel("Momentum:"));
-        errorMomentumWeightSpin.setDecimals(4);
-        errorMomentumWeightSpin.setRange(0.0001, 10000);
-        errorMomentumWeightSpin.setSingleStep(0.0001);
-        errorMomentumWeightSpin.setValue(100);
-        hbox->addWidget(&errorMomentumWeightSpin);
+    hbox->addSpacing(8);
+    hbox->addWidget(new QLabel("Momentum:"));
+    errorMomentumWeightSpin.setDecimals(4);
+    errorMomentumWeightSpin.setRange(0.0001, 10000);
+    errorMomentumWeightSpin.setSingleStep(0.0001);
+    errorMomentumWeightSpin.setValue(100);
+    hbox->addWidget(&errorMomentumWeightSpin);
             
-        hbox->addSpacing(8);
-        hbox->addWidget(new QLabel("AngularMomentum"));
-        errorAngularMomentumWeightSpin.setDecimals(4);
-        errorAngularMomentumWeightSpin.setRange(0.0001, 10000);
-        errorAngularMomentumWeightSpin.setSingleStep(0.0001);
-        errorAngularMomentumWeightSpin.setValue(1000);
-        hbox->addWidget(&errorAngularMomentumWeightSpin);
-        hbox->addStretch();
+    hbox->addSpacing(8);
+    hbox->addWidget(new QLabel("AngularMomentum"));
+    errorAngularMomentumWeightSpin.setDecimals(4);
+    errorAngularMomentumWeightSpin.setRange(0.0001, 10000);
+    errorAngularMomentumWeightSpin.setSingleStep(0.0001);
+    errorAngularMomentumWeightSpin.setValue(1000);
+    hbox->addWidget(&errorAngularMomentumWeightSpin);
+    hbox->addStretch();
 
 
-        hbox = newRow(vbox);
-        hbox->addWidget(new QLabel("Force:"));
-        inputForceWeightSpin.setDecimals(4);
-        inputForceWeightSpin.setRange(0.0001, 10000);
-        inputForceWeightSpin.setSingleStep(0.0001);
-        inputForceWeightSpin.setValue(0.001);
-        hbox->addWidget(&inputForceWeightSpin);
+    hbox = newRow(vbox);
+    hbox->addWidget(new QLabel("Force:"));
+    inputForceWeightSpin.setDecimals(4);
+    inputForceWeightSpin.setRange(0.0001, 10000);
+    inputForceWeightSpin.setSingleStep(0.0001);
+    inputForceWeightSpin.setValue(0.001);
+    hbox->addWidget(&inputForceWeightSpin);
 
-        hbox->addSpacing(8);
-        hbox->addWidget(new QLabel("Moment:"));
-        inputMomentWeightSpin.setDecimals(4);
-        inputMomentWeightSpin.setRange(0.0001, 10000);
-        inputMomentWeightSpin.setSingleStep(0.0001);
-        inputMomentWeightSpin.setValue(10000);
-        hbox->addWidget(&inputMomentWeightSpin);
-        hbox->addStretch();
-
-
-        hbox = newRow(vbox);
-        saveParameterInFileNameCheck.setText("Save parameters in file name");
-        saveParameterInFileNameCheck.setChecked(true);
-        hbox->addWidget(&saveParameterInFileNameCheck);
-        hbox->addStretch();
+    hbox->addSpacing(8);
+    hbox->addWidget(new QLabel("Moment:"));
+    inputMomentWeightSpin.setDecimals(4);
+    inputMomentWeightSpin.setRange(0.0001, 10000);
+    inputMomentWeightSpin.setSingleStep(0.0001);
+    inputMomentWeightSpin.setValue(10000);
+    hbox->addWidget(&inputMomentWeightSpin);
+    hbox->addStretch();
 
 
-        hbox = newRow(vbox);
-        hbox->addWidget(new QLabel("CM:"));
-        errorCMNameLine.setText("CM");
-        hbox->addWidget(&errorCMNameLine);
-
-        hbox->addStretch(8);
-        hbox->addWidget(new QLabel("P:"));
-        errorMomentumNameLine.setText("P");
-        hbox->addWidget(&errorMomentumNameLine);
-
-        hbox->addSpacing(8);
-        hbox->addWidget(new QLabel("L:"));
-        errorAngularMomentumNameLine.setText("L");
-        hbox->addWidget(&errorAngularMomentumNameLine);
-
-        hbox->addSpacing(8);
-        hbox->addWidget(new QLabel("F:"));
-        inputForceNameLine.setText("F");
-        hbox->addWidget(&inputForceNameLine);
-
-        hbox->addSpacing(8);
-        hbox->addWidget(new QLabel("N:"));
-        inputMomentNameLine.setText("N");
-        hbox->addWidget(&inputMomentNameLine);
-        hbox->addStretch();
+    hbox = newRow(vbox);
+    saveParameterInFileNameCheck.setText("Save parameters in file name");
+    saveParameterInFileNameCheck.setChecked(true);
+    hbox->addWidget(&saveParameterInFileNameCheck);
+    hbox->addStretch();
 
 
-        QVBoxLayout* topVBox = new QVBoxLayout();
-        topVBox->addLayout(vbox);
+    hbox = newRow(vbox);
+    hbox->addWidget(new QLabel("CM:"));
+    errorCMNameLine.setText("CM");
+    hbox->addWidget(&errorCMNameLine);
 
-        QPushButton* okButton = new QPushButton("&Ok");
-        okButton->setDefault(true);
-        QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
-        buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
-        connect(buttonBox,SIGNAL(accepted()), this, SLOT(accept()));
-        topVBox->addWidget(buttonBox);
+    hbox->addStretch(8);
+    hbox->addWidget(new QLabel("P:"));
+    errorMomentumNameLine.setText("P");
+    hbox->addWidget(&errorMomentumNameLine);
 
-        setLayout(topVBox);
-    }
+    hbox->addSpacing(8);
+    hbox->addWidget(new QLabel("L:"));
+    errorAngularMomentumNameLine.setText("L");
+    hbox->addWidget(&errorAngularMomentumNameLine);
 
-    void storeState(Archive& archive){
-        archive.write("errorCMWeight", errorCMWeightSpin.value());
-        archive.write("errorMomentumWeight", errorMomentumWeightSpin.value());
-        archive.write("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value());
-        archive.write("inputForceWeight", inputForceWeightSpin.value());
-        archive.write("inputMomentWeight", inputMomentWeightSpin.value());
-        archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
-    }
+    hbox->addSpacing(8);
+    hbox->addWidget(new QLabel("F:"));
+    inputForceNameLine.setText("F");
+    hbox->addWidget(&inputForceNameLine);
 
-    void restoreState(const Archive& archive){
-        errorCMWeightSpin.setValue(archive.get("errorCMWeight", errorCMWeightSpin.value()));
-        errorMomentumWeightSpin.setValue(archive.get("errorMomentumWeight", errorMomentumWeightSpin.value()));
-        errorAngularMomentumWeightSpin.setValue(archive.get("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value()));
-        inputForceWeightSpin.setValue(archive.get("inputForceWeight", inputForceWeightSpin.value()));
-        inputMomentWeightSpin.setValue(archive.get("inputMomentWeight", inputMomentWeightSpin.value()));
-        saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
-    }
-};
+    hbox->addSpacing(8);
+    hbox->addWidget(new QLabel("N:"));
+    inputMomentNameLine.setText("N");
+    hbox->addWidget(&inputMomentNameLine);
+    hbox->addStretch();
 
+
+    QVBoxLayout* topVBox = new QVBoxLayout();
+    topVBox->addLayout(vbox);
+
+    QPushButton* okButton = new QPushButton("&Ok");
+    okButton->setDefault(true);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
+    buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
+    connect(buttonBox,SIGNAL(accepted()), this, SLOT(accept()));
+    topVBox->addWidget(buttonBox);
+
+    setLayout(topVBox);
+}
+
+// void MultiContactStabilizerSetupDialog::addSeparator(QVBoxLayout* vbox)
+// {
+//     vbox->addSpacing(4);
+//     vbox->addWidget(new HSeparator());
+//     vbox->addSpacing(2);
+// }
+
+// void MultiContactStabilizerSetupDialog::addSeparator(QVBoxLayout* vbox, QWidget* widget)
+// {
+//     vbox->addSpacing(4);
+//     vbox->addLayout(new HSeparatorBox(widget));
+//     vbox->addSpacing(2);
+// }
+
+QHBoxLayout* MultiContactStabilizerSetupDialog::newRow(QVBoxLayout* vbox)
+{
+    QHBoxLayout* hbox = new QHBoxLayout();
+    hbox->setSpacing(2);
+    hbox->setContentsMargins(2, 2, 2, 2);
+    vbox->addLayout(hbox);
+    return hbox;
+}
+
+void MultiContactStabilizerSetupDialog::storeState(Archive& archive)
+{
+    archive.write("errorCMWeight", errorCMWeightSpin.value());
+    archive.write("errorMomentumWeight", errorMomentumWeightSpin.value());
+    archive.write("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value());
+    archive.write("inputForceWeight", inputForceWeightSpin.value());
+    archive.write("inputMomentWeight", inputMomentWeightSpin.value());
+    archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
+}
+
+void MultiContactStabilizerSetupDialog::restoreState(const Archive& archive)
+{
+    errorCMWeightSpin.setValue(archive.get("errorCMWeight", errorCMWeightSpin.value()));
+    errorMomentumWeightSpin.setValue(archive.get("errorMomentumWeight", errorMomentumWeightSpin.value()));
+    errorAngularMomentumWeightSpin.setValue(archive.get("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value()));
+    inputForceWeightSpin.setValue(archive.get("inputForceWeight", inputForceWeightSpin.value()));
+    inputMomentWeightSpin.setValue(archive.get("inputMomentWeight", inputMomentWeightSpin.value()));
+    saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
 }
 
 MultiContactStabilizerBar::MultiContactStabilizerBar(MultiContactStabilizerPlugin* plugin)

@@ -100,6 +100,8 @@ public:
     std::deque<MultiContactStabilizerParam> mcsParamDeque;
     double m,dt;
     int unitInputDim;// 接触点ごとの入力次元
+    double errorCMWeight,errorMomentumWeight,errorAngularMomentumWeight;
+    double inputForceWeight,inputMomentWeight;
 
     MultiContactStabilizer();
 

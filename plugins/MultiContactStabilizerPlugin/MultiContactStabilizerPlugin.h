@@ -48,6 +48,7 @@
 #include "MultiContactStabilizerBar.h"
 
 namespace cnoid{
+    class MultiContactStabilizerBar;
 
     class MultiContactStabilizerPlugin : public Plugin
     {
@@ -64,6 +65,7 @@ namespace cnoid{
         BodyPtr body;
         BodyMotionItem* mBodyMotionItem;
         BodyMotionPtr motion;
+        MultiContactStabilizerBar* mBar;
 
         boost::filesystem::path mPoseSeqPath;
 

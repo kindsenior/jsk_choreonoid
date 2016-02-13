@@ -10,8 +10,8 @@ using namespace hrp;
 
 bool MultiContactStabilizerPlugin::initialize()
 {
-    MultiContactStabilizerBar* bar = new MultiContactStabilizerBar(this);
-    addToolBar(bar);
+    mBar = new MultiContactStabilizerBar(this);
+    addToolBar(mBar);
     return true;
 }
 
@@ -194,6 +194,11 @@ void MultiContactStabilizerPlugin::execControl()
     mcs->m = body->mass();
     mcs->dt = dt;
     mcs->numWindows = 10;
+    mcs->errorCMWeight = mBar->dialog->errorCMWeightSpin.value();
+    mcs->errorMomentumWeight = mBar->dialog->errorMomentumWeightSpin.value();
+    mcs->errorAngularMomentumWeight = mBar->dialog->errorAngularMomentumWeightSpin.value();
+    mcs->inputForceWeight = mBar->dialog->inputForceWeightSpin.value();
+    mcs->inputMomentWeight = mBar->dialog->inputMomentWeightSpin.value();
 
     // モーション走査
     fnamess.str("");
