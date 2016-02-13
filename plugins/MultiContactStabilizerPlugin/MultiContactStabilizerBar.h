@@ -31,12 +31,14 @@ public:
     DoubleSpinBox errorAngularMomentumWeightSpin;
     DoubleSpinBox inputForceWeightSpin;
     DoubleSpinBox inputMomentWeightSpin;
+    DoubleSpinBox numWindowsSpin;
 
     LineEdit errorCMNameLine;
     LineEdit errorMomentumNameLine;
     LineEdit errorAngularMomentumNameLine;
     LineEdit inputForceNameLine;
     LineEdit inputMomentNameLine;
+    LineEdit numWindowsNameLine;
 
     CheckBox saveParameterInFileNameCheck;
 

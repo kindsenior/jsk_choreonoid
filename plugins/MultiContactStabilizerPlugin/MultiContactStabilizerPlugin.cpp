@@ -193,7 +193,7 @@ void MultiContactStabilizerPlugin::execControl()
     mcs = new MultiContactStabilizer();
     mcs->m = body->mass();
     mcs->dt = dt;
-    mcs->numWindows = 10;
+    mcs->numWindows = mBar->dialog->numWindowsSpin.value();
     mcs->errorCMWeight = mBar->dialog->errorCMWeightSpin.value();
     mcs->errorMomentumWeight = mBar->dialog->errorMomentumWeightSpin.value();
     mcs->errorAngularMomentumWeight = mBar->dialog->errorAngularMomentumWeightSpin.value();

@@ -56,6 +56,16 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
 
     hbox = newRow(vbox);
+    hbox->addWidget(new QLabel("Window:"));
+    numWindowsSpin.setDecimals(0);
+    numWindowsSpin.setRange(1, 1000);
+    numWindowsSpin.setSingleStep(1);
+    numWindowsSpin.setValue(13);
+    hbox->addWidget(&numWindowsSpin);
+    hbox->addStretch();
+
+
+    hbox = newRow(vbox);
     saveParameterInFileNameCheck.setText("Save parameters in file name");
     saveParameterInFileNameCheck.setChecked(true);
     hbox->addWidget(&saveParameterInFileNameCheck);
@@ -78,14 +88,19 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     hbox->addWidget(&errorAngularMomentumNameLine);
 
     hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("F:"));
-    inputForceNameLine.setText("F");
+    hbox->addWidget(new QLabel("f:"));
+    inputForceNameLine.setText("f");
     hbox->addWidget(&inputForceNameLine);
 
     hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("N:"));
-    inputMomentNameLine.setText("N");
+    hbox->addWidget(new QLabel("n:"));
+    inputMomentNameLine.setText("n");
     hbox->addWidget(&inputMomentNameLine);
+
+    hbox->addSpacing(8);
+    hbox->addWidget(new QLabel("N:"));
+    numWindowsNameLine.setText("N");
+    hbox->addWidget(&numWindowsNameLine);
     hbox->addStretch();
 
 
@@ -132,6 +147,7 @@ void MultiContactStabilizerSetupDialog::storeState(Archive& archive)
     archive.write("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value());
     archive.write("inputForceWeight", inputForceWeightSpin.value());
     archive.write("inputMomentWeight", inputMomentWeightSpin.value());
+    archive.write("numWindows", numWindowsSpin.value());
     archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
 }
 
@@ -142,6 +158,7 @@ void MultiContactStabilizerSetupDialog::restoreState(const Archive& archive)
     errorAngularMomentumWeightSpin.setValue(archive.get("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value()));
     inputForceWeightSpin.setValue(archive.get("inputForceWeight", inputForceWeightSpin.value()));
     inputMomentWeightSpin.setValue(archive.get("inputMomentWeight", inputMomentWeightSpin.value()));
+    numWindowsSpin.setValue(archive.get("numWindows", numWindowsSpin.value()));
     saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
 }
 
