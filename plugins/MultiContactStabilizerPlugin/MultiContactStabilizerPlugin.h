@@ -45,6 +45,7 @@
 
 #include "Controller.h"
 #include "test.h"
+#include "MultiContactStabilizerBar.h"
 
 namespace cnoid{
 
@@ -77,18 +78,7 @@ namespace cnoid{
             // require("Dynamics");
         }
     
-        virtual bool initialize()
-        {
-            ToolBar* bar = new ToolBar("MultiContactStabilizer");
-
-            bar->addButton("MCS")
-                ->sigClicked().connect(boost::bind(&MultiContactStabilizerPlugin::execControl, this));
-
-            bar->setVisibleByDefault(true);// 効かない?
-            addToolBar(bar);
-
-            return true;
-        }
+        virtual bool initialize();
 
         void generateSeq();
         void generateContactConstraintParamVec(std::vector<hrp::ContactConstraintParam>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);

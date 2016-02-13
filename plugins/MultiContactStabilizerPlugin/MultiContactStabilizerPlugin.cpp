@@ -8,6 +8,14 @@ using namespace cnoid;
 using namespace std;
 using namespace hrp;
 
+bool MultiContactStabilizerPlugin::initialize()
+{
+    MultiContactStabilizerBar* bar = new MultiContactStabilizerBar(this);
+    addToolBar(bar);
+    return true;
+}
+
+
 void MultiContactStabilizerPlugin::generateSeq()
 {
     stringstream ss;
