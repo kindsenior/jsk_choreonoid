@@ -24,7 +24,7 @@ public:
     QP(){};
 
     QP(int nV, int nE, int nIne)
-        : qpOASES::QProblem(nV, nE*2+nIne)
+        : qpOASES::QProblem(nV, nE+nIne)
     {
         valueDim = nV;
         equalDim = nE;
