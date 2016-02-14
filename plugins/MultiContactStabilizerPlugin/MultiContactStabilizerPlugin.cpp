@@ -257,6 +257,8 @@ void MultiContactStabilizerPlugin::execControl()
     setSubItem("refP", mRefPSeqPtr, mBodyMotionItem);
     setSubItem("refL", mRefLSeqPtr, mBodyMotionItem);
 
+    mOfs.close();
+
     for(std::vector<int>::iterator iter = failIdxVec.begin(); iter != failIdxVec.end(); ++iter) cout << "Failed in " << *iter << ":(" << (*iter)*dt << " sec)" << endl;
     if(failIdxVec.empty()) cout << "All QP succeeded" << endl;
     failIdxVec.clear();
