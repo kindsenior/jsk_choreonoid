@@ -28,9 +28,12 @@ typedef struct CONTACTCONSTRAINTPARAM
     double mu;
 }ContactConstraintParam;
 
-typedef struct MODELPREVIEWCONTROLLERPARAM
+class ModelPreviewControllerParam
 {
-    // int inputDim;
+public:
+    int stateDim;
+    int inputDim;
+
     dmatrix systemMat;// A
     dmatrix inputMat;// B
     dmatrix equalMat;
@@ -44,7 +47,9 @@ typedef struct MODELPREVIEWCONTROLLERPARAM
     dvector errorWeightVec;
     dvector inputWeightVec;
     // dmatrix outputMat;
-}ModelPreviewControllerParam;
+
+    ModelPreviewControllerParam(){};
+};
 
 class ModelPreviewController
 {
@@ -80,7 +85,7 @@ public:
     int stateDim;
     int psiCols, equalMatRows, inequalMatRows;
     bool isInitial;
-    std::deque<ModelPreviewControllerParam> mpcParamDeque;
+    std::deque<ModelPreviewControllerParam*> mpcParamDeque;
     dvector x0;
 
     ModelPreviewController();
@@ -97,7 +102,6 @@ class MultiContactStabilizer : public ModelPreviewController
 {
     friend class Test;
 public:
-    std::deque<MultiContactStabilizerParam> mcsParamDeque;
     double m,dt;
     int unitInputDim;// 接触点ごとの入力次元
     double errorCMWeight,errorMomentumWeight,errorAngularMomentumWeight;
@@ -109,7 +113,7 @@ public:
     int execQP();
 };
 
-class MultiContactStabilizerParam
+class MultiContactStabilizerParam : public ModelPreviewControllerParam
 {
 private:
     MultiContactStabilizer* controller;
@@ -125,24 +129,27 @@ public:
     Vector3 L;
     Vector3 F;
 
-    MultiContactStabilizerParam(MultiContactStabilizer* mcs){
+    MultiContactStabilizerParam(MultiContactStabilizer* mcs)
+        : ModelPreviewControllerParam()
+    {
         controller = mcs;
+        stateDim = controller->stateDim;
         unitInputDim = controller->unitInputDim;
         dt = controller->dt;
         numEquals = 1;//Fzの合計
         numInequals = 0;
     }
 
-    void calcInputMatrix(dmatrix& inputMat);
-    void calcSystemMatrix(dmatrix& systemMat);
-    void calcEqualMatrix(dmatrix& equalMat);
-    void calcEqualVector(dvector& equalVec);
-    void calcInequalMatrix(dmatrix& inequalMat);
-    void calcMinimumVector(dvector& minVec);
-    void calcRefStateVector(dvector& refStateVec);
-    void calcErrorWeightVector(dvector& errorWeightVec);
-    void calcInputWeightVector(dvector& inputWeightVec);
-    void convertToMPCParam(ModelPreviewControllerParam& mpcParam);
+    void calcInputMatrix();
+    void calcSystemMatrix();
+    void calcEqualMatrix();
+    void calcEqualVector();
+    void calcInequalMatrix();
+    void calcMinimumVector();
+    void calcRefStateVector();
+    void calcErrorWeightVector();
+    void calcInputWeightVector();
+    void convertToMPCParam();
 };
 
 }

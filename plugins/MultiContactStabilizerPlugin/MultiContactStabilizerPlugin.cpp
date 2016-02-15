@@ -81,8 +81,9 @@ void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector
     }
 }
 
-void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiContactStabilizerParam& mcsParam, BodyPtr body, std::vector<ContactConstraintParam>& ccParamVec)
+void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiContactStabilizerParam* mcsParam, BodyPtr body, std::vector<ContactConstraintParam>& ccParamVec)
 {
+
     static Vector3 g;
     g << 0,0,9.8;
 
@@ -91,19 +92,19 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
     CM = body->calcCenterOfMass();
     body->calcTotalMomentum(P,L);
     L -= CM.cross(P);// convert to around CoM
-    mcsParam.CM = CM;
-    mcsParam.P = P;
-    mcsParam.L = L;
-    mcsParam.F = (P - lastP)/dt + body->mass()*g;
+    mcsParam->CM = CM;
+    mcsParam->P = P;
+    mcsParam->L = L;
+    mcsParam->F = (P - lastP)/dt + body->mass()*g;
 
     // 接触点座標系の更新 等式と不等式数の合計
     for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         (*iter).p = body->link((*iter).linkName)->p();
         (*iter).R =  body->link((*iter).linkName)->R();
-        mcsParam.numEquals += (*iter).numEquals;
-        mcsParam.numInequals += (*iter).numInequals;
+        mcsParam->numEquals += (*iter).numEquals;
+        mcsParam->numInequals += (*iter).numInequals;
     }
-    mcsParam.ccParamVec = ccParamVec;
+    mcsParam->ccParamVec = ccParamVec;
 
     lastP = P;
 }
@@ -115,7 +116,7 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
     updateBodyState(body, motion, min(i,numFrames-1));
     body->calcForwardKinematics(true, true);
 
-    MultiContactStabilizerParam mcsParam = MultiContactStabilizerParam(mcs);
+    MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(mcs);
     // 動作軌道に依存するパラメータの設定
     generateMultiContactStabilizerParam(mcsParam, body, ccParamVec);
 
@@ -140,11 +141,9 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
 
         mcs->mpcParamDeque.pop_front();
     }
-    ModelPreviewControllerParam mpcParam;
-    mcsParam.convertToMPCParam(mpcParam);
+    mcsParam->convertToMPCParam();
 
-    mcs->mcsParamDeque.push_back(mcsParam);
-    mcs->mpcParamDeque.push_back(mpcParam);
+    mcs->mpcParamDeque.push_back(mcsParam);
 }
 
 void MultiContactStabilizerPlugin::execControl()

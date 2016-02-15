@@ -84,7 +84,7 @@ namespace cnoid{
 
         void generateSeq();
         void generateContactConstraintParamVec(std::vector<hrp::ContactConstraintParam>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);
-        void generateMultiContactStabilizerParam(hrp::MultiContactStabilizerParam& mcsParam, BodyPtr body, std::vector<hrp::ContactConstraintParam>& ccParamVec);
+        void generateMultiContactStabilizerParam(hrp::MultiContactStabilizerParam* mcsParam, BodyPtr body, std::vector<hrp::ContactConstraintParam>& ccParamVec);
         void execControl();
 
     };
