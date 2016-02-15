@@ -8,7 +8,7 @@ using namespace hrp;
 
 void Test::testAugmentedMatrix(MultiContactStabilizer* mcs)
 {
-    std::deque<ModelPreviewControllerParam*> mpcParamDeque =  mcs->mpcParamDeque;
+    std::deque<ModelPredictiveControllerParam*> mpcParamDeque =  mcs->mpcParamDeque;
     int stateDim = mcs->stateDim;
     dvector U(mcs->psiCols);
     dvector xk(stateDim);
@@ -16,7 +16,7 @@ void Test::testAugmentedMatrix(MultiContactStabilizer* mcs)
     dvector x0(stateDim);
     x0 = mcs->x0;
     int colIdx = 0;
-    for(std::deque<ModelPreviewControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+    for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
         int idx = std::distance(mpcParamDeque.begin(), iter);
         dmatrix inputMat = (*iter)->inputMat;
         int inputDim = inputMat.cols();

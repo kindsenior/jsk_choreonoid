@@ -28,7 +28,7 @@ typedef struct CONTACTCONSTRAINTPARAM
     double mu;
 }ContactConstraintParam;
 
-class ModelPreviewControllerParam
+class ModelPredictiveControllerParam
 {
 public:
     int stateDim;
@@ -48,10 +48,10 @@ public:
     dvector inputWeightVec;
     // dmatrix outputMat;
 
-    ModelPreviewControllerParam(){};
+    ModelPredictiveControllerParam(){};
 };
 
-class ModelPreviewController
+class ModelPredictiveController
 {
 protected:
     QP qpInterface;
@@ -85,10 +85,10 @@ public:
     int stateDim;
     int psiCols, equalMatRows, inequalMatRows;
     bool isInitial;
-    std::deque<ModelPreviewControllerParam*> mpcParamDeque;
+    std::deque<ModelPredictiveControllerParam*> mpcParamDeque;
     dvector x0;
 
-    ModelPreviewController();
+    ModelPredictiveController();
 
     void calcAugmentedMatrix();
     void updateX0Vector();
@@ -98,7 +98,7 @@ public:
 
 class Test;
 class MultiContactStabilizerParam;
-class MultiContactStabilizer : public ModelPreviewController
+class MultiContactStabilizer : public ModelPredictiveController
 {
     friend class Test;
 public:
@@ -113,7 +113,7 @@ public:
     int execQP();
 };
 
-class MultiContactStabilizerParam : public ModelPreviewControllerParam
+class MultiContactStabilizerParam : public ModelPredictiveControllerParam
 {
 private:
     MultiContactStabilizer* controller;
@@ -130,7 +130,7 @@ public:
     Vector3 F;
 
     MultiContactStabilizerParam(MultiContactStabilizer* mcs)
-        : ModelPreviewControllerParam()
+        : ModelPredictiveControllerParam()
     {
         controller = mcs;
         stateDim = controller->stateDim;
