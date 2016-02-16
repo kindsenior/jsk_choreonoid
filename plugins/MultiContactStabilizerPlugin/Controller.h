@@ -12,21 +12,10 @@
 
 #include <hrpUtil/EigenTypes.h>
 
+#include "ContactConstraint.h"
 #include "QP.h"
 
 namespace hrp {
-
-typedef struct CONTACTCONSTRAINTPARAM
-{
-    int contactState;
-    int numEquals;
-    int numInequals;
-    std::string linkName;
-    Vector3 p;
-    Matrix33 R;
-    std::vector<Vector3> edgeVec;
-    double mu;
-}ContactConstraintParam;
 
 class ModelPredictiveControllerParam
 {
@@ -121,7 +110,7 @@ private:
     double dt;
 
 public:
-    std::vector<ContactConstraintParam> ccParamVec;
+    std::vector<ContactConstraintParam*> ccParamVec;
     int numEquals;
     int numInequals;
     Vector3 CM;

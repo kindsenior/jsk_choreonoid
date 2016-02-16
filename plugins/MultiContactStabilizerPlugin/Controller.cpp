@@ -200,10 +200,10 @@ void MultiContactStabilizerParam::calcSystemMatrix()
 void MultiContactStabilizerParam::calcInputMatrix()
 {
     inputMat = dmatrix::Zero(stateDim,inputDim);
-    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+    for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
-        Matrix33 R = (*iter).R;
-        Vector3 p = (*iter).p;
+        Matrix33 R = (*iter)->R;
+        Vector3 p = (*iter)->p;
 
         dmatrix R2 = dmatrix::Zero(unitInputDim,unitInputDim);
         R2.block(0,0,3,3) = R;
@@ -225,9 +225,9 @@ void MultiContactStabilizerParam::calcInputMatrix()
 void MultiContactStabilizerParam::calcEqualMatrix()
 {
     equalMat = dmatrix::Zero(numEquals, inputDim);
-    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+    for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
-        Matrix33 R = (*iter).R;
+        Matrix33 R = (*iter)->R;
         equalMat.block(0,unitInputDim*idx, 1,3) = R.block(2,0,1,3);
     }
 }
@@ -259,7 +259,7 @@ void MultiContactStabilizerParam::calcInequalMatrix()
 void MultiContactStabilizerParam::calcMinimumVector()
 {
     minVec = dvector::Constant(inputDim,-INFINITY);
-    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+    for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
 
         minVec.block(unitInputDim*idx+2,0,1,1) = dmatrix::Zero(1,1);
@@ -288,7 +288,7 @@ void MultiContactStabilizerParam::calcInputWeightVector()
 {
     inputWeightVec = dvector(inputDim);
     double inputForceWeight = controller->inputForceWeight, inputMomentWeight = controller->inputMomentWeight;
-    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+    for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
         inputWeightVec.block(unitInputDim*idx,0, unitInputDim,1) << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;
     }
@@ -297,6 +297,10 @@ void MultiContactStabilizerParam::calcInputWeightVector()
 void MultiContactStabilizerParam::convertToMPCParam()
 {
     inputDim = unitInputDim*ccParamVec.size();
+    for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+        numEquals += (*iter)->numEquals;
+        numInequals += (*iter)->numInequals;
+    }
 
     calcEqualMatrix();
     calcEqualVector();

@@ -48,40 +48,30 @@ void MultiContactStabilizerPlugin::generateSeq()
     ofs.close();
 }
 
-void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector<ContactConstraintParam>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
+void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
     for(std::set<Link*>::iterator linkIter = contactLinkCantidateSet.begin(); linkIter != contactLinkCantidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
         if(contactState < 2){// 接触フラグが0か1 要改良
-            ContactConstraintParam ccParam;
-            ccParam.contactState = contactState;
-            ccParam.linkName = (*linkIter)->name();
-
-            ccParam.numEquals = 0;// 接触条件ごとの等式条件は0個 Fzの制約は全接触点の合計
-
-            // 接触点座標で変化しないローカルな値は代入できる
-            ccParam.mu = 0.5;// 要改良
-            ccParam.numInequals = 4;// 静止摩擦制約式数
-
-            Vector3 edge;// 要改良 直線の係数a,b,cを代入
+            std::vector<hrp::Vector3> edgeVec;
+            hrp::Vector3 edge;// 要改良 直線の係数a,b,cを代入
             edge << -1, 0, 0.1;
-            ccParam.edgeVec.push_back(edge);
+            edgeVec.push_back(edge);
             edge << 1, 0, 0.1;
-            ccParam.edgeVec.push_back(edge);
+            edgeVec.push_back(edge);
             edge << 0, -1, 0.05;
-            ccParam.edgeVec.push_back(edge);
+            edgeVec.push_back(edge);
             edge << 0, 1, 0.05;
-            ccParam.edgeVec.push_back(edge);
+            edgeVec.push_back(edge);
 
-            ccParam.numInequals += ccParam.edgeVec.size();// cop制約式数
-
+            StaticContactConstraintParam* ccParam = new StaticContactConstraintParam((*linkIter)->name(), 0.5, edgeVec);// 摩擦係数 要改良
             ccParamVec.push_back(ccParam);
         }
     }
 }
 
-void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiContactStabilizerParam* mcsParam, BodyPtr body, std::vector<ContactConstraintParam>& ccParamVec)
+void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiContactStabilizerParam* mcsParam, BodyPtr body, std::vector<ContactConstraintParam*>& ccParamVec)
 {
 
     static Vector3 g;
@@ -98,18 +88,16 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
     mcsParam->F = (P - lastP)/dt + body->mass()*g;
 
     // 接触点座標系の更新 等式と不等式数の合計
-    for(std::vector<ContactConstraintParam>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        (*iter).p = body->link((*iter).linkName)->p();
-        (*iter).R =  body->link((*iter).linkName)->R();
-        mcsParam->numEquals += (*iter).numEquals;
-        mcsParam->numInequals += (*iter).numInequals;
+    for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+        (*iter)->p = body->link((*iter)->linkName)->p();
+        (*iter)->R =  body->link((*iter)->linkName)->R();
     }
     mcsParam->ccParamVec = ccParamVec;
 
     lastP = P;
 }
 
-void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstraintParam>& ccParamVec)
+void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
 {
     cout << endl << "##############################" << endl << "turn:" << i << endl;
 
@@ -233,7 +221,7 @@ void MultiContactStabilizerPlugin::execControl()
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
 
         // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
-        std::vector<ContactConstraintParam> ccParamVec;
+        std::vector<ContactConstraintParam*> ccParamVec;
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
 
         for(int i = backPoseIter->time()/dt; i < frontPoseIter->time()/dt; ++i){
@@ -242,7 +230,7 @@ void MultiContactStabilizerPlugin::execControl()
     }
 
     {// numWindows回数 Dequeの最後を取り出して最後に追加しながらproc
-        std::vector<ContactConstraintParam> ccParamVec;
+        std::vector<ContactConstraintParam*> ccParamVec;
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, --poseSeqPtr->end(), poseSeqPtr);
 
         for(int i = numFrames - 1; i < numFrames + mcs->numWindows; ++i){

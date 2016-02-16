@@ -59,7 +59,7 @@ namespace cnoid{
         Vector3d lastP;
         std::vector<int> failIdxVec;
 
-        void processCycle(int i, std::vector<hrp::ContactConstraintParam>& ccParamVec);
+        void processCycle(int i, std::vector<hrp::ContactConstraintParam*>& ccParamVec);
 
     public:
         BodyPtr body;
@@ -83,8 +83,8 @@ namespace cnoid{
         virtual bool initialize();
 
         void generateSeq();
-        void generateContactConstraintParamVec(std::vector<hrp::ContactConstraintParam>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);
-        void generateMultiContactStabilizerParam(hrp::MultiContactStabilizerParam* mcsParam, BodyPtr body, std::vector<hrp::ContactConstraintParam>& ccParamVec);
+        void generateContactConstraintParamVec(std::vector<hrp::ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);
+        void generateMultiContactStabilizerParam(hrp::MultiContactStabilizerParam* mcsParam, BodyPtr body, std::vector<hrp::ContactConstraintParam*>& ccParamVec);
         void execControl();
 
     };
