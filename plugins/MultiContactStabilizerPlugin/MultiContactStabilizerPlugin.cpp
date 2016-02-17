@@ -101,6 +101,9 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
 {
     cout << endl << "##############################" << endl << "turn:" << i << endl;
 
+    clock_t st = clock();
+    double tmList[4] = {0,0,0,0};
+
     updateBodyState(body, motion, min(i,numFrames-1));
     body->calcForwardKinematics(true, true);
 
@@ -108,10 +111,23 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
     // 動作軌道に依存するパラメータの設定
     generateMultiContactStabilizerParam(mcsParam, body, ccParamVec);
 
+    clock_t et = clock();
+    tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+    st = et;
+
     if(mcs->mpcParamDeque.size() == mcs->numWindows){
         mcs->calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
         mcs->setupQP();
+
+        et = clock();
+        tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+        st = et;
+
         if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows);
+
+        et = clock();
+        tmList[2] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+        st = et;
 
         // Test::testAugmentedMatrix(mcs);
 
@@ -132,6 +148,12 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
     mcsParam->convertToMPCParam();
 
     mcs->mpcParamDeque.push_back(mcsParam);
+
+    et = clock();
+    tmList[3] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+    st = et;
+
+    cout << "  FK: " << tmList[0] << "[ms]  setup: " << tmList[1] << "[ms]  QP: " << tmList[2] << "[ms]  convert: " << tmList[3]  << "[ms]" << endl;
 }
 
 void MultiContactStabilizerPlugin::execControl()
