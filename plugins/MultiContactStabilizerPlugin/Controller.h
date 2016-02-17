@@ -109,6 +109,9 @@ private:
     int unitInputDim;
     double dt;
 
+    void dumpMatrix(dmatrix& mat,    dmatrix ContactConstraintParam::*inMat, void (ContactConstraintParam::*func)(void), int rowIdx, int colIdx);
+    void dumpVector(dvector& retVec, dvector ContactConstraintParam::*inVec, void (ContactConstraintParam::*func)(void), int rowIdx);
+
 public:
     std::vector<ContactConstraintParam*> ccParamVec;
     int numEquals;
@@ -131,10 +134,9 @@ public:
 
     void calcInputMatrix();
     void calcSystemMatrix();
-    void calcEqualMatrix();
-    void calcEqualVector();
-    void calcInequalMatrix();
-    void calcMinimumVector();
+    void calcEqualConstraints();
+    void calcInequalConstraints();
+    void calcBoundVectors();
     void calcRefStateVector();
     void calcErrorWeightVector();
     void calcInputWeightVector();

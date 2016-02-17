@@ -12,6 +12,9 @@ namespace hrp {
 
 class ContactConstraintParam
 {
+protected:
+    int unitInputDim;
+
 public:
     int contactState;
     int numEquals;
@@ -20,12 +23,24 @@ public:
     Vector3 p;
     Matrix33 R;
 
+    dmatrix equalMat;
+    dvector equalVec;
     dmatrix inequalMat;
+    dvector inequalMinVec;
+    dvector inequalMaxVec;
+    dvector minVec;
+    dvector maxVec;
 
     std::vector<Vector3> edgeVec;
     double mu;
 
-    virtual void calcInequalMatrix()=0;
+    virtual void calcEqualMatrix(){equalMat.resize(0,0);};
+    virtual void calcEqualVector(){equalVec.resize(0);};
+    virtual void calcInequalMatrix(){inequalMat.resize(0,0);};
+    virtual void calcInequalMinimumVector(){inequalMinVec.resize(0);};
+    virtual void calcInequalMaximumVector(){inequalMaxVec.resize(0);}
+    virtual void calcMinimumVector(){minVec.resize(0);};
+    virtual void calcMaximumVector(){maxVec.resize(0);};
 
     ContactConstraintParam(const std::string linkName_)
     {
@@ -40,10 +55,15 @@ public:
     // double mu;
 
     void calcInequalMatrix();
+    void calcInequalMinimumVector();
+    void calcInequalMaximumVector();
+    void calcMinimumVector();
+    void calcMaximumVector();
 
     StaticContactConstraintParam(const std::string linkName_, const double mu_, const std::vector<Vector3>& edgeVec_)
         : ContactConstraintParam(linkName_)
     {
+        unitInputDim = 6;
         numEquals = 0;
         mu = mu_;
         edgeVec = edgeVec_;
