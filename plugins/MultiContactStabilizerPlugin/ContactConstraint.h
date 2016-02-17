@@ -45,25 +45,38 @@ public:
     };
 };
 
-class StaticContactConstraintParam : public ContactConstraintParam
+class SimpleContactConstraintParam : public ContactConstraintParam
 {
 public:
     std::vector<Vector3> edgeVec;
-    double muTrans, muRot;
 
-    void calcInequalMatrix();
-    void calcInequalMinimumVector();
-    void calcInequalMaximumVector();
-    void calcMinimumVector();
-    void calcMaximumVector();
+    virtual void calcInequalMatrix();
+    virtual void calcInequalMinimumVector();
+    virtual void calcInequalMaximumVector();
+    virtual void calcMinimumVector();
+    virtual void calcMaximumVector();
 
-    StaticContactConstraintParam(const std::string linkName_, const double mu_, const std::vector<Vector3>& edgeVec_)
+    SimpleContactConstraintParam(const std::string linkName_, const std::vector<Vector3>& edgeVec_)
         : ContactConstraintParam(linkName_)
     {
         unitInputDim = 6;
         numEquals = 0;
-        muTrans = mu_;
         edgeVec = edgeVec_;
+        numInequals = edgeVec.size();// 静止摩擦制約4式
+    };
+};
+
+class StaticContactConstraintParam : public SimpleContactConstraintParam
+{
+public:
+    double muTrans, muRot;
+
+    void calcInequalMatrix();
+
+    StaticContactConstraintParam(const std::string linkName_, const double mu_, const std::vector<Vector3>& edgeVec_)
+        : SimpleContactConstraintParam(linkName_, edgeVec_)
+    {
+        muTrans = mu_;
         numInequals = 4 + edgeVec.size();// 静止摩擦制約4式
     };
 };

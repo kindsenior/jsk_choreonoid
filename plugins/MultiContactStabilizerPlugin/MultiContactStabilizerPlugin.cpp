@@ -65,7 +65,8 @@ void MultiContactStabilizerPlugin::generateContactConstraintParamVec(std::vector
             edge << 0, 1, 0.05;
             edgeVec.push_back(edge);
 
-            StaticContactConstraintParam* ccParam = new StaticContactConstraintParam((*linkIter)->name(), 0.5, edgeVec);// 摩擦係数 要改良
+            SimpleContactConstraintParam* ccParam = new SimpleContactConstraintParam((*linkIter)->name(), edgeVec);
+            // StaticContactConstraintParam* ccParam = new StaticContactConstraintParam((*linkIter)->name(), 0.5, edgeVec);// 摩擦係数 要改良
             ccParamVec.push_back(ccParam);
         }
     }
