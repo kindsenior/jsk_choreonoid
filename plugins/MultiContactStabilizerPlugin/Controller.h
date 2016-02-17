@@ -109,8 +109,8 @@ private:
     int unitInputDim;
     double dt;
 
-    void dumpMatrix(dmatrix& mat,    dmatrix ContactConstraintParam::*inMat, void (ContactConstraintParam::*func)(void), int rowIdx, int colIdx);
-    void dumpVector(dvector& retVec, dvector ContactConstraintParam::*inVec, void (ContactConstraintParam::*func)(void), int rowIdx);
+    void calcMatrix(void (ContactConstraintParam::*func)(void));
+    void calcVector(void (ContactConstraintParam::*func)(void));
 
 public:
     std::vector<ContactConstraintParam*> ccParamVec;

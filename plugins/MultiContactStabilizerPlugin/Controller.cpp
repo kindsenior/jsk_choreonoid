@@ -40,20 +40,36 @@ void ModelPredictiveController::calcPsiMatrix()
     }
 }
 
+namespace {
+    template <typename containerClass, typename paramClass> void dumpMatrix(dmatrix& retMat, dmatrix paramClass::*inMat, containerClass& container, int rowIdx, int colIdx)
+    {
+        for(typename containerClass::iterator iter = container.begin(); iter != container.end(); ++iter){
+            int rows = ((*iter)->*inMat).rows();
+            int cols = ((*iter)->*inMat).cols();
+            retMat.block(rowIdx,colIdx, rows,cols) = (*iter)->*inMat;
+            rowIdx += rows;
+            colIdx += cols;
+        }
+    }
+
+    template <typename containerClass, typename paramClass> void dumpVector(dvector& retVec, dvector paramClass::*inVec, containerClass& container, int rowIdx)
+    {
+        for(typename containerClass::iterator iter = container.begin(); iter != container.end(); ++iter){
+            int rows = ((*iter)->*inVec).rows();
+            retVec.block(rowIdx,0, rows,1) = (*iter)->*inVec;
+            rowIdx += rows;
+        }
+    }
+}
+
 void ModelPredictiveController::calcEqualConstraints()
 {
     equalMat = dmatrix::Zero(equalMatRows,psiCols);
     equalVec = dvector(equalMatRows);
     int rowIdx = 0;
     int colIdx = 0;
-    for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
-        int rows = (*iter)->equalMat.rows();
-        int cols = (*iter)->equalMat.cols();
-        equalMat.block(rowIdx,colIdx, rows,cols) = (*iter)->equalMat;
-        equalVec.block(rowIdx,0,      rows,1) = (*iter)->equalVec;
-        rowIdx += rows;
-        colIdx += cols;
-    }
+    ::dumpMatrix(equalMat, &ModelPredictiveControllerParam::equalMat, mpcParamDeque, rowIdx, colIdx);
+    ::dumpVector(equalVec, &ModelPredictiveControllerParam::equalVec, mpcParamDeque, rowIdx);
 }
 
 void ModelPredictiveController::calcInequalConstraints()
@@ -63,15 +79,9 @@ void ModelPredictiveController::calcInequalConstraints()
     inequalMaxVec = dvector(inequalMatRows);
     int rowIdx = 0;
     int colIdx = 0;
-    for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
-        int rows = (*iter)->inequalMat.rows();
-        int cols = (*iter)->inequalMat.cols();
-        inequalMat.block(rowIdx,colIdx, rows,cols) = (*iter)->inequalMat;
-        inequalMinVec.block(rowIdx,0,   rows,1) = (*iter)->inequalMinVec;
-        inequalMaxVec.block(rowIdx,0,   rows,1) = (*iter)->inequalMaxVec;
-        rowIdx += rows;
-        colIdx += cols;
-    }
+    ::dumpMatrix(inequalMat, &ModelPredictiveControllerParam::inequalMat, mpcParamDeque, rowIdx, colIdx);
+    ::dumpVector(inequalMinVec, &ModelPredictiveControllerParam::inequalMinVec, mpcParamDeque, rowIdx);
+    ::dumpVector(inequalMaxVec, &ModelPredictiveControllerParam::inequalMaxVec, mpcParamDeque, rowIdx);
 }
 
 void ModelPredictiveController::calcBoundVectors()
@@ -79,12 +89,8 @@ void ModelPredictiveController::calcBoundVectors()
     minVec = dvector(psiCols);
     maxVec = dvector(psiCols);
     int rowIdx = 0;
-    for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
-        int rows = (*iter)->minVec.rows();
-        minVec.block(rowIdx,0, rows,1) = (*iter)->minVec;
-        maxVec.block(rowIdx,0, rows,1) = (*iter)->maxVec;
-        rowIdx += rows;
-    }
+    ::dumpVector(minVec, &ModelPredictiveControllerParam::minVec, mpcParamDeque, rowIdx);
+    ::dumpVector(maxVec, &ModelPredictiveControllerParam::maxVec, mpcParamDeque, rowIdx);
 }
 
 void ModelPredictiveController::calcRefXVector()
@@ -222,25 +228,17 @@ void MultiContactStabilizerParam::calcInputMatrix()
     }
 }
 
-void MultiContactStabilizerParam::dumpMatrix(dmatrix& retMat, dmatrix ContactConstraintParam::*inMat, void (ContactConstraintParam::*func)(void), int rowIdx, int colIdx)
+void MultiContactStabilizerParam::calcMatrix(void (ContactConstraintParam::*calcFunc)(void))
 {
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        ((*iter)->*func)();
-        int rows = ((*iter)->*inMat).rows();
-        int cols = ((*iter)->*inMat).cols();
-        retMat.block(rowIdx,colIdx, rows,cols) = (*iter)->*inMat;
-        rowIdx += rows;
-        colIdx += cols;
+        ((*iter)->*calcFunc)();
     }
 }
 
-void MultiContactStabilizerParam::dumpVector(dvector& retVec, dvector ContactConstraintParam::*inVec,  void (ContactConstraintParam::*func)(void), int rowIdx)
+void MultiContactStabilizerParam::calcVector(void (ContactConstraintParam::*calcFunc)(void))
 {
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        ((*iter)->*func)();
-        int rows = ((*iter)->*inVec).rows();
-        retVec.block(rowIdx,0, rows,1) = (*iter)->*inVec;
-        rowIdx += rows;
+        ((*iter)->*calcFunc)();
     }
 }
 
@@ -260,8 +258,11 @@ void MultiContactStabilizerParam::calcEqualConstraints()
     ++rowIdx;
 
     // each contact constraint
-    dumpMatrix(equalMat, &ContactConstraintParam::equalMat, &ContactConstraintParam::calcEqualMatrix, rowIdx, colIdx);
-    dumpVector(equalVec, &ContactConstraintParam::equalVec, &ContactConstraintParam::calcEqualVector, rowIdx);
+    colIdx = 0;
+    calcMatrix(&ContactConstraintParam::calcEqualMatrix);
+    calcVector(&ContactConstraintParam::calcEqualVector);
+    ::dumpMatrix(equalMat, &ContactConstraintParam::equalMat, ccParamVec, rowIdx, colIdx);
+    ::dumpVector(equalVec, &ContactConstraintParam::equalVec, ccParamVec, rowIdx);
 }
 
 void MultiContactStabilizerParam::calcInequalConstraints()
@@ -270,9 +271,12 @@ void MultiContactStabilizerParam::calcInequalConstraints()
     inequalMat = dmatrix::Zero(numInequals, inputDim);
     inequalMinVec.resize(numInequals);
     inequalMaxVec.resize(numInequals);
-    dumpMatrix(inequalMat, &ContactConstraintParam::inequalMat, &ContactConstraintParam::calcInequalMatrix, rowIdx, colIdx);
-    dumpVector(inequalMinVec, &ContactConstraintParam::inequalMinVec, &ContactConstraintParam::calcInequalMinimumVector, rowIdx);
-    dumpVector(inequalMaxVec, &ContactConstraintParam::inequalMaxVec, &ContactConstraintParam::calcInequalMaximumVector, rowIdx);
+    calcMatrix(&ContactConstraintParam::calcInequalMatrix);
+    calcVector(&ContactConstraintParam::calcInequalMinimumVector);
+    calcVector(&ContactConstraintParam::calcInequalMaximumVector);
+    ::dumpMatrix(inequalMat, &ContactConstraintParam::inequalMat, ccParamVec, rowIdx, colIdx);
+    ::dumpVector(inequalMinVec, &ContactConstraintParam::inequalMinVec, ccParamVec, rowIdx);
+    ::dumpVector(inequalMaxVec, &ContactConstraintParam::inequalMaxVec, ccParamVec, rowIdx);
 }
 
 void MultiContactStabilizerParam::calcBoundVectors()
@@ -280,8 +284,10 @@ void MultiContactStabilizerParam::calcBoundVectors()
     int rowIdx = 0;
     minVec.resize(inputDim);
     maxVec.resize(inputDim);
-    dumpVector(minVec, &ContactConstraintParam::minVec, &ContactConstraintParam::calcMinimumVector, rowIdx);
-    dumpVector(maxVec, &ContactConstraintParam::maxVec, &ContactConstraintParam::calcMaximumVector, rowIdx);
+    calcVector(&ContactConstraintParam::calcMinimumVector);
+    calcVector(&ContactConstraintParam::calcMaximumVector);
+    ::dumpVector(minVec, &ContactConstraintParam::minVec, ccParamVec, rowIdx);
+    ::dumpVector(maxVec, &ContactConstraintParam::maxVec, ccParamVec, rowIdx);
 }
 
 void MultiContactStabilizerParam::calcRefStateVector()
