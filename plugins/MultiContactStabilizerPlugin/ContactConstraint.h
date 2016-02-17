@@ -31,9 +31,6 @@ public:
     dvector minVec;
     dvector maxVec;
 
-    std::vector<Vector3> edgeVec;
-    double mu;
-
     virtual void calcEqualMatrix(){equalMat.resize(0,0);};
     virtual void calcEqualVector(){equalVec.resize(0);};
     virtual void calcInequalMatrix(){inequalMat.resize(0,0);};
@@ -51,8 +48,8 @@ public:
 class StaticContactConstraintParam : public ContactConstraintParam
 {
 public:
-    // std::vector<Vector3> edgeVec;
-    // double mu;
+    std::vector<Vector3> edgeVec;
+    double muTrans, muRot;
 
     void calcInequalMatrix();
     void calcInequalMinimumVector();
@@ -65,7 +62,7 @@ public:
     {
         unitInputDim = 6;
         numEquals = 0;
-        mu = mu_;
+        muTrans = mu_;
         edgeVec = edgeVec_;
         numInequals = 4 + edgeVec.size();// 静止摩擦制約4式
     };

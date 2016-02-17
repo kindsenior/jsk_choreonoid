@@ -14,7 +14,7 @@ void StaticContactConstraintParam::calcInequalMatrix()
         int idx = std::distance(edgeVec.begin(), iter);
         inequalMat.block(idx,0, 1,6) << 0,0,(*iter)[2], (*iter)[1],-(*iter)[0],0;
     }
-    inequalMat.block(edgeVec.size(),0, 4,3) << -1,0,mu, 0,-1,mu, 1,0,mu, 0,1,mu;
+    inequalMat.block(edgeVec.size(),0, 4,3) << -1,0,muTrans, 0,-1,muTrans, 1,0,muTrans, 0,1,muTrans;
 }
 
 void StaticContactConstraintParam::calcInequalMinimumVector()
