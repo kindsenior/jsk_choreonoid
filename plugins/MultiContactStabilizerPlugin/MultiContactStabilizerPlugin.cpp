@@ -144,6 +144,7 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
         CM << x0[0],x0[2],0;
         P << x0[1],x0[3],0;
         L << x0[4],x0[5],0;
+        CM /= body->mass();
         mRefCMSeqPtr->at(i - mcs->numWindows) = CM;
         mRefPSeqPtr->at(i - mcs->numWindows) = P;
         mRefLSeqPtr->at(i - mcs->numWindows) = L;

@@ -292,10 +292,11 @@ void MultiContactStabilizerParam::calcBoundVectors()
 
 void MultiContactStabilizerParam::calcRefStateVector()
 {
+    const double m = controller->m;
     refStateVec = dvector(stateDim);
-    refStateVec[0] = CM(0);
+    refStateVec[0] = m*CM(0);
     refStateVec[1] = P(0);
-    refStateVec[2] = CM(1);
+    refStateVec[2] = m*CM(1);
     refStateVec[3] = P(1);
     refStateVec[4] = L(0);
     refStateVec[5] = L(1);
