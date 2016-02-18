@@ -6,6 +6,7 @@
 
 using namespace hrp;
 using namespace std;
+using namespace boost;
 
 void SimpleContactConstraintParam::calcInequalMatrix()
 {
@@ -22,6 +23,13 @@ void StaticContactConstraintParam::calcInequalMatrix()
     inequalMat.block(edgeVec.size(),0, 4,3) << -1,0,muTrans, 0,-1,muTrans, 1,0,muTrans, 0,1,muTrans;
 }
 
+
+void SlideContactConstraintParam::calcInequalMatrix()
+{
+    SimpleContactConstraintParam::calcInequalMatrix();
+    inequalMat.block(edgeVec.size(),0, 2,3) << 1,0,muTrans*math::sign(direction(0)), 0,1,muTrans*math::sign(direction(1));
+}
+
 void SimpleContactConstraintParam::calcInequalMinimumVector()
 {
     inequalMinVec = dvector::Zero(numInequals);
@@ -30,6 +38,13 @@ void SimpleContactConstraintParam::calcInequalMinimumVector()
 void SimpleContactConstraintParam::calcInequalMaximumVector()
 {
     inequalMaxVec = dvector::Constant(numInequals,INFINITY);
+}
+
+void SlideContactConstraintParam::calcInequalMaximumVector()
+{
+    SimpleContactConstraintParam::calcInequalMaximumVector();
+    inequalMaxVec(edgeVec.size()) = 0;
+    inequalMaxVec(edgeVec.size()+1) = 0;
 }
 
 void SimpleContactConstraintParam::calcMinimumVector()

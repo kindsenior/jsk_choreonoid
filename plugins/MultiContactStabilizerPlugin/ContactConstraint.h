@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 
+#include <boost/math/special_functions/sign.hpp>
+
 #include <hrpUtil/EigenTypes.h>
 
 namespace hrp {
@@ -62,7 +64,7 @@ public:
         unitInputDim = 6;
         numEquals = 0;
         edgeVec = edgeVec_;
-        numInequals = edgeVec.size();// 静止摩擦制約4式
+        numInequals = edgeVec.size();
     };
 };
 
@@ -73,11 +75,29 @@ public:
 
     void calcInequalMatrix();
 
-    StaticContactConstraintParam(const std::string linkName_, const double mu_, const std::vector<Vector3>& edgeVec_)
+    StaticContactConstraintParam(const std::string linkName_, const std::vector<Vector3>& edgeVec_, const double mu_)
         : SimpleContactConstraintParam(linkName_, edgeVec_)
     {
         muTrans = mu_;
         numInequals = 4 + edgeVec.size();// 静止摩擦制約4式
+    };
+};
+
+class SlideContactConstraintParam : public SimpleContactConstraintParam
+{
+public:
+    double muTrans, muRot;
+    Vector3 direction;
+
+    void calcInequalMatrix();
+    void calcInequalMaximumVector();
+
+    SlideContactConstraintParam(const std::string linkName_, const std::vector<Vector3>& edgeVec_, const double mu_, const Vector3& direction_)
+        : SimpleContactConstraintParam(linkName_, edgeVec_)
+    {
+        muTrans = mu_;
+        direction = direction_;
+        numInequals = 2 + edgeVec.size();// 動摩擦制約2式
     };
 };
 
