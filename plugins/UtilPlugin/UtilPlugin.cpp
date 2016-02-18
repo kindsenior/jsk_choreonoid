@@ -107,6 +107,23 @@ int cnoid::getPrevContactState( const PoseSeq::iterator poseIter, const PoseSeqP
     return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId );
 }
 
+Vector3d cnoid::getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId)
+{
+    Vector3d ret = pose2->ikLinkInfo(linkId)->p - pose1->ikLinkInfo(linkId)->p;
+    ret /= ret.norm();
+    std::cout << "getDirection()>>direction:" << ret.transpose() << std::endl;
+    return ret;
+}
+
+Vector3d cnoid::getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
+{
+    std::cout << "getPrevDirection(" << poseIter->time() << "[sec] linkid:" << linkId << ")" << std::endl;
+    PoseSeq::iterator prevPoseIter = getPrevPose(poseIter, poseSeq, linkId);
+    if( poseIter == prevPoseIter ){std::cout << " this is first pose" << std::endl; return Vector3d::Zero();}
+    return getDirection(prevPoseIter->get<Pose>(), getNextPose(prevPoseIter, poseSeq, linkId)->get<Pose>(), linkId);
+}
+
+// 足の接触状態しか見ていない lgh要改良
 bool cnoid::isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body ){
     std::cout << "isContactStateChanging(" << poseIter->time() <<  "[sec])" << std::endl;
 
