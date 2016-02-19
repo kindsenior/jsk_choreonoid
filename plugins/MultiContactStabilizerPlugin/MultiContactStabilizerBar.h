@@ -18,7 +18,6 @@
 
 namespace cnoid {
 
-class MultiContactStabilizerSetupDialog;
 class MultiContactStabilizerPlugin;
 
 class MultiContactStabilizerSetupDialog : public Dialog

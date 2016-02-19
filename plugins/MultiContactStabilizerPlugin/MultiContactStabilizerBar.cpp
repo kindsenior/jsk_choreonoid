@@ -30,7 +30,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     hbox->addWidget(&errorMomentumWeightSpin);
             
     hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("AngularMomentum"));
+    hbox->addWidget(new QLabel("AngularMomentum:"));
     errorAngularMomentumWeightSpin.setAccessibleName(QString("L"));
     errorAngularMomentumWeightSpin.setDecimals(4);
     errorAngularMomentumWeightSpin.setRange(0.0001, 10000);
