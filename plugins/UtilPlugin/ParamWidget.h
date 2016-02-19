@@ -20,6 +20,7 @@ class ParamWidget : public CheckBox
 {
 private:
     std::string saveName_;
+    std::string archiveName_;
 
 public:
     ParamWidget()
@@ -33,12 +34,13 @@ public:
         layout->addWidget((CheckBox*)this);
     }
 
-    void setSaveName(const std::string& name)
-    {
-        saveName_ = name;
-    }
-
+    void setSaveName(const std::string& name){saveName_ = name;}
     std::string saveName(){return saveName_;}
+    void setArchiveName(const std::string& name){archiveName_ = name;}
+    std::string archiveName(){return archiveName_;}
+
+    virtual std::string getParam()=0;
+    virtual void setParam(std::string param)=0;
 };
 
 class SpinParamWidget : public ParamWidget,
@@ -61,8 +63,20 @@ public:
         layout->addWidget((DoubleSpinBox*)this);
     }
 
-    double getParam(){return DoubleSpinBox::value();}
-    void setParam(double param){DoubleSpinBox::setValue(param);}
+    std::string getParam()
+    {
+        std::stringstream ss;
+        ss << DoubleSpinBox::value();
+        return ss.str();
+    }
+    void setParam(std::string param)
+    {
+        std::stringstream ss;
+        ss.str(param);
+        double x;
+        ss >> x;
+        DoubleSpinBox::setValue(x);
+    }
 };
 
 }

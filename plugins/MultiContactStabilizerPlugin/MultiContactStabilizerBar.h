@@ -25,12 +25,14 @@ class MultiContactStabilizerSetupDialog : public Dialog
 public:
     QVBoxLayout* vbox;
 
-    SpinParamWidget errorCMWeightSpin;
-    SpinParamWidget errorMomentumWeightSpin;
-    SpinParamWidget errorAngularMomentumWeightSpin;
-    SpinParamWidget inputForceWeightSpin;
-    SpinParamWidget inputMomentWeightSpin;
-    SpinParamWidget numWindowsSpin;
+    SpinParamWidget* errorCMWeightSpin;
+    SpinParamWidget* errorMomentumWeightSpin;
+    SpinParamWidget* errorAngularMomentumWeightSpin;
+    SpinParamWidget* inputForceWeightSpin;
+    SpinParamWidget* inputMomentWeightSpin;
+    SpinParamWidget* numWindowsSpin;
+
+    std::vector<ParamWidget*> paramWidgetVec;
 
     CheckBox saveParameterInFileNameCheck;
 

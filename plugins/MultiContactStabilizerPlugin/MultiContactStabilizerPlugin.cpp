@@ -209,23 +209,20 @@ void MultiContactStabilizerPlugin::execControl()
     mcs = new MultiContactStabilizer();
     mcs->m = body->mass();
     mcs->dt = dt;
-    mcs->numWindows = mBar->dialog->numWindowsSpin.value();
-    mcs->errorCMWeight = mBar->dialog->errorCMWeightSpin.value();
-    mcs->errorMomentumWeight = mBar->dialog->errorMomentumWeightSpin.value();
-    mcs->errorAngularMomentumWeight = mBar->dialog->errorAngularMomentumWeightSpin.value();
-    mcs->inputForceWeight = mBar->dialog->inputForceWeightSpin.value();
-    mcs->inputMomentWeight = mBar->dialog->inputMomentWeightSpin.value();
+    mcs->numWindows = mBar->dialog->numWindowsSpin->value();
+    mcs->errorCMWeight = mBar->dialog->errorCMWeightSpin->value();
+    mcs->errorMomentumWeight = mBar->dialog->errorMomentumWeightSpin->value();
+    mcs->errorAngularMomentumWeight = mBar->dialog->errorAngularMomentumWeightSpin->value();
+    mcs->inputForceWeight = mBar->dialog->inputForceWeightSpin->value();
+    mcs->inputMomentWeight = mBar->dialog->inputMomentWeightSpin->value();
 
     // モーション走査
     fnamess.str("");
     fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL";
     if(mBar->dialog->saveParameterInFileNameCheck.isChecked()){
-        fnamess << "_" << mBar->dialog->numWindowsSpin.value() << mBar->dialog->numWindowsSpin.saveName();
-        fnamess << "_" << mBar->dialog->errorCMWeightSpin.value() << mBar->dialog->errorCMWeightSpin.saveName();
-        fnamess << "_" << mBar->dialog->errorMomentumWeightSpin.value() << mBar->dialog->errorMomentumWeightSpin.saveName();
-        fnamess << "_" << mBar->dialog->errorAngularMomentumWeightSpin.value() << mBar->dialog->errorAngularMomentumWeightSpin.saveName();
-        fnamess << "_" << mBar->dialog->inputForceWeightSpin.value() << mBar->dialog->inputForceWeightSpin.saveName();
-        fnamess << "_" << mBar->dialog->inputMomentWeightSpin.value() << mBar->dialog->inputMomentWeightSpin.saveName();
+        for(std::vector<ParamWidget*>::iterator iter = mBar->dialog->paramWidgetVec.begin(); iter != mBar->dialog->paramWidgetVec.end(); ++iter){
+            fnamess << "_" << (*iter)->getParam() << (*iter)->saveName();
+        }
         string s = fnamess.str();
         replace(s.begin(), s.end(), '.', '-');
         fnamess.str("");
