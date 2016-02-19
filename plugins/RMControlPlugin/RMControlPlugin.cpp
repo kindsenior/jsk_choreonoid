@@ -331,7 +331,7 @@ void RMControlPlugin::loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr
     // fnamess << "/home/kunio/Dropbox/log/choreonoid/refPL_" << motion->frameRate() << ".dat";
     fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion->frameRate() << "fps.dat";
     ofstream ofs(fnamess.str().c_str());
-    ofs << "time refCMx refCMy refCMz refPx refPy refPz" << endl;
+    ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
     const double dt = 1.0/motion->frameRate();
     const double g = 9.80665;
     const double m = mBody->mass();
@@ -341,18 +341,23 @@ void RMControlPlugin::loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr
     refLSeq = Vector3Seq(motion->numFrames());
 
     // 目標重心位置
-    Vector3SeqPtr refCMSeq = motionItem->findSubItem<Vector3SeqItem>("refCM")->seq();
+    Vector3SeqPtr refCMSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refCM")->seq();
+    Vector3SeqPtr refPSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refP")->seq();
+    Vector3SeqPtr refLSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refL")->seq();
 
     // 目標運動量 motion loop
     for(int i = 0; i < motion->numFrames(); ++i){
-        refLSeq[i] = Vector3d::Zero();
+        // refLSeq[i] = Vector3d::Zero();
+        refLSeq[i] = refLSeqPtr->at(i);
 
         int nextFrame = std::min( i + 1, motion->numFrames() - 1 );
-        refPSeq[i] = ( refCMSeq->at(nextFrame) - refCMSeq->at(i) ) / dt;
+        // refPSeq[i] = ( refCMSeqPtr->at(nextFrame) - refCMSeqPtr->at(i) ) / dt;
+        refPSeq[i] = refPSeqPtr->at(i);
 
-        ofs << i*dt ;
-        ofs <<  " " << ( refCMSeq->at(i)/m ).transpose();// 重心 2,3,4
-        ofs <<  " " << refPSeq[i].transpose();// 運動量 5,6,7
+        ofs << i*dt;
+        ofs << " " << refCMSeqPtr->at(i).transpose();// 重心 2,3,4
+        ofs << " " << refPSeq[i].transpose();// 運動量 5,6,7
+        ofs << " " << refLSeq[i].transpose();// 角運動量 8,9,10
         ofs << endl;
 
     }// end motion loop
@@ -430,8 +435,8 @@ void RMControlPlugin::RMControl(){
         // 目標運動量軌道作成
         Vector3Seq refPSeq,refLSeq;
         Vector3d initDCM,endDCM,initL,endL;// initDCMとendPを明示的に0で初期化していない
-        generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
-        // loadRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initP, endP, initL, endL, refPSeq, refLSeq );
+        // generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
+        loadRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
         cout << " Generated ref P/L" << endl;
 
         // Item* pChildItem = bodyItems[0]->childItem();
