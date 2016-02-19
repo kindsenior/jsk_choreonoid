@@ -32,13 +32,6 @@ public:
     SpinParamWidget inputMomentWeightSpin;
     SpinParamWidget numWindowsSpin;
 
-    LineEdit errorCMNameLine;
-    LineEdit errorMomentumNameLine;
-    LineEdit errorAngularMomentumNameLine;
-    LineEdit inputForceNameLine;
-    LineEdit inputMomentNameLine;
-    LineEdit numWindowsNameLine;
-
     CheckBox saveParameterInFileNameCheck;
 
     MultiContactStabilizerSetupDialog();
