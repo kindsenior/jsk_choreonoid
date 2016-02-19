@@ -100,23 +100,23 @@ QHBoxLayout* MultiContactStabilizerSetupDialog::newRow(QVBoxLayout* vbox)
 
 void MultiContactStabilizerSetupDialog::storeState(Archive& archive)
 {
-    archive.write("errorCMWeight", errorCMWeightSpin.value());
-    archive.write("errorMomentumWeight", errorMomentumWeightSpin.value());
-    archive.write("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value());
-    archive.write("inputForceWeight", inputForceWeightSpin.value());
-    archive.write("inputMomentWeight", inputMomentWeightSpin.value());
-    archive.write("numWindows", numWindowsSpin.value());
+    archive.write("errorCMWeight", errorCMWeightSpin.getParam());
+    archive.write("errorMomentumWeight", errorMomentumWeightSpin.getParam());
+    archive.write("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.getParam());
+    archive.write("inputForceWeight", inputForceWeightSpin.getParam());
+    archive.write("inputMomentWeight", inputMomentWeightSpin.getParam());
+    archive.write("numWindows", numWindowsSpin.getParam());
     archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
 }
 
 void MultiContactStabilizerSetupDialog::restoreState(const Archive& archive)
 {
-    errorCMWeightSpin.setValue(archive.get("errorCMWeight", errorCMWeightSpin.value()));
-    errorMomentumWeightSpin.setValue(archive.get("errorMomentumWeight", errorMomentumWeightSpin.value()));
-    errorAngularMomentumWeightSpin.setValue(archive.get("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.value()));
-    inputForceWeightSpin.setValue(archive.get("inputForceWeight", inputForceWeightSpin.value()));
-    inputMomentWeightSpin.setValue(archive.get("inputMomentWeight", inputMomentWeightSpin.value()));
-    numWindowsSpin.setValue(archive.get("numWindows", numWindowsSpin.value()));
+    errorCMWeightSpin.setParam(archive.get("errorCMWeight", errorCMWeightSpin.getParam()));
+    errorMomentumWeightSpin.setParam(archive.get("errorMomentumWeight", errorMomentumWeightSpin.getParam()));
+    errorAngularMomentumWeightSpin.setParam(archive.get("errorAngularMomentumWeight", errorAngularMomentumWeightSpin.getParam()));
+    inputForceWeightSpin.setParam(archive.get("inputForceWeight", inputForceWeightSpin.getParam()));
+    inputMomentWeightSpin.setParam(archive.get("inputMomentWeight", inputMomentWeightSpin.getParam()));
+    numWindowsSpin.setParam(archive.get("numWindows", numWindowsSpin.getParam()));
     saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
 }
 

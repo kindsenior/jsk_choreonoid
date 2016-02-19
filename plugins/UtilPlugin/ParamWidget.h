@@ -59,7 +59,10 @@ public:
     {
         ParamWidget::addToLayout(layout);
         layout->addWidget((DoubleSpinBox*)this);
-    };
+    }
+
+    double getParam(){return DoubleSpinBox::value();}
+    void setParam(double param){DoubleSpinBox::setValue(param);}
 };
 
 }
