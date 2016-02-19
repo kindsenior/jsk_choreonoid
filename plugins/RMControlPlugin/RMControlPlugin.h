@@ -80,9 +80,9 @@ namespace cnoid{
 
         // ロボットモデル依存の部分あり
         // 各種行列を計算
-        void calcMatrixies( MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
-                            MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
-                            MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, std::vector<Constraint>& jointConstraintVec);
+        void calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
+                           MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
+                           MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, std::vector<Constraint>& jointConstraintVec);
 
 
         // スプライン補間

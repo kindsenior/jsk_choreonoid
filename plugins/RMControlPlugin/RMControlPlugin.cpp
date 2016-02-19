@@ -9,14 +9,6 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
-MatrixXd pinv(const MatrixXd A){
-  if(A.rows() < A.cols()){
-    return A.transpose() * ( A * A.transpose() ).inverse();
-  }else{
-    return ( A.transpose() * A ).inverse() * A.transpose();
-  }
-}
-
 // ロボットモデル依存の部分あり
 // 各種行列を計算
 void RMControlPlugin::calcMatrixies( MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
@@ -621,7 +613,8 @@ void RMControlPlugin::RMControl(){
 
                 // ss << "ref valVec " << valVec.transpose() << endl;
 
-                MatrixXd Ainv = pinv(A);// 正方行列でない場合inverseは使えない
+                MatrixXd Ainv;
+                Ainv = PseudoInverse(A);// 正方行列でない場合inverseは使えない
                 valVec = Ainv * y + ( MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A ) * valVec;
                 xib = valVec.block(0,0, 6,1);
                 dqfree = valVec.block(6,0, dof,1);
