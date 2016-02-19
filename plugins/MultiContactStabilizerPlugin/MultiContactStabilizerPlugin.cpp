@@ -219,15 +219,7 @@ void MultiContactStabilizerPlugin::execControl()
     // モーション走査
     fnamess.str("");
     fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL";
-    if(mBar->dialog->saveParameterInFileNameCheck.isChecked()){
-        for(std::vector<ParamWidget*>::iterator iter = mBar->dialog->paramWidgetVec.begin(); iter != mBar->dialog->paramWidgetVec.end(); ++iter){
-            fnamess << "_" << (*iter)->getParam() << (*iter)->saveName();
-        }
-        string s = fnamess.str();
-        replace(s.begin(), s.end(), '.', '-');
-        fnamess.str("");
-        fnamess << s;
-    }
+    if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) fnamess << mBar->dialog->getParamString();
     fnamess << "_" << frameRate << "fps.dat";
     mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
     mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;

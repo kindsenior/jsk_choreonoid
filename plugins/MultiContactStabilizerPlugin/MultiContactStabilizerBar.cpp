@@ -6,6 +6,7 @@
 using namespace cnoid;
 
 MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
+    : ParamSetupDialog()
 {
     setWindowTitle("Multi Contact Stabilizer Setup");
 
@@ -108,28 +109,15 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 //     vbox->addSpacing(2);
 // }
 
-QHBoxLayout* MultiContactStabilizerSetupDialog::newRow(QVBoxLayout* vbox)
-{
-    QHBoxLayout* hbox = new QHBoxLayout();
-    hbox->setSpacing(2);
-    hbox->setContentsMargins(2, 2, 2, 2);
-    vbox->addLayout(hbox);
-    return hbox;
-}
-
 void MultiContactStabilizerSetupDialog::storeState(Archive& archive)
 {
-    for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
-        archive.write((*iter)->archiveName(), (*iter)->getParam());
-    }
+    ParamSetupDialog::storeState(archive);
     archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
 }
 
 void MultiContactStabilizerSetupDialog::restoreState(const Archive& archive)
 {
-    for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
-        (*iter)->setParam(archive.get((*iter)->archiveName(), (*iter)->getParam()));
-    }
+    ParamSetupDialog::restoreState(archive);
     saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
 }
 

@@ -22,7 +22,7 @@ namespace cnoid {
 
 class MultiContactStabilizerPlugin;
 
-class MultiContactStabilizerSetupDialog : public Dialog
+class MultiContactStabilizerSetupDialog : public ParamSetupDialog
 {
 public:
     QVBoxLayout* vbox;
@@ -34,13 +34,10 @@ public:
     SpinParamWidget* inputMomentWeightSpin;
     SpinParamWidget* numWindowsSpin;
 
-    std::vector<ParamWidget*> paramWidgetVec;
-
     CheckBox saveParameterInFileNameCheck;
 
     MultiContactStabilizerSetupDialog();
 
-    QHBoxLayout* newRow(QVBoxLayout* vbox);
     void storeState(Archive& archive);
     void restoreState(const Archive& archive);
 };
