@@ -388,11 +388,11 @@ void RMControlPlugin::RMControl(){
 
 
     // 選択行列作成 step 1
-    int select[] = {1,2,3,4,5};
-    int numSelects = sizeof(select)/sizeof(select[0]);
+    VectorXd SVec(6); SVec << 0.1,0.1,0.1, 1000,1000,0;
+    const int numSelects = (SVec.array() != 0).count();
     MatrixXd S(numSelects,6);
     for(int i = 0; i < numSelects; ++i){
-        S.row(i) = MatrixXd::Identity(6,6).row(select[i]-1);
+        if(SVec(i) != 0) S.row(i) = SVec(i)*MatrixXd::Identity(6,6).row(i);
     }
     cout << " Finished Step 1: setting select array" << endl;
 
