@@ -14,27 +14,18 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     QHBoxLayout* hbox = newRow(vbox);
     errorCMWeightSpin.setText("CM:");
     errorCMWeightSpin.setSaveName("CM");
-    errorCMWeightSpin.setDecimals(4);
-    errorCMWeightSpin.setRange(0.0001, 10000);
-    errorCMWeightSpin.setSingleStep(0.0001);
     errorCMWeightSpin.setValue(100);
     errorCMWeightSpin.addToLayout(hbox);
             
     hbox->addSpacing(8);
     errorMomentumWeightSpin.setText("Momentum:");
     errorMomentumWeightSpin.setSaveName("P");
-    errorMomentumWeightSpin.setDecimals(4);
-    errorMomentumWeightSpin.setRange(0.0001, 10000);
-    errorMomentumWeightSpin.setSingleStep(0.0001);
     errorMomentumWeightSpin.setValue(10);
     errorMomentumWeightSpin.addToLayout(hbox);
             
     hbox->addSpacing(8);
     errorAngularMomentumWeightSpin.setText("AngularMomentum:");
     errorAngularMomentumWeightSpin.setSaveName("L:");
-    errorAngularMomentumWeightSpin.setDecimals(4);
-    errorAngularMomentumWeightSpin.setRange(0.0001, 10000);
-    errorAngularMomentumWeightSpin.setSingleStep(0.0001);
     errorAngularMomentumWeightSpin.setValue(1000);
     errorAngularMomentumWeightSpin.addToLayout(hbox);
     hbox->addStretch();
@@ -43,18 +34,12 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     hbox = newRow(vbox);
     inputForceWeightSpin.setText("Force:");
     inputForceWeightSpin.setSaveName("f");
-    inputForceWeightSpin.setDecimals(4);
-    inputForceWeightSpin.setRange(0.0001, 10000);
-    inputForceWeightSpin.setSingleStep(0.0001);
     inputForceWeightSpin.setValue(0.001);
     inputForceWeightSpin.addToLayout(hbox);
 
     hbox->addSpacing(8);
     inputMomentWeightSpin.setText("Moment:");
     inputMomentWeightSpin.setSaveName("n");
-    inputMomentWeightSpin.setDecimals(4);
-    inputMomentWeightSpin.setRange(0.0001, 10000);
-    inputMomentWeightSpin.setSingleStep(0.0001);
     inputMomentWeightSpin.setValue(10);
     inputMomentWeightSpin.addToLayout(hbox);
     hbox->addStretch();

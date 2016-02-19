@@ -49,6 +49,9 @@ public:
         : ParamWidget(),
           DoubleSpinBox()
     {
+        setDecimals(4);
+        setRange(0.0001, 10000);
+        setSingleStep(0.0001);
         setValue(1000);
     };
 
