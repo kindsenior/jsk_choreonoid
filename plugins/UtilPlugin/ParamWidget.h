@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#include <iostream>
+#include <sstream>
 
 #include <cnoid/ToolBar>
 #include <cnoid/Dialog>

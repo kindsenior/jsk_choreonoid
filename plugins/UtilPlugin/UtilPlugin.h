@@ -22,8 +22,6 @@
 #include <cnoid/src/Body/Jacobian.h>
 #include <cnoid/Vector3SeqItem>
 
-#include "ParamWidget.h"
-
 namespace cnoid{
 
 struct SubMass

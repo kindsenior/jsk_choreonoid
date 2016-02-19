@@ -14,6 +14,8 @@
 
 #include <cnoid/Archive>
 
+#include <UtilPlugin/ParamSetupDialog.h>
+
 #include "MultiContactStabilizerPlugin.h"
 
 namespace cnoid {

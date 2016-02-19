@@ -2,7 +2,10 @@ message("This is UtilPlugin")
 
 set(PLUGIN_NAME UtilPlugin)
 set(TARGET Cnoid${PLUGIN_NAME})
-set(headers UtilPlugin.h)
+set(headers
+	UtilPlugin.h
+	ParamWidget.h
+	ParamSetupDialog.h)
 
 add_library(${TARGET} SHARED UtilPlugin)
 
