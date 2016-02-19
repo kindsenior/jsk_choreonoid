@@ -220,12 +220,12 @@ void MultiContactStabilizerPlugin::execControl()
     fnamess.str("");
     fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL";
     if(mBar->dialog->saveParameterInFileNameCheck.isChecked()){
-        fnamess << "_" << mBar->dialog->numWindowsSpin.value() << mBar->dialog->numWindowsSpin.accessibleName().toStdString();
-        fnamess << "_" << mBar->dialog->errorCMWeightSpin.value() << mBar->dialog->errorCMWeightSpin.accessibleName().toStdString();
-        fnamess << "_" << mBar->dialog->errorMomentumWeightSpin.value() << mBar->dialog->errorMomentumWeightSpin.accessibleName().toStdString();
-        fnamess << "_" << mBar->dialog->errorAngularMomentumWeightSpin.value() << mBar->dialog->errorAngularMomentumWeightSpin.accessibleName().toStdString();
-        fnamess << "_" << mBar->dialog->inputForceWeightSpin.value() << mBar->dialog->inputForceWeightSpin.accessibleName().toStdString();
-        fnamess << "_" << mBar->dialog->inputMomentWeightSpin.value() << mBar->dialog->inputMomentWeightSpin.accessibleName().toStdString();
+        fnamess << "_" << mBar->dialog->numWindowsSpin.value() << mBar->dialog->numWindowsSpin.saveName();
+        fnamess << "_" << mBar->dialog->errorCMWeightSpin.value() << mBar->dialog->errorCMWeightSpin.saveName();
+        fnamess << "_" << mBar->dialog->errorMomentumWeightSpin.value() << mBar->dialog->errorMomentumWeightSpin.saveName();
+        fnamess << "_" << mBar->dialog->errorAngularMomentumWeightSpin.value() << mBar->dialog->errorAngularMomentumWeightSpin.saveName();
+        fnamess << "_" << mBar->dialog->inputForceWeightSpin.value() << mBar->dialog->inputForceWeightSpin.saveName();
+        fnamess << "_" << mBar->dialog->inputMomentWeightSpin.value() << mBar->dialog->inputMomentWeightSpin.saveName();
         string s = fnamess.str();
         replace(s.begin(), s.end(), '.', '-');
         fnamess.str("");

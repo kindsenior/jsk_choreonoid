@@ -12,62 +12,62 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     vbox = new QVBoxLayout();
 
     QHBoxLayout* hbox = newRow(vbox);
-    hbox->addWidget(new QLabel("CM:"));
-    errorCMWeightSpin.setAccessibleName(QString("CM"));
+    errorCMWeightSpin.setText("CM:");
+    errorCMWeightSpin.setSaveName("CM");
     errorCMWeightSpin.setDecimals(4);
     errorCMWeightSpin.setRange(0.0001, 10000);
     errorCMWeightSpin.setSingleStep(0.0001);
-    errorCMWeightSpin.setValue(1000);
-    hbox->addWidget(&errorCMWeightSpin);
+    errorCMWeightSpin.setValue(100);
+    errorCMWeightSpin.addToLayout(hbox);
             
     hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("Momentum:"));
-    errorMomentumWeightSpin.setAccessibleName(QString("P"));
+    errorMomentumWeightSpin.setText("Momentum:");
+    errorMomentumWeightSpin.setSaveName("P");
     errorMomentumWeightSpin.setDecimals(4);
     errorMomentumWeightSpin.setRange(0.0001, 10000);
     errorMomentumWeightSpin.setSingleStep(0.0001);
-    errorMomentumWeightSpin.setValue(100);
-    hbox->addWidget(&errorMomentumWeightSpin);
+    errorMomentumWeightSpin.setValue(10);
+    errorMomentumWeightSpin.addToLayout(hbox);
             
     hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("AngularMomentum:"));
-    errorAngularMomentumWeightSpin.setAccessibleName(QString("L"));
+    errorAngularMomentumWeightSpin.setText("AngularMomentum:");
+    errorAngularMomentumWeightSpin.setSaveName("L:");
     errorAngularMomentumWeightSpin.setDecimals(4);
     errorAngularMomentumWeightSpin.setRange(0.0001, 10000);
     errorAngularMomentumWeightSpin.setSingleStep(0.0001);
     errorAngularMomentumWeightSpin.setValue(1000);
-    hbox->addWidget(&errorAngularMomentumWeightSpin);
+    errorAngularMomentumWeightSpin.addToLayout(hbox);
     hbox->addStretch();
 
 
     hbox = newRow(vbox);
-    hbox->addWidget(new QLabel("Force:"));
-    inputForceWeightSpin.setAccessibleName(QString("f"));
+    inputForceWeightSpin.setText("Force:");
+    inputForceWeightSpin.setSaveName("f");
     inputForceWeightSpin.setDecimals(4);
     inputForceWeightSpin.setRange(0.0001, 10000);
     inputForceWeightSpin.setSingleStep(0.0001);
     inputForceWeightSpin.setValue(0.001);
-    hbox->addWidget(&inputForceWeightSpin);
+    inputForceWeightSpin.addToLayout(hbox);
 
     hbox->addSpacing(8);
-    hbox->addWidget(new QLabel("Moment:"));
-    inputMomentWeightSpin.setAccessibleName(QString("n"));
+    inputMomentWeightSpin.setText("Moment:");
+    inputMomentWeightSpin.setSaveName("n");
     inputMomentWeightSpin.setDecimals(4);
     inputMomentWeightSpin.setRange(0.0001, 10000);
     inputMomentWeightSpin.setSingleStep(0.0001);
-    inputMomentWeightSpin.setValue(10000);
-    hbox->addWidget(&inputMomentWeightSpin);
+    inputMomentWeightSpin.setValue(10);
+    inputMomentWeightSpin.addToLayout(hbox);
     hbox->addStretch();
 
 
     hbox = newRow(vbox);
-    hbox->addWidget(new QLabel("Window:"));
-    numWindowsSpin.setAccessibleName(QString("N"));
+    numWindowsSpin.setText("Window:");
+    numWindowsSpin.setSaveName("N");
     numWindowsSpin.setDecimals(0);
     numWindowsSpin.setRange(1, 1000);
     numWindowsSpin.setSingleStep(1);
     numWindowsSpin.setValue(13);
-    hbox->addWidget(&numWindowsSpin);
+    numWindowsSpin.addToLayout(hbox);
     hbox->addStretch();
 
 

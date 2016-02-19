@@ -25,12 +25,12 @@ class MultiContactStabilizerSetupDialog : public Dialog
 public:
     QVBoxLayout* vbox;
 
-    DoubleSpinBox errorCMWeightSpin;
-    DoubleSpinBox errorMomentumWeightSpin;
-    DoubleSpinBox errorAngularMomentumWeightSpin;
-    DoubleSpinBox inputForceWeightSpin;
-    DoubleSpinBox inputMomentWeightSpin;
-    DoubleSpinBox numWindowsSpin;
+    SpinParamWidget errorCMWeightSpin;
+    SpinParamWidget errorMomentumWeightSpin;
+    SpinParamWidget errorAngularMomentumWeightSpin;
+    SpinParamWidget inputForceWeightSpin;
+    SpinParamWidget inputMomentWeightSpin;
+    SpinParamWidget numWindowsSpin;
 
     LineEdit errorCMNameLine;
     LineEdit errorMomentumNameLine;
