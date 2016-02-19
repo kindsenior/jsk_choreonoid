@@ -16,7 +16,7 @@
 
 namespace cnoid {
 
-class ParamWidget : virtual public CheckBox
+class ParamWidget : public CheckBox
 {
 private:
     std::string saveName_;
@@ -41,8 +41,8 @@ public:
     std::string saveName(){return saveName_;};
 };
 
-class SpinParamWidget : virtual public ParamWidget,
-                        virtual public DoubleSpinBox
+class SpinParamWidget : public ParamWidget,
+                        public DoubleSpinBox
 {
 public:
     SpinParamWidget()
