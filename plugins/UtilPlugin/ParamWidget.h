@@ -26,19 +26,19 @@ public:
         : CheckBox()
     {
         setText("hogefuga");
-    };
+    }
 
     void addToLayout(QBoxLayout* layout)
     {
         layout->addWidget((CheckBox*)this);
-    };
+    }
 
     void setSaveName(const std::string& name)
     {
         saveName_ = name;
     }
 
-    std::string saveName(){return saveName_;};
+    std::string saveName(){return saveName_;}
 };
 
 class SpinParamWidget : public ParamWidget,
@@ -53,7 +53,7 @@ public:
         setRange(0.0001, 10000);
         setSingleStep(0.0001);
         setValue(1000);
-    };
+    }
 
     void addToLayout(QBoxLayout* layout)
     {
