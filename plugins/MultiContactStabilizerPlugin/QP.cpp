@@ -14,7 +14,7 @@ int QP::execQP(dvector& U,
                 const dvector& minVec, const dvector& maxVec)
 {
     static int count = 0;
-    if(count == 0 && COUT){
+    if(COUT){
         cout << "H:" << endl << HMat << endl << endl;
         cout << "g:" << endl << gVec.transpose() << endl << endl;
         cout << "eqMat:" << endl << equalMat << endl << endl;
@@ -60,13 +60,24 @@ int QP::execQP(dvector& U,
         lbA[inequalDim+i] = equalVec[i];
         ubA[inequalDim+i] = equalVec[i];
     }
+
+    Options options;
+    // options.enableFarBounds = BT_TRUE;//added
+    //options.enableFlippingBounds = BT_FALSE;//default comment
+    // options.initialStatusBounds = ST_INACTIVE;
+    // options.numRefinementSteps = 1;
+    // options.enableCholeskyRefactorisation = 1;
+    options.printLevel = PL_LOW;// default comment
+    // options.printLevel = PL_NONE;// default comment
+    setOptions( options );
+
     returnValue ret = init(H,g,A,lb,ub,lbA,ubA, maxCalcCount);
     real_t xOpt[valueDim];
     getPrimalSolution(xOpt);
     for(int i=0; i < valueDim; ++i){
         U(i) = xOpt[i];
     }
-    if(count == 0 && COUT){
+    if(COUT){
         cout << "U(after):" << endl << U.transpose() << endl << endl;
         cout << "objVal: " << getObjVal() << endl;
     }

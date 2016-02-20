@@ -175,7 +175,7 @@ void MultiContactStabilizer::setupQP()
 int MultiContactStabilizer::execQP()
 {
     static int count = 0;
-    if(count == 0 && COUT){
+    if(COUT){
         cout << "psi:" << endl << psiMat << endl << endl;
         cout << "phi:" << endl << phiMat << endl << endl;
         cout << "refX:" << endl << refX.transpose() << endl << endl;

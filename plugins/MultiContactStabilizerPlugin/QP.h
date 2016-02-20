@@ -7,7 +7,7 @@
 #include <qpOASES.hpp>
 #include <hrpUtil/EigenTypes.h>
 
-#define COUT true
+#define COUT false
 
 namespace hrp {
 
