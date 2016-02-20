@@ -46,7 +46,6 @@
 #include <UtilPlugin/UtilPlugin.h>
 
 #include "Controller.h"
-#include "test.h"
 #include "MultiContactStabilizerBar.h"
 
 namespace cnoid{

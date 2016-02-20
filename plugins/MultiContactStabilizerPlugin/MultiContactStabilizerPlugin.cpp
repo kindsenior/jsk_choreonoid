@@ -135,8 +135,6 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
         tmList[2] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
         st = et;
 
-        // Test::testAugmentedMatrix(mcs);
-
         mcs->updateX0Vector();
         VectorXd x0(mcs->stateDim);
         x0 = mcs->x0;
@@ -272,4 +270,3 @@ void MultiContactStabilizerPlugin::execControl()
 }
 
 CNOID_IMPLEMENT_PLUGIN_ENTRY(MultiContactStabilizerPlugin)
-
