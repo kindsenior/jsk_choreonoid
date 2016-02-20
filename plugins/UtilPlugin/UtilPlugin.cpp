@@ -136,8 +136,9 @@ bool cnoid::isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseS
         std::cout << "  linkID:" << linkInfoIter->first << " link name:" << body->link(linkInfoIter->first)->name() << " " << linkInfoIter->second.isTouching() << std::endl;
         for( int i = 0; i < lbh->numFeet(); ++i ){
             if( lbh->footLink(i)->index() == linkInfoIter->first && linkInfoIter->second.isTouching() ){// 足先リンクで且つ接触している
-                if( getPrevContactState( poseIter, poseSeq, linkInfoIter->first ) != getNextContactState( poseIter, poseSeq, linkInfoIter->first ) ){// 前後の接触状態比較
-                    std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state changing at " << poseIter->time() << std::endl;
+                int prevState,nextState;
+                if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
+                    std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state changing at " << poseIter->time() << "[sec]: " << prevState << "->" << nextState << std::endl;
                     return true;
                 }else{
                     std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state is not changing or not touching at " << poseIter->time() << std::endl;
