@@ -8,6 +8,8 @@ using namespace hrp;
 
 void Test::testAugmentedMatrix()
 {
+    cout << endl << "augmented matrix test" << endl;
+
     mcs->calcAugmentedMatrix();
 
     std::deque<ModelPredictiveControllerParam*> mpcParamDeque =  mcs->mpcParamDeque;
@@ -33,11 +35,10 @@ void Test::testAugmentedMatrix()
         colIdx += inputDim;
     }
 
-    cout << endl << endl;
     cout << "numWindows: " << mcs->numWindows << endl;
     cout << "stateDim: " << stateDim << endl;
-    cout << "x0:" << endl << x0.transpose() << endl << endl;
-    cout << "phiMat (" << mcs->phiMat.rows() << "x" << mcs->phiMat.cols() << "):" << endl << mcs->phiMat << endl << endl;
+    cout << "x0:" << x0.transpose() << endl << endl;
+    // cout << "phiMat (" << mcs->phiMat.rows() << "x" << mcs->phiMat.cols() << "):" << endl << mcs->phiMat << endl << endl;
     // cout << "psiMat (" << mcs->psiMat.rows() << "x" << mcs->psiMat.cols() << "):" << endl << mcs->psiMat << endl << endl;
     // cout << (mcs->phiMat*x0).transpose() << endl << endl;
     // cout << (mcs->psiMat*U).transpose() << endl << endl;
@@ -212,6 +213,7 @@ int main(void)
     fprintf(p, "set yrange [0:2]\n");
     fprintf(p, "plot '/tmp/mcs-test_init.dat' u 1:%d t columnhead, '/tmp/mcs-test_ref.dat' u 1:%d t columnhead, '/tmp/mcs-test_contact.dat' u 1:%d t columnhead w lp, '/tmp/mcs-test_contact.dat' u 1:%d+3 t columnhead w lp\n", 2,2,2,2);// CoM x
     fflush(p);
+    cout << "Please Enter" << endl;
     while(fgetc(stdin) != '\n');
     fprintf(p, "set yrange [-0.3:0.3]\n");
     fprintf(p, "plot '/tmp/mcs-test_init.dat' u 1:%d t columnhead, '/tmp/mcs-test_ref.dat' u 1:%d t columnhead, '/tmp/mcs-test_contact.dat' u 1:%d t columnhead w lp, '/tmp/mcs-test_contact.dat' u 1:%d+3 t columnhead w lp\n", 3,3,3,3);// CoM y
