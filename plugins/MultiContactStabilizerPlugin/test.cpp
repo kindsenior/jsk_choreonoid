@@ -6,8 +6,10 @@
 using namespace std;
 using namespace hrp;
 
-void Test::testAugmentedMatrix(MultiContactStabilizer* mcs)
+void Test::testAugmentedMatrix()
 {
+    mcs->calcAugmentedMatrix();
+
     std::deque<ModelPredictiveControllerParam*> mpcParamDeque =  mcs->mpcParamDeque;
     int stateDim = mcs->stateDim;
     dvector U(mcs->psiCols);
@@ -224,6 +226,5 @@ int main(void)
     fflush(p);
     while(fgetc(stdin) != '\n');    pclose(p);
 
-
-    // Test::testAugmentedMatrix(test.mcs);
+    test.testAugmentedMatrix();
 }

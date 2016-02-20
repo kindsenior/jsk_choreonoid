@@ -46,7 +46,7 @@ public:
         mcs->inputMomentWeight = 10;
     };
 
-    static void testAugmentedMatrix(hrp::MultiContactStabilizer* mcs);
+    void testAugmentedMatrix();
 
     void processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec);
 
