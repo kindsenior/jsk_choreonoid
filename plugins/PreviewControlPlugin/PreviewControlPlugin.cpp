@@ -7,31 +7,6 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
-// ownerBodyItem = findOwnerItem<BodyItem>(); // we may be able to get bodyItem from body
-
-MatrixXd smoothMatrix( const int rows, int halfRange ){
-  if( 2*halfRange + 1 > rows )halfRange = 1;
-
-  MatrixXd smoothMat = MatrixXd::Identity( rows, rows );
-  for( int i = 0; i < halfRange; ++i ){
-    for( int j = 1; j-1 < halfRange; ++j ){
-      smoothMat(i,max(0,i-j)) = 1.0/(i+1+halfRange); smoothMat(i,i) = 1.0/(i+1+halfRange); smoothMat(i,min((int)rows-1,i+j)) = 1.0/(i+1+halfRange); 
-    }
-  }
-  for( int i = halfRange; i < rows - halfRange; ++i ){
-    for( int j = 1; j-1 < halfRange; ++j ){
-      smoothMat(i,i-j) = 1.0/(2*halfRange+1); smoothMat(i,i) = 1.0/(2*halfRange+1); smoothMat(i,i+j) = 1.0/(2*halfRange+1); 
-    }
-  }
-  for( int i = rows - halfRange; i < rows; ++i ){
-    for( int j = 1; j-1 < halfRange; ++j ){
-      smoothMat(i,max(0,i-j)) = 1.0/(rows-i+halfRange);  smoothMat(i,i) = 1.0/(rows-i+halfRange); smoothMat(i,min((int)rows-1,i+j)) = 1.0/(rows-i+halfRange); 
-    }
-  }
-
-  return smoothMat;
-}
-
 // 球面からZ座標を計算
 double PreviewControlPlugin::calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius ){
   return centerPos.z() + sqrt( pow(radius,2) - pow(pos.x()-centerPos.x(), 2) - pow(pos.y()-centerPos.y(), 2) );
