@@ -38,3 +38,12 @@ ItemTreeView.instance().selectItem(poseSeqItem)
 floorItem = BodyItem()
 floorItem.load(os.path.join(shareDirectory(), "model/misc/floor.wrl"))
 worldItem.addChildItem(floorItem)
+
+simulatorItem = AISTSimulatorItem()
+worldItem.addChildItem(simulatorItem)
+
+floorLink = floorItem.body().rootLink()
+simulatorItem.setFriction(robot.link("LLEG_JOINT5"), floorLink, 1.0, 1.0)
+simulatorItem.setFriction(robot.link("LLEG_JOINT6"), floorLink, 1.0, 1.0)
+simulatorItem.setFriction(robot.link("RLEG_JOINT5"), floorLink, 0.0, 0.0)
+simulatorItem.setFriction(robot.link("RLEG_JOINT6"), floorLink, 0.0, 0.0)
