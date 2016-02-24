@@ -28,33 +28,33 @@ namespace cnoid{
 
 class PreviewControlPlugin : public Plugin
 {
- public:
+public:
     
- PreviewControlPlugin() : Plugin("PreviewControl")
+    PreviewControlPlugin() : Plugin("PreviewControl")
     {
-      require("Body");
-      require("Dynamics");
-      require("Util");
+        require("Body");
+        require("Dynamics");
+        require("Util");
     }
     
-  virtual bool initialize()
-  {
-    ToolBar* bar = new ToolBar("PreviewControl");
-    bar->addButton("PreviewControl")->sigClicked().connect(boost::bind(&PreviewControlPlugin::PreviewControl, this));
-    /* bar->setVisibleByDefault(true); */ /* 関係ない?? */
-    addToolBar(bar);
+    virtual bool initialize()
+    {
+        ToolBar* bar = new ToolBar("PreviewControl");
+        bar->addButton("PreviewControl")->sigClicked().connect(boost::bind(&PreviewControlPlugin::PreviewControl, this));
+        /* bar->setVisibleByDefault(true); */ /* 関係ない?? */
+        addToolBar(bar);
 
-    return true;
-  }
+        return true;
+    }
 
-  double calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius );
+    double calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius );
 
-  // 腰位置を可動域内に修正
-  void modifyWaistIntoRange
+    // 腰位置を可動域内に修正
+    void modifyWaistIntoRange
     ( Vector3d& waistPos, const Vector3d lFootPos, const Vector3d rFootPos, const Vector3d lHipPos, const Vector3d rHipPos, const double legLength );
 
-  // 予見制御
-  void PreviewControl();
+    // 予見制御
+    void PreviewControl();
 
 };
 
