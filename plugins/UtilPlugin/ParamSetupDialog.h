@@ -13,6 +13,8 @@ protected:
     std::vector<ParamWidget*> paramWidgetVec;
 
 public:
+    CheckBox saveParameterInFileNameCheck;
+
     ParamSetupDialog() : Dialog() {};
 
     QHBoxLayout* newRow(QVBoxLayout* vbox)
@@ -35,17 +37,19 @@ public:
         return str;
     }
 
-    void storeState(Archive& archive){
+    virtual void storeState(Archive& archive){
         for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
             archive.write((*iter)->archiveName(), (*iter)->getParam());
         }
+        archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
     }
 
-    void restoreState(const Archive& archive)
+    virtual void restoreState(const Archive& archive)
     {
         for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
             (*iter)->setParam(archive.get((*iter)->archiveName(), (*iter)->getParam()));
         }
+        saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
     }
 };
 

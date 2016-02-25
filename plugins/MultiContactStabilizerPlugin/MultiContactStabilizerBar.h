@@ -32,12 +32,7 @@ public:
     SpinParamWidget* inputMomentWeightSpin;
     SpinParamWidget* numWindowsSpin;
 
-    CheckBox saveParameterInFileNameCheck;
-
     MultiContactStabilizerSetupDialog();
-
-    void storeState(Archive& archive);
-    void restoreState(const Archive& archive);
 };
 
 

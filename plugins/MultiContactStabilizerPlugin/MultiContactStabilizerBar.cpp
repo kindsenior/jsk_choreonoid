@@ -109,18 +109,6 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 //     vbox->addSpacing(2);
 // }
 
-void MultiContactStabilizerSetupDialog::storeState(Archive& archive)
-{
-    ParamSetupDialog::storeState(archive);
-    archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
-}
-
-void MultiContactStabilizerSetupDialog::restoreState(const Archive& archive)
-{
-    ParamSetupDialog::restoreState(archive);
-    saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
-}
-
 MultiContactStabilizerBar::MultiContactStabilizerBar(MultiContactStabilizerPlugin* plugin)
     : ToolBar("MultiContactStabilizerBar")
 {
