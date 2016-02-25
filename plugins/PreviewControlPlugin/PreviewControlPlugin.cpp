@@ -7,6 +7,14 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
+bool PreviewControlPlugin::initialize()
+{
+    mBar = new PreviewControlBar(this);
+    addToolBar(mBar);
+
+    return true;
+}
+
 // 球面からZ座標を計算
 double PreviewControlPlugin::calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius ){
     return centerPos.z() + sqrt( pow(radius,2) - pow(pos.x()-centerPos.x(), 2) - pow(pos.y()-centerPos.y(), 2) );

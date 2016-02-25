@@ -1,3 +1,8 @@
+/**
+   @author Kunio Kojima
+*/
+#pragma once
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -23,13 +28,19 @@
 #include <UtilPlugin/UtilPlugin.h>
 
 #include "PreviewController.h"
+#include "PreviewControlBar.h"
 
 namespace cnoid{
 
+class PreviewControlBar;
+
 class PreviewControlPlugin : public Plugin
 {
+protected:
+    PreviewControlBar* mBar;
+
 public:
-    
+
     PreviewControlPlugin() : Plugin("PreviewControl")
     {
         require("Body");
@@ -37,15 +48,7 @@ public:
         require("Util");
     }
     
-    virtual bool initialize()
-    {
-        ToolBar* bar = new ToolBar("PreviewControl");
-        bar->addButton("PreviewControl")->sigClicked().connect(boost::bind(&PreviewControlPlugin::PreviewControl, this));
-        /* bar->setVisibleByDefault(true); */ /* 関係ない?? */
-        addToolBar(bar);
-
-        return true;
-    }
+    virtual bool initialize();
 
     double calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius );
 
