@@ -54,7 +54,7 @@ public:
     ( Vector3d& waistPos, const Vector3d lFootPos, const Vector3d rFootPos, const Vector3d lHipPos, const Vector3d rHipPos, const double legLength );
 
     // 予見制御
-    void PreviewControl();
+    void execControl();
 
 };
 

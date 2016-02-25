@@ -28,7 +28,7 @@ void PreviewControlPlugin::modifyWaistIntoRange
 }
 
 // 予見制御
-void PreviewControlPlugin::PreviewControl(){
+void PreviewControlPlugin::execControl(){
     cout << "\x1b[31m" << "Start Preview Control" << "\x1b[m" << endl;
 
     // BodyItem,BodyPtr
