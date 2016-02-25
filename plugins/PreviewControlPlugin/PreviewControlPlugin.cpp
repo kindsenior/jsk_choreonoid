@@ -155,6 +155,10 @@ void PreviewControlPlugin::execControl(){
         diffCMSeqPtr.reset( new Vector3Seq() );
         diffCMSeqPtr->setNumFrames(motion->numFrames(), true);
 
+        Vector3SeqPtr cartZMPSeqPtr;
+        cartZMPSeqPtr.reset(new Vector3Seq());
+        cartZMPSeqPtr->setNumFrames(motion->numFrames(), true);
+
         // preview_dynamics_filter<preview_control> df(dt, 0.8, ref_zmp_list.front());
         rats::preview_dynamics_filter<rats::extended_preview_control> df(dt, 0.8, ref_zmp_list.front());
         double cart_zmp[3], refzmp[3];
@@ -171,6 +175,8 @@ void PreviewControlPlugin::execControl(){
 
                 x.z() = 0;
                 diffCMSeqPtr->at(index) = x;
+
+                cartZMPSeqPtr->at(index) << cart_zmp[0], cart_zmp[1], cart_zmp[2];
 
                 ++index;
                 /* zmpx ;; this zmp is "zmp as a table-cart model" cogy refzmpx zmpy cogy refzmpy */
@@ -220,13 +226,16 @@ void PreviewControlPlugin::execControl(){
         // zmpファイル書き出し
         {
             stringstream ss;
-            ss << poseSeqPath.parent_path().string() << "/" << getBasename(poseSeqPath) << "_plot_" << motion->frameRate() << "fps_" << loopNum << ".dat";
+            ss << poseSeqPath.parent_path().string() << "/" << getBasename(poseSeqPath) << "_PC_" << motion->frameRate() << "fps_" << loopNum << ".dat";
             ofstream ofs; ofs.open(ss.str().c_str()); if( ofs == NULL ){ cout << "\x1b[31m" << "dat file open error" << "\x1b[m" << endl; return; }
             DynamicsPlugin::calcZMP( body, motion, zmpSeqPtr );
-            ofs << "time zmpx zmpy zmpz CMx CMy CMz rootPosX rootPosY rootPosZ" << endl;
+            ofs << "time  cartZMPx cartZMPy cartZMPz refCMx refCMy refCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
             for(int i = 0; i < motion->numFrames(); ++i){
-                motion->frame(i) >> *body; body->calcCenterOfMass();
-                ofs << i*dt << " " << zmpSeqPtr->at(i).transpose() << " " << body->centerOfMass().transpose() << " " << body->rootLink()->p().transpose() << endl;
+                motion->frame(i) >> *body;
+                body->calcCenterOfMass();
+                ofs << i*dt
+                    << " " << cartZMPSeqPtr->at(i).transpose() << " " << diffCMSeqPtr->at(i).transpose()
+                    << " " << zmpSeqPtr->at(i).transpose() << " " << body->centerOfMass().transpose() << " " << body->rootLink()->p().transpose() << endl;
             }
             ofs.close();
         }
