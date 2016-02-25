@@ -25,8 +25,6 @@ class MultiContactStabilizerPlugin;
 class MultiContactStabilizerSetupDialog : public ParamSetupDialog
 {
 public:
-    QVBoxLayout* vbox;
-
     SpinParamWidget* errorCMWeightSpin;
     SpinParamWidget* errorMomentumWeightSpin;
     SpinParamWidget* errorAngularMomentumWeightSpin;

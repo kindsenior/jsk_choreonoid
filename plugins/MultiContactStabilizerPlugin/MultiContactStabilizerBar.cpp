@@ -10,7 +10,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 {
     setWindowTitle("Multi Contact Stabilizer Setup");
 
-    vbox = new QVBoxLayout();
+    QVBoxLayout* vbox = new QVBoxLayout();
 
     numWindowsSpin = new SpinParamWidget();
     paramWidgetVec.push_back(numWindowsSpin);
