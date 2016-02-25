@@ -96,26 +96,27 @@ void PreviewControlPlugin::execControl(){
     DynamicsPlugin::calcZMP( body, motion, initialZMPSeqPtr );// 入力動作のzmpの計算
 
     // 目標zmp・初期zmp・初期重心軌道書き出し
-    stringstream ss0;
-    ss0 << poseSeqPath.parent_path().string() << "/" << getBasename(poseSeqPath) << "_plot_" << motion->frameRate() << "fps" << ".dat";
-    FILE* fp0 = fopen(ss0.str().c_str(), "w");
-    Vector3d lastPosVec = body->rootLink()->p();
-    Vector3d lastVelVec = VectorXd::Zero(3);
-    fprintf(fp0,"time initZMPX initZMPY refZMPX refZMPY COMX COMY rootPosX rootPosY rootVelX rootVelY rootAccX rootAccY\n");
-    for(int i = 0; i < motion->numFrames(); ++i){
-        motion->frame(i) >> *body; body->calcCenterOfMass();
+    {
+        stringstream ss0;
+        ss0 << poseSeqPath.parent_path().string() << "/" << getBasename(poseSeqPath) << "_PC_" << motion->frameRate() << "fps" << ".dat";
+        ofstream ofs(ss0.str().c_str());
+        Vector3d lastPosVec = body->rootLink()->p();
+        Vector3d lastVelVec = VectorXd::Zero(3);
+        ofs << "time initZMPx initZMPy initZMPz refZMPx refZMPy refZMPz initCMx initCMy initCMz rootPosX rootPosY rootPosZ rootVelX rootVelY rootVelZ rootAccX rootAccY rootAccZ" << endl;
+        for(int i = 0; i < motion->numFrames(); ++i){
+            motion->frame(i) >> *body;
+            body->calcCenterOfMass();
       
-        Vector3d velVec = (body->rootLink()->p() - lastPosVec)/dt;
-        Vector3d accVec = (velVec - lastVelVec)/dt;
-        lastPosVec = body->rootLink()->p(); lastVelVec = velVec;
+            Vector3d velVec = (body->rootLink()->p() - lastPosVec)/dt;
+            Vector3d accVec = (velVec - lastVelVec)/dt;
+            lastPosVec = body->rootLink()->p(); lastVelVec = velVec;
 
-        fprintf(fp0, "%f  %f %f  %f %f  %f %f  %f %f  %f %f  %f %f\n",
-                i*dt, initialZMPSeqPtr->at(i).x(),initialZMPSeqPtr->at(i).y(), refZmpSeqPtr->at(i).x(),refZmpSeqPtr->at(i).y(),// 1  2 3(初期ZMP)  4 5(目標zmp)
-                body->centerOfMass().x(), body->centerOfMass().y(), 
-                body->rootLink()->p().x(), body->rootLink()->p().y(),
-                velVec.x(), velVec.y(), accVec.x(), accVec.y() );
+            ofs << i*dt
+                << " " << initialZMPSeqPtr->at(i).transpose() << " " << refZmpSeqPtr->at(i).transpose() << " " << body->centerOfMass().transpose()
+                << " " << body->rootLink()->p().transpose() << " " << velVec.transpose() << " " << accVec.transpose() << endl;
+        }
+        ofs.close();
     }
-    fclose(fp0);
 
     // 予見制御収束ループ
     Vector3SeqPtr zmpSeqPtr;
