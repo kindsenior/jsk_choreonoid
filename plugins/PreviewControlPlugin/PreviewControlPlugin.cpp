@@ -105,6 +105,7 @@ void PreviewControlPlugin::execControl(){
         ofs << "time initZMPx initZMPy initZMPz refZMPx refZMPy refZMPz initCMx initCMy initCMz rootPosX rootPosY rootPosZ rootVelX rootVelY rootVelZ rootAccX rootAccY rootAccZ" << endl;
         for(int i = 0; i < motion->numFrames(); ++i){
             motion->frame(i) >> *body;
+            body->calcForwardKinematics();
             body->calcCenterOfMass();
       
             Vector3d velVec = (body->rootLink()->p() - lastPosVec)/dt;
@@ -232,6 +233,7 @@ void PreviewControlPlugin::execControl(){
             ofs << "time  cartZMPx cartZMPy cartZMPz refCMx refCMy refCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
             for(int i = 0; i < motion->numFrames(); ++i){
                 motion->frame(i) >> *body;
+                body->calcForwardKinematics();
                 body->calcCenterOfMass();
                 ofs << i*dt
                     << " " << cartZMPSeqPtr->at(i).transpose() << " " << diffCMSeqPtr->at(i).transpose()
