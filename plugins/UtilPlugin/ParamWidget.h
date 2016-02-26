@@ -26,7 +26,9 @@ public:
     ParamWidget()
         : CheckBox()
     {
-        setText("hogefuga");
+        setText("default text");
+        saveName_ = "defaultSaveName";
+        archiveName_ = "defaultArchiveName";
     }
 
     void addToLayout(QBoxLayout* layout)
