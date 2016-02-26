@@ -19,11 +19,6 @@ public:
         dialog = dialog_;
     };
 
-    // virtual void setDialog(ParamSetupDialog* dialog_)
-    // {
-    //     dialog = dialog_;
-    // }
-
     virtual bool storeState(Archive& archive)
     {
         dialog->storeState(archive);
