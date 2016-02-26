@@ -110,24 +110,18 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 // }
 
 MultiContactStabilizerBar::MultiContactStabilizerBar(MultiContactStabilizerPlugin* plugin)
-    : ToolBar("MultiContactStabilizerBar")
+    : SetupToolBar("MultiContactStabilizerBar")
 {
-    dialog = new MultiContactStabilizerSetupDialog();
+    initialize(plugin);
+}
+
+void MultiContactStabilizerBar::initialize(MultiContactStabilizerPlugin* plugin)
+{
+    dialog = (MultiContactStabilizerSetupDialog*) new MultiContactStabilizerSetupDialog();
+    SetupToolBar::initialize(dialog);
 
     addButton("MCS")->sigClicked().connect(boost::bind(&MultiContactStabilizerPlugin::execControl, plugin));
     addButton(QIcon(":/Base/icons/setup.png"))->sigClicked().connect(boost::bind(&MultiContactStabilizerSetupDialog::show, dialog));
 
     setVisibleByDefault(true);// 効かない?
-}
-
-bool MultiContactStabilizerBar::storeState(Archive& archive)
-{
-    dialog->storeState(archive);
-    return true;
-}
-
-bool MultiContactStabilizerBar::restoreState(const Archive& archive)
-{
-    dialog->restoreState(archive);
-    return true;
 }

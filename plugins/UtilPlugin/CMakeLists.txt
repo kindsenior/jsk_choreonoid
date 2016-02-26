@@ -5,7 +5,8 @@ set(TARGET Cnoid${PLUGIN_NAME})
 set(headers
 	UtilPlugin.h
 	ParamWidget.h
-	ParamSetupDialog.h)
+	ParamSetupDialog.h
+	SetupToolBar.h)
 
 add_library(${TARGET} SHARED UtilPlugin)
 

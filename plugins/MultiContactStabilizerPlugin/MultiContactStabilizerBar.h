@@ -14,7 +14,7 @@
 
 #include <cnoid/Archive>
 
-#include <UtilPlugin/ParamSetupDialog.h>
+#include <UtilPlugin/SetupToolBar.h>
 
 #include "MultiContactStabilizerPlugin.h"
 
@@ -36,16 +36,14 @@ public:
 };
 
 
-class MultiContactStabilizerBar : public ToolBar
+class MultiContactStabilizerBar : public SetupToolBar
 {
-private:
-    bool storeState(Archive& archive);
-    bool restoreState(const Archive& archive);
-
 public:
     MultiContactStabilizerSetupDialog* dialog;
 
     MultiContactStabilizerBar(MultiContactStabilizerPlugin* plugin);
+
+    void initialize(MultiContactStabilizerPlugin* plugin);
 };
 
 }

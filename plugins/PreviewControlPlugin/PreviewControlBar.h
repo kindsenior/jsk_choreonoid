@@ -14,7 +14,7 @@
 
 #include <cnoid/Archive>
 
-#include <UtilPlugin/ParamSetupDialog.h>
+#include <UtilPlugin/SetupToolBar.h>
 
 #include "PreviewControlPlugin.h"
 
@@ -28,15 +28,14 @@ public:
     PreviewControlSetupDialog();
 };
 
-class PreviewControlBar : public ToolBar
+class PreviewControlBar : public SetupToolBar
 {
-protected:
-
 public:
-
     PreviewControlSetupDialog* dialog;
 
     PreviewControlBar(PreviewControlPlugin* plugin);
+
+    void initialize(PreviewControlPlugin* plugin);
 };
 
 }
