@@ -22,7 +22,7 @@ namespace cnoid {
 
 class PreviewControlPlugin;
 
-class PreviewControlSetupDialog : public Dialog
+class PreviewControlSetupDialog : public ParamSetupDialog
 {
 public:
     ComboParamWidget* modeCombo;
