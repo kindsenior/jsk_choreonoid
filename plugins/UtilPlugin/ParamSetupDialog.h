@@ -3,6 +3,7 @@
 */
 #pragma once
 
+#include <cnoid/Archive>
 #include "ParamWidget.h"
 
 namespace cnoid {
@@ -26,6 +27,20 @@ public:
         return hbox;
     }
 
+    // void addSeparator(QVBoxLayout* vbox)
+    // {
+    //     vbox->addSpacing(4);
+    //     vbox->addWidget(new HSeparator());
+    //     vbox->addSpacing(2);
+    // }
+
+    // void addSeparator(QVBoxLayout* vbox, QWidget* widget)
+    // {
+    //     vbox->addSpacing(4);
+    //     vbox->addLayout(new HSeparatorBox(widget));
+    //     vbox->addSpacing(2);
+    // }
+
     std::string getParamString()
     {
         std::stringstream ss;
@@ -37,7 +52,8 @@ public:
         return str;
     }
 
-    virtual void storeState(Archive& archive){
+    virtual void storeState(Archive& archive)
+    {
         for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
             archive.write((*iter)->archiveName(), (*iter)->getParam());
         }
