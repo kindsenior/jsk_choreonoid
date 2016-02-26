@@ -25,6 +25,8 @@ class PreviewControlPlugin;
 class PreviewControlSetupDialog : public Dialog
 {
 public:
+    ComboParamWidget* modeCombo;
+
     PreviewControlSetupDialog();
 };
 

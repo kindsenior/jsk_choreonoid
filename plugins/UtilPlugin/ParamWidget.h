@@ -12,6 +12,7 @@
 #include <cnoid/Buttons>
 #include <cnoid/CheckBox>
 #include <cnoid/LineEdit>
+#include <cnoid/ComboBox>
 #include <QDialogButtonBox>
 
 namespace cnoid {
@@ -78,6 +79,32 @@ public:
         double x;
         ss >> x;
         DoubleSpinBox::setValue(x);
+    }
+};
+
+class ComboParamWidget : public ParamWidget,
+                         public ComboBox
+{
+public:
+    ComboParamWidget()
+        : ParamWidget(),
+          ComboBox()
+    {
+        insertItem(0,QString("DynamicsFilter"));
+        insertItem(1,QString("TrajectoryPranning"));
+    }
+
+    void addToLayout(QBoxLayout* layout)
+    {
+        ParamWidget::addToLayout(layout);
+        layout->addWidget((ComboBox*)this);
+    }
+
+    std::string getParam(){return currentText().toStdString();}
+    void setParam(std::string param)
+    {
+        int idx;
+        if((idx = findText(QString(param.c_str()))) != -1) setCurrentIndex(idx);
     }
 };
 
