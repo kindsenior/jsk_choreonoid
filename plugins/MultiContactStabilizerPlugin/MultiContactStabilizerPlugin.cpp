@@ -33,7 +33,8 @@ void MultiContactStabilizerPlugin::generateSeq()
         Vector3d P,L,CM;
         CM = body->calcCenterOfMass();
         body->calcTotalMomentum(P,L);
-        L -= CM.cross(P);// convert to around CoM
+        // L -= CM.cross(P);// convert to around CoM
+        L << 0,0,0;
 
         initCMSeqPtr->at(i) =  CM;
         initPSeqPtr->at(i) = P;
@@ -90,7 +91,8 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
     L -= CM.cross(P);// convert to around CoM
     mcsParam->CM = CM;
     mcsParam->P = P;
-    mcsParam->L = L;
+    // mcsParam->L = L;
+    mcsParam->L << 0,0,0;
     mcsParam->F = (P - lastP)/dt + body->mass()*g;
 
     // 接触点座標系の更新 等式と不等式数の合計
