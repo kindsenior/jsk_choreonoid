@@ -90,8 +90,6 @@ public:
         : ParamWidget(),
           ComboBox()
     {
-        insertItem(0,QString("DynamicsFilter"));
-        insertItem(1,QString("TrajectoryPranning"));
     }
 
     void addToLayout(QBoxLayout* layout)
