@@ -49,7 +49,8 @@ namespace rats
   class preview_control_base
   {
   protected:
-    static const double g = 9.80665; /* [m/s^2] */
+    // static const double g = 9.80665; /* [m/s^2] */
+    static constexpr double g = 9.80665; // for c++11
     riccati_equation<dim> riccati;
     Eigen::Matrix<double, 3, 3> tcA;
     Eigen::Matrix<double, 3, 1> tcb;

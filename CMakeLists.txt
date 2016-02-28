@@ -73,6 +73,10 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${CATKIN_DEVEL_PREFIX}/lib/choreonoid-${choreonoid_VER})
 
+# for -std=c++11
+# set(CMAKE_CXX_STANDARD 11)# できない?
+add_compile_options(-std=c++11)
+
 option(CLEAN "Clean" OFF)
 if(CLEAN)
 	message("clean")
