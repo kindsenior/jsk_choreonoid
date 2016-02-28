@@ -129,6 +129,10 @@ void PreviewControlPlugin::execControl(){
 
     // 予見制御収束ループ
     Vector3SeqPtr zmpSeqPtr;
+    string modeStr = mBar->dialog->modeCombo->currentText().toStdString();
+    cout << "control mode: " << modeStr << endl;
+    string dfMode = mBar->dialog->modeCombo->itemText(DynamicsFilter).toStdString();
+    string tpMode = mBar->dialog->modeCombo->itemText(TrajectoryPlanning).toStdString();
     for(int loopNum = 0; loopNum < 5; ++loopNum ){
         cout << "loop: " << loopNum << endl;
 
@@ -151,10 +155,20 @@ void PreviewControlPlugin::execControl(){
         
             hrp::Vector3 v;// 実際のzmp
             v << zmpSeqPtr->at(i).x(), zmpSeqPtr->at(i).y(), zmpSeqPtr->at(i).z();
-            // zmp差分を入力
-            // if( i+1 < static_cast<size_t>(round(max_tm / dt)) ) ref_zmp_list.push(ref_v - v);
-            if( i+1 < static_cast<size_t>(round(max_tm / dt)) ) ref_zmp_list.push(ref_v);
-            else ref_zmp_list.push( ref_zmp_list.back() );// 最後は1つ前の値と同じ
+
+            // 目標値リストに入力
+            if(i+1 < static_cast<size_t>(round(max_tm / dt))){
+                if(modeStr == dfMode){
+                    ref_zmp_list.push(ref_v - v);
+                }else if(modeStr == tpMode){
+                    ref_zmp_list.push(ref_v);
+                }else{
+                    cout << "No such controle mode" << endl;
+                    return;
+                }
+            }else{
+                ref_zmp_list.push(ref_zmp_list.back());// 最後は1つ前の値と同じ
+            }
 
             // cout << tmp_tm << "     " << ref_v.transpose()  << "     " << v.transpose() << endl;
         }
@@ -212,8 +226,11 @@ void PreviewControlPlugin::execControl(){
 
             // cout << "before lhip:" << jpl->joint(0)->p.transpose() << " rhip:" << jpr->joint(0)->p.transpose() << endl;
             // cout << "before lfoot:" << lFootPos.transpose() << " rfoot:" << rFootPos.transpose() << endl;
-            // body->rootLink()->p() += 0.7*diffCMSeqPtr->at(i);// 腰位置修正 ゲインを掛けるだけでは微妙
-            body->rootLink()->p() += dCM;
+            if(modeStr == dfMode){
+                body->rootLink()->p() += 0.7*diffCMSeqPtr->at(i);// 腰位置修正 ゲインを掛けるだけでは微妙
+            }else if(modeStr == tpMode){
+                body->rootLink()->p() += dCM;
+            }
             body->calcForwardKinematics();// 状態更新
             lHipPos = jpl->joint(0)->p(); rHipPos = jpr->joint(0)->p();
             // cout << " after lhip:" << jpl->joint(0)->p.transpose() << " rhip:" << jpr->joint(0)->p.transpose() << endl;

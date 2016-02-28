@@ -20,6 +20,8 @@
 
 namespace cnoid {
 
+enum ControlMode : int { DynamicsFilter = 0, TrajectoryPlanning = 1 };
+
 class PreviewControlPlugin;
 
 class PreviewControlSetupDialog : public ParamSetupDialog

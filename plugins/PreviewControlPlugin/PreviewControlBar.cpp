@@ -16,9 +16,9 @@ PreviewControlSetupDialog::PreviewControlSetupDialog()
     modeCombo->setText("Control Mode:");
     modeCombo->setSaveName("");
     modeCombo->setArchiveName("controlMode");
-    modeCombo->insertItem(0,QString("DynamicsFilter"));
-    modeCombo->insertItem(1,QString("TrajectoryPranning"));
-    modeCombo->setCurrentIndex(0);
+    modeCombo->insertItem(DynamicsFilter, QString("DynamicsFilter"));
+    modeCombo->insertItem(TrajectoryPlanning, QString("TrajectoryPlanning"));
+    modeCombo->setCurrentIndex(DynamicsFilter);
     modeCombo->addToLayout(hbox);
     hbox->addStretch();
 
