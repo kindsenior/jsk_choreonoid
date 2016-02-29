@@ -23,9 +23,9 @@ void MultiContactStabilizerPlugin::generateSeq()
     ofstream ofs( ((filesystem::path) mPoseSeqPath.parent_path() / ss.str()).string().c_str() );
     ofs << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
 
-    Vector3SeqPtr initCMSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM");
-    Vector3SeqPtr initPSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
-    Vector3SeqPtr initLSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("initL");
+    Vector3SeqPtr initCMSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM");
+    Vector3SeqPtr initPSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
+    Vector3SeqPtr initLSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initL");
     for(int i = 0; i < numFrames; ++i){
         updateBodyState(body, motion, i);
         body->calcForwardKinematics(true,true);
@@ -42,9 +42,9 @@ void MultiContactStabilizerPlugin::generateSeq()
 
         ofs << i*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
     }
-    setSubItem("initCM", initCMSeqPtr, mBodyMotionItem);
-    setSubItem("initP", initPSeqPtr, mBodyMotionItem);
-    setSubItem("initL", initLSeqPtr, mBodyMotionItem);
+    setSubItem("initCM", initCMSeqPtr, mBodyMotionItemPtr);
+    setSubItem("initP", initPSeqPtr, mBodyMotionItemPtr);
+    setSubItem("initL", initLSeqPtr, mBodyMotionItemPtr);
 
     ofs.close();
 }
@@ -185,8 +185,8 @@ void MultiContactStabilizerPlugin::execControl()
 
     // BodyMotion作成
     BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();
-    PoseProvider* provider = pPoseSeqItem->interpolator().get();
-    bmgb->shapeBodyMotion(body, provider, mBodyMotionItem, true);
+    PoseProvider* provider = poseSeqItemPtr->interpolator().get();
+    bmgb->shapeBodyMotion(body, provider, mBodyMotionItemPtr, true);
     cout << "Generated motion" << endl;
 
     frameRate = motion->frameRate();
@@ -224,9 +224,9 @@ void MultiContactStabilizerPlugin::execControl()
     mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
     mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
 
-    mRefCMSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
-    mRefPSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
-    mRefLSeqPtr = mBodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
+    mRefCMSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
+    mRefPSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
+    mRefLSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
 
     {
         Vector3d tmpL;
@@ -258,9 +258,9 @@ void MultiContactStabilizerPlugin::execControl()
 
     free(mcs);
 
-    setSubItem("refCM", mRefCMSeqPtr, mBodyMotionItem);
-    setSubItem("refP", mRefPSeqPtr, mBodyMotionItem);
-    setSubItem("refL", mRefLSeqPtr, mBodyMotionItem);
+    setSubItem("refCM", mRefCMSeqPtr, mBodyMotionItemPtr);
+    setSubItem("refP", mRefPSeqPtr, mBodyMotionItemPtr);
+    setSubItem("refL", mRefLSeqPtr, mBodyMotionItemPtr);
 
     mOfs.close();
 

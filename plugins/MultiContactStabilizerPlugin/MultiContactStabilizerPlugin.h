@@ -64,7 +64,7 @@ namespace cnoid{
 
     public:
         BodyPtr body;
-        BodyMotionItem* mBodyMotionItem;
+        BodyMotionItemPtr mBodyMotionItemPtr;
         BodyMotionPtr motion;
         MultiContactStabilizerBar* mBar;
 
