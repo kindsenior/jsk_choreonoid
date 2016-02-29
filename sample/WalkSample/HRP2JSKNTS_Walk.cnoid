@@ -15,6 +15,15 @@ items:
       children: 
         - 
           id: 2
+          name: "cnoid_setup.py"
+          plugin: Python
+          class: PythonScriptItem
+          data: 
+            file: "../../scripts/cnoid_setup.py"
+            executionOnLoading: true
+            backgroundExecution: false
+        - 
+          id: 3
           name: "HRP2JSKNTS_walkSample.py"
           plugin: Python
           class: PythonScriptItem

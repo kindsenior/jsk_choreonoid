@@ -1,11 +1,4 @@
-from cnoid.Util import *
-from cnoid.Base import *
-from cnoid.BodyPlugin import *
-from cnoid.PoseSeqPlugin import *
-
-import os
 import yaml
-import roslib
 
 package_path = roslib.packages.get_pkg_dir("jsk_choreonoid")
 sample_path = os.path.join(package_path, "sample/WalkSample")
