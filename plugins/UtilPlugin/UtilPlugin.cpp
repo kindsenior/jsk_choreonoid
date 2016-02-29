@@ -183,7 +183,7 @@ void UtilPlugin::getFootLink( Link** plFootLink, Link** prFootLink, const BodyPt
   cout << "Finished setting foot links" << endl;
 }
 
-void cnoid::getSelectedPoseSeqSet(BodyPtr& body, BodyItemPtr& bodyItemPtr,
+void cnoid::getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
                                   PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
                                   BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion)
 {

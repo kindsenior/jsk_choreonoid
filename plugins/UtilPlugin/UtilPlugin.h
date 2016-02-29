@@ -62,9 +62,9 @@ Vector3d getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr pos
 
 bool isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body );
 
-void getSelectedPoseSeqSet(BodyPtr& body, BodyItemPtr& bodyItemPtr,
-                                  PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
-                                  BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion);
+void getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
+                           PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
+                           BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion);
 
 void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame );
 

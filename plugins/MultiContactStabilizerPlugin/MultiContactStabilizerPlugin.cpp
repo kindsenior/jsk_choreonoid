@@ -172,7 +172,7 @@ void MultiContactStabilizerPlugin::execControl()
     BodyItemPtr bodyItemPtr;
     PoseSeqItemPtr poseSeqItemPtr;
     PoseSeqPtr poseSeqPtr;
-    getSelectedPoseSeqSet(body, bodyItemPtr, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr, motion);
+    getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr, motion);
 
     mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
     cout << "PoseSeqPath: " << mPoseSeqPath << endl;
