@@ -9,17 +9,17 @@ PreviewControlSetupDialog::PreviewControlSetupDialog()
 
     QVBoxLayout* vbox = new QVBoxLayout();
 
-    modeCombo = new ComboParamWidget();
-    paramWidgetVec.push_back(modeCombo);
+    controlModeCombo = new ComboParamWidget();
+    paramWidgetVec.push_back(controlModeCombo);
 
     QHBoxLayout* hbox = newRow(vbox);
-    modeCombo->setText("Control Mode:");
-    modeCombo->setSaveName("");
-    modeCombo->setArchiveName("controlMode");
-    modeCombo->insertItem(DynamicsFilter, QString("DynamicsFilter"));
-    modeCombo->insertItem(TrajectoryPlanning, QString("TrajectoryPlanning"));
-    modeCombo->setCurrentIndex(DynamicsFilter);
-    modeCombo->addToLayout(hbox);
+    controlModeCombo->setText("Control Mode:");
+    controlModeCombo->setSaveName("");
+    controlModeCombo->setArchiveName("controlMode");
+    controlModeCombo->insertItem(DynamicsFilter, QString("DynamicsFilter"));
+    controlModeCombo->insertItem(TrajectoryPlanning, QString("TrajectoryPlanning"));
+    controlModeCombo->setCurrentIndex(DynamicsFilter);
+    controlModeCombo->addToLayout(hbox);
     hbox->addStretch();
 
 

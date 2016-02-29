@@ -122,10 +122,10 @@ void PreviewControlPlugin::execControl(){
 
     // 予見制御収束ループ
     Vector3SeqPtr zmpSeqPtr;
-    string modeStr = mBar->dialog->modeCombo->currentText().toStdString();
+    string modeStr = mBar->dialog->controlModeCombo->currentText().toStdString();
     cout << "control mode: " << modeStr << endl;
-    string dfMode = mBar->dialog->modeCombo->itemText(DynamicsFilter).toStdString();
-    string tpMode = mBar->dialog->modeCombo->itemText(TrajectoryPlanning).toStdString();
+    string dfMode = mBar->dialog->controlModeCombo->itemText(DynamicsFilter).toStdString();
+    string tpMode = mBar->dialog->controlModeCombo->itemText(TrajectoryPlanning).toStdString();
     for(int loopNum = 0; loopNum < 5; ++loopNum ){
         cout << "loop: " << loopNum << endl;
 
