@@ -178,10 +178,7 @@ void MultiContactStabilizerPlugin::execControl()
     cout << "PoseSeqPath: " << mPoseSeqPath << endl;
 
     // BodyMotion作成
-    BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();
-    PoseProvider* provider = poseSeqItemPtr->interpolator().get();
-    bmgb->shapeBodyMotion(body, provider, mBodyMotionItemPtr, true);
-    cout << "Generated motion" << endl;
+    generateBodyMotionFromBar(body, poseSeqItemPtr, mBodyMotionItemPtr);
 
     frameRate = motion->frameRate();
     dt = 1.0/frameRate;
