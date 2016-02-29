@@ -55,7 +55,9 @@ public:
     virtual void storeState(Archive& archive)
     {
         for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
-            archive.write((*iter)->archiveName(), (*iter)->getParam());
+            std::string archiveName = (*iter)->archiveName();
+            archive.write(archiveName, (*iter)->getParam());
+            archive.write(archiveName+"Check",(*iter)->isChecked());
         }
         archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
     }
@@ -63,7 +65,9 @@ public:
     virtual void restoreState(const Archive& archive)
     {
         for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
-            (*iter)->setParam(archive.get((*iter)->archiveName(), (*iter)->getParam()));
+            std::string archiveName = (*iter)->archiveName();
+            (*iter)->setParam(archive.get(archiveName, (*iter)->getParam()));
+            (*iter)->setChecked(archive.get(archiveName+"Check", (*iter)->isChecked()));
         }
         saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
     }
