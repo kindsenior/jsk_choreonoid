@@ -39,21 +39,19 @@ void PreviewControlPlugin::modifyWaistIntoRange
 void PreviewControlPlugin::execControl(){
     cout << "\x1b[31m" << "Start Preview Control" << "\x1b[m" << endl;
 
-    // BodyItem,BodyPtr
-    ItemList<BodyItem> bodyItems = ItemTreeView::mainInstance()->checkedItems<BodyItem>();
-    BodyPtr body = bodyItems[0]->body();// ロボットモデルは１個のみチェック
-
+    BodyItemPtr bodyItemPtr;
+    BodyPtr body;
+    PoseSeqItemPtr poseSeqItemPtr;
+    PoseSeqPtr poseSeqPtr;
+    BodyMotionItemPtr bodyMotionItemPtr;
+    BodyMotionPtr motion;
+    getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion);
 
     // 足先リンク名取得
     Link *lFootLink, *rFootLink;
     UtilPlugin::getFootLink( &lFootLink, &rFootLink, body );
 
-    // PoseSeqItem,BodyMotionItem,BodyMotionPtr
-    ItemList<PoseSeqItem> poseSeqItems = ItemTreeView::mainInstance()->selectedItems<Item>();
-    BodyMotionItem* bodyMotionItem = poseSeqItems[0]->bodyMotionItem();// poseSeqを１個のみ選択
-    BodyMotionPtr motion = bodyMotionItem->motion();
-    string poseSeqPathString = poseSeqItems[0]->filePath();
-    boost::filesystem::path poseSeqPath(poseSeqPathString);
+    boost::filesystem::path poseSeqPath(poseSeqItemPtr->filePath());
     cout << " parent_path:" << poseSeqPath.parent_path().string() << " basename:" << getBasename(poseSeqPath) << endl;
 
     JointPathPtr jpl = getCustomJointPath( body, body->rootLink(), lFootLink );
