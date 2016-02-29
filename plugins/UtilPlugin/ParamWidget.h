@@ -28,6 +28,7 @@ public:
         : CheckBox()
     {
         setText("default text");
+        setChecked(true);
         saveName_ = "defaultSaveName";
         archiveName_ = "defaultArchiveName";
     }
