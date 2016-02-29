@@ -67,8 +67,8 @@ void PreviewControlPlugin::execControl(){
     cout << "numFrames: " << motion->numFrames() << endl;
     if( motion->numFrames() == 0 ){
         BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();// インスタンス生成
-        PoseProvider* provider = poseSeqItems[0]->interpolator().get();
-        bmgb->shapeBodyMotion(body, provider, bodyMotionItem, true);
+        PoseProvider* provider = poseSeqItemPtr->interpolator().get();
+        bmgb->shapeBodyMotion(body, provider, bodyMotionItemPtr, true);
         cout << "Generated motion" << endl;
     }else{
         cout << "Need not generate motion" << endl;
@@ -77,7 +77,7 @@ void PreviewControlPlugin::execControl(){
     double dt = 1.0/motion->frameRate(), max_tm = motion->numFrames() / (double)motion->frameRate();
 
     // 目標zmpを計算
-    PoseSeqInterpolatorPtr poseSeqInterpolatorPtr = poseSeqItems[0]->interpolator();
+    PoseSeqInterpolatorPtr poseSeqInterpolatorPtr = poseSeqItemPtr->interpolator();
     Vector3SeqPtr refZmpSeqPtr;
     // refZmpSeqPtr.reset( new Vector3Seq() );
     // refZmpSeqPtr->setNumFrames(motion->numFrames(), true);
