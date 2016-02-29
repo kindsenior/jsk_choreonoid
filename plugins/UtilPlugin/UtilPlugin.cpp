@@ -183,6 +183,24 @@ void UtilPlugin::getFootLink( Link** plFootLink, Link** prFootLink, const BodyPt
   cout << "Finished setting foot links" << endl;
 }
 
+void cnoid::getSelectedPoseSeqSet(BodyPtr& body, BodyItemPtr& bodyItemPtr,
+                                  PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
+                                  BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion)
+{
+    ItemList<PoseSeqItem> selectedItemList = ItemTreeView::mainInstance()->selectedItems<Item>();
+    if(selectedItemList.empty()){cout << "Select PoseSeqItem!!" << endl; return;}
+    bodyItemPtr = selectedItemList[0]->findOwnerItem<BodyItem>();
+    body = bodyItemPtr->body();
+    cout << "Robot:" << body->name() << endl;
+
+    poseSeqItemPtr = selectedItemList[0];
+    cout << poseSeqItemPtr->name() << endl;
+
+    poseSeqPtr = poseSeqItemPtr->poseSeq();
+    bodyMotionItem = poseSeqItemPtr->bodyMotionItem();
+    motion = bodyMotionItem->motion();
+}
+
 void cnoid::updateBodyState( BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame ){
     int prevFrame = max(currentFrame-1, 0);
     int nextFrame = min(currentFrame+1, motion->numFrames()-1);

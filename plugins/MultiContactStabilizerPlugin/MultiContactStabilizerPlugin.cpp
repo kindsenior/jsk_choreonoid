@@ -169,19 +169,13 @@ void MultiContactStabilizerPlugin::execControl()
     MessageView::instance()->putln("MultiContactStabilizer called !");
     cout << "MultiContactStabilizer()" << endl;
 
-    ItemList<PoseSeqItem> selectedItemList = ItemTreeView::mainInstance()->selectedItems<Item>();
-    if(selectedItemList.empty()){cout << "Select PoseSeqItem!!" << endl; return;}
-    BodyItem* pBodyItem = selectedItemList[0]->findOwnerItem<BodyItem>();
-    body = pBodyItem->body();
-    cout << "Robot:" << body->name() << endl;
-    PoseSeqItem* pPoseSeqItem = selectedItemList[0];
-    cout << pPoseSeqItem->name() << endl;
-    mPoseSeqPath = boost::filesystem::path(pPoseSeqItem->filePath());
-    cout << "PoseSeqPath: " << mPoseSeqPath << endl;
+    BodyItemPtr bodyItemPtr;
+    PoseSeqItemPtr poseSeqItemPtr;
+    PoseSeqPtr poseSeqPtr;
+    getSelectedPoseSeqSet(body, bodyItemPtr, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr, motion);
 
-    PoseSeqPtr poseSeqPtr = pPoseSeqItem->poseSeq();
-    mBodyMotionItem = pPoseSeqItem->bodyMotionItem();
-    motion = mBodyMotionItem->motion();
+    mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
+    cout << "PoseSeqPath: " << mPoseSeqPath << endl;
 
     // BodyMotion作成
     BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();
