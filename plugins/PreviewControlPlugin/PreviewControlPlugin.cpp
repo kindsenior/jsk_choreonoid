@@ -66,10 +66,7 @@ void PreviewControlPlugin::execControl(){
     // motion生成
     cout << "numFrames: " << motion->numFrames() << endl;
     if( motion->numFrames() == 0 ){
-        BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();// インスタンス生成
-        PoseProvider* provider = poseSeqItemPtr->interpolator().get();
-        bmgb->shapeBodyMotion(body, provider, bodyMotionItemPtr, true);
-        cout << "Generated motion" << endl;
+        generateBodyMotionFromBar(body, poseSeqItemPtr, bodyMotionItemPtr);
     }else{
         cout << "Need not generate motion" << endl;
     }
