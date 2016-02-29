@@ -177,7 +177,6 @@ void PreviewControlPlugin::execControl(){
         bool r = true;
         size_t index = 0;
         while (r) {
-
             hrp::Vector3 p, x;// p: current_refzmp   x: refcog
             // r = df.update(p, x, ref_zmp_list.front(), ref_frame_list.front(), !ref_zmp_list.empty());
             r = df.update(p, x, ref_zmp_list.front(), !ref_zmp_list.empty());
