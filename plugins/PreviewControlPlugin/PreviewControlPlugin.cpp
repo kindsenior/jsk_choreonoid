@@ -98,9 +98,11 @@ void PreviewControlPlugin::execControl(){
 
     // 目標zmp・初期zmp・初期重心軌道書き出し
     {
-        stringstream ss0;
-        ss0 << poseSeqPath.parent_path().string() << "/" << getBasename(poseSeqPath) << "_PC_" << motion->frameRate() << "fps" << ".dat";
-        ofstream ofs(ss0.str().c_str());
+        stringstream ss;
+        ss << poseSeqPath.stem().string() << "_PC";
+        if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) ss << mBar->dialog->getParamString();
+        ss << "_" << motion->frameRate() << ".dat";
+        ofstream ofs(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
         Vector3d lastPosVec = body->rootLink()->p();
         Vector3d lastVelVec = VectorXd::Zero(3);
         ofs << "time initZMPx initZMPy initZMPz refZMPx refZMPy refZMPz initCMx initCMy initCMz rootPosX rootPosY rootPosZ rootVelX rootVelY rootVelZ rootAccX rootAccY rootAccZ" << endl;
@@ -231,8 +233,12 @@ void PreviewControlPlugin::execControl(){
         // zmpファイル書き出し
         {
             stringstream ss;
-            ss << poseSeqPath.parent_path().string() << "/" << getBasename(poseSeqPath) << "_PC_" << motion->frameRate() << "fps_" << loopNum << ".dat";
-            ofstream ofs; ofs.open(ss.str().c_str()); if( ofs == NULL ){ cout << "\x1b[31m" << "dat file open error" << "\x1b[m" << endl; return; }
+            ss << poseSeqPath.stem().string() << "_PC";
+            if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) ss << mBar->dialog->getParamString();
+            ss << "_" << motion->frameRate() << "fps_" << loopNum << ".dat";
+            ofstream ofs;
+            ofs.open(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
+
             DynamicsPlugin::calcZMP( body, motion, zmpSeqPtr );
             ofs << "time  cartZMPx cartZMPy cartZMPz refCMx refCMy refCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
             for(int i = 0; i < motion->numFrames(); ++i){
