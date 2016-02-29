@@ -52,14 +52,12 @@ void PreviewControlPlugin::execControl(){
     ItemList<PoseSeqItem> poseSeqItems = ItemTreeView::mainInstance()->selectedItems<Item>();
     BodyMotionItem* bodyMotionItem = poseSeqItems[0]->bodyMotionItem();// poseSeqを１個のみ選択
     BodyMotionPtr motion = bodyMotionItem->motion();
-    // boost::filesystem::path poseSeqPath( AppConfig::archive()->get("currentFileDialogDirectory", shareDirectory()).c_str() );
     string poseSeqPathString = poseSeqItems[0]->filePath();
     boost::filesystem::path poseSeqPath(poseSeqPathString);
     cout << " parent_path:" << poseSeqPath.parent_path().string() << " basename:" << getBasename(poseSeqPath) << endl;
 
     JointPathPtr jpl = getCustomJointPath( body, body->rootLink(), lFootLink );
     JointPathPtr jpr = getCustomJointPath( body, body->rootLink(), rFootLink );
-
 
     // 脚長さ計算
     for( int i = 0; i < jpl->numJoints(); ++i ) jpl->joint(i)->q() =0;
@@ -93,7 +91,7 @@ void PreviewControlPlugin::execControl(){
     //   refZmpSeqPtr->at(i).y() = (*(poseSeqInterpolatorPtr->ZMP())).y();
     //   refZmpSeqPtr->at(i).z() = (*(poseSeqInterpolatorPtr->ZMP())).z();
     // }
-    // refZmpSeqPtr = motion->ZMPseq();// motionのZMP
+
     // refZmpSeqPtr = motion->getOrCreateExtraSeq<Vector3Seq>("ZMP");// motionのZMP
     refZmpSeqPtr = motion->extraSeq<Vector3Seq>("ZMP");// motionのZMP Vector3SeqはZMPSeqでもいい??
     cout << "Finished generating ref zmp seq" << endl;
@@ -141,11 +139,9 @@ void PreviewControlPlugin::execControl(){
         DynamicsPlugin::calcZMP( body, motion, zmpSeqPtr );// 実際のzmpの計算
 
         // 予見制御用の実際のzmpと目標zmp、誤差zmp、時刻tmを計算
-        // cout << max_tm << " " << dt << " " << round(max_tm / dt) << endl;
         std::queue<hrp::Vector3> ref_zmp_list;
         std::deque<double> tm_list;
         for (size_t i = 0; i < static_cast<size_t>(round(max_tm / dt)); ++i){
-
             // tm_list
             double tmp_tm = i * dt;
             tm_list.push_back(tmp_tm);
@@ -169,8 +165,6 @@ void PreviewControlPlugin::execControl(){
             }else{
                 ref_zmp_list.push(ref_zmp_list.back());// 最後は1つ前の値と同じ
             }
-
-            // cout << tmp_tm << "     " << ref_v.transpose()  << "     " << v.transpose() << endl;
         }
         cout << "Finished generating ref zmp list" << endl;
     
@@ -202,9 +196,6 @@ void PreviewControlPlugin::execControl(){
                 cartZMPSeqPtr->at(index) << cart_zmp[0], cart_zmp[1], cart_zmp[2];
 
                 ++index;
-                /* zmpx ;; this zmp is "zmp as a table-cart model" cogy refzmpx zmpy cogy refzmpy */
-                // fprintf(fp, "%f %f %f %f %f %f %f\n", tm_list[index], cart_zmp[0], x[0], refzmp[0], cart_zmp[1], x[1],refzmp[1] );
-                // cout << tm_list[index] << " " << x.transpose() << endl;
             } else if ( !ref_zmp_list.empty() ) r = true;
             if (!ref_zmp_list.empty()){
                 ref_zmp_list.pop();
@@ -215,7 +206,6 @@ void PreviewControlPlugin::execControl(){
         for(int i = 0; i < motion->numFrames(); ++i){
             Vector3d lFootPos,rFootPos, lHipPos, rHipPos, dCM;
             Matrix3 lFootR,rFootR;
-            // cout << i*dt << " ";
             motion->frame(i) >> *body;
             body->calcForwardKinematics();// 状態更新
             dCM = diffCMSeqPtr->at(i) - body->calcCenterOfMass();
@@ -224,8 +214,6 @@ void PreviewControlPlugin::execControl(){
             lFootPos = lFootLink->p(); lFootR = lFootLink->R();// 足先位置取得
             rFootPos = rFootLink->p(); rFootR = rFootLink->R();
 
-            // cout << "before lhip:" << jpl->joint(0)->p.transpose() << " rhip:" << jpr->joint(0)->p.transpose() << endl;
-            // cout << "before lfoot:" << lFootPos.transpose() << " rfoot:" << rFootPos.transpose() << endl;
             if(modeStr == dfMode){
                 body->rootLink()->p() += 0.7*diffCMSeqPtr->at(i);// 腰位置修正 ゲインを掛けるだけでは微妙
             }else if(modeStr == tpMode){
@@ -233,8 +221,7 @@ void PreviewControlPlugin::execControl(){
             }
             body->calcForwardKinematics();// 状態更新
             lHipPos = jpl->joint(0)->p(); rHipPos = jpr->joint(0)->p();
-            // cout << " after lhip:" << jpl->joint(0)->p.transpose() << " rhip:" << jpr->joint(0)->p.transpose() << endl;
-            // cout << " after lfoot:" << lFootPos.transpose() << " rfoot:" << rFootPos.transpose() << endl;
+
             Vector3 tmpVec = body->rootLink()->p();
             modifyWaistIntoRange( tmpVec, lFootPos, rFootPos, lHipPos, rHipPos, legLength );
             body->rootLink()->p() = tmpVec;// 腰位置修正は要改良
@@ -242,8 +229,6 @@ void PreviewControlPlugin::execControl(){
 
             if( !jpl->calcInverseKinematics(lFootPos,lFootR) ) cout << "\x1b[31m" << i*dt << " lfoot IK fail" << "\x1b[m" << endl;
             if( !jpr->calcInverseKinematics(rFootPos,rFootR) ) cout << "\x1b[31m" << i*dt << " rfoot IK fail" << "\x1b[m" << endl;
-
-            // cout << body->rootLink()->p.transpose() << "  " << lFootPos.transpose() << "  " << rFootPos.transpose() << endl << endl;
 
             motion->frame(i) << *body;
         }
@@ -280,7 +265,5 @@ void PreviewControlPlugin::execControl(){
 
     cout << "\x1b[31m" << "Finished Preview Control" << "\x1b[m" << endl << endl;
 }
-
-
 
 CNOID_IMPLEMENT_PLUGIN_ENTRY(PreviewControlPlugin)
