@@ -201,6 +201,14 @@ void cnoid::getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
     motion = bodyMotionItem->motion();
 }
 
+void cnoid::generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const BodyMotionItemPtr& bodyMotionItemPtr)
+{
+    BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();
+    PoseProvider* provider = poseSeqItemPtr->interpolator().get();
+    bmgb->shapeBodyMotion(body, provider, bodyMotionItemPtr, true);
+    cout << "Generated motion" << endl;
+}
+
 void cnoid::updateBodyState( BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame ){
     int prevFrame = max(currentFrame-1, 0);
     int nextFrame = min(currentFrame+1, motion->numFrames()-1);

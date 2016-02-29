@@ -17,6 +17,7 @@
 #include <boost/bind.hpp>
 #include <cnoid/MessageView>
 #include <cnoid/src/PoseSeqPlugin/PoseSeqItem.h>
+#include <cnoid/BodyMotionGenerationBar>
 #include <cnoid/Vector3Seq>
 #include <cnoid/LeggedBodyHelper>
 #include <cnoid/src/Body/Jacobian.h>
@@ -65,6 +66,8 @@ bool isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, Bod
 void getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
                            PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
                            BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion);
+
+void generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemptr, const BodyMotionItemPtr& bodyMotionItemPtr);
 
 void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame );
 
