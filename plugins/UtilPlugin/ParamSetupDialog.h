@@ -45,7 +45,9 @@ public:
     {
         std::stringstream ss;
         for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
-            ss << "_" << (*iter)->getParam() << (*iter)->saveName();
+            if((*iter)->isChecked()){
+                ss << "_" << (*iter)->getParam() << (*iter)->saveName();
+            }
         }
         std::string str = ss.str();
         replace(str.begin(), str.end(), '.', '-');
