@@ -342,7 +342,7 @@ toolbars:
     saveParameterInFileName: true
   "PreviewControl": 
     controlMode: DynamicsFilter
-    controlModeCheck: true
+    controlModeCheck: false
     saveParameterInFileName: true
 Body: 
   "BodyMotionEngine": 
