@@ -45,7 +45,7 @@ void PreviewControlPlugin::execControl(){
     PoseSeqPtr poseSeqPtr;
     BodyMotionItemPtr bodyMotionItemPtr;
     BodyMotionPtr motion;
-    getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion);
+    if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion)) return;
 
     // 足先リンク名取得
     Link *lFootLink, *rFootLink;
