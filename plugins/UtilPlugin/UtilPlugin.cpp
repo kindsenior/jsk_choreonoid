@@ -183,12 +183,12 @@ void UtilPlugin::getFootLink( Link** plFootLink, Link** prFootLink, const BodyPt
   cout << "Finished setting foot links" << endl;
 }
 
-void cnoid::getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
+bool cnoid::getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
                                   PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
                                   BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion)
 {
     ItemList<PoseSeqItem> selectedItemList = ItemTreeView::mainInstance()->selectedItems<Item>();
-    if(selectedItemList.empty()){cout << "Select PoseSeqItem!!" << endl; return;}
+    if(selectedItemList.empty()){cout << "Select PoseSeqItem!!" << endl; return false;}
     bodyItemPtr = selectedItemList[0]->findOwnerItem<BodyItem>();
     body = bodyItemPtr->body();
     cout << "Robot:" << body->name() << endl;
@@ -199,6 +199,8 @@ void cnoid::getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
     poseSeqPtr = poseSeqItemPtr->poseSeq();
     bodyMotionItem = poseSeqItemPtr->bodyMotionItem();
     motion = bodyMotionItem->motion();
+
+    return true;
 }
 
 void cnoid::generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const BodyMotionItemPtr& bodyMotionItemPtr)
