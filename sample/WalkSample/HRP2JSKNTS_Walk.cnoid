@@ -333,7 +333,7 @@ toolbars:
     errorCMWeightCheck: true
     errorMomentumWeight: 10
     errorMomentumWeightCheck: true
-    errorAngularMomentumWeight: 10000
+    errorAngularMomentumWeight: 1000
     errorAngularMomentumWeightCheck: true
     inputForceWeight: 0.001
     inputForceWeightCheck: true
