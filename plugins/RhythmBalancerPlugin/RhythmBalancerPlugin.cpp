@@ -21,6 +21,7 @@
 #include <cnoid/BodyMotionPoseProvider>
 #include <cnoid/PoseProviderToBodyMotionConverter>
 #include <cnoid/BodyMotionUtil>
+#include <cnoid/PointSetItem>
 #include <cnoid/TimeBar>
 #include <cnoid/Archive>
 #include <cnoid/MenuManager>
@@ -31,8 +32,11 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <boost/format.hpp>
+#include <boost/thread.hpp>
 #include <set>
 // #include "../../../src/PoseSeqPlugin/gettext.h"
+
+#include <UtilPlugin/UtilPlugin.h>
 
 using namespace boost;
 using namespace cnoid;
@@ -41,6 +45,7 @@ using namespace std;
 class RhythmBalancerPlugin : public Plugin
 {
 public:
+    SignalProxy<void()>::connection_type connections;
     
     RhythmBalancerPlugin() : Plugin("RhythmBalancer")
     {
@@ -160,32 +165,14 @@ public:
             }// 各poseに対するforの終わり
         }// 各poseSeqに対するforの終わり
 
-        // collision取得
-        {
-            BodyItemPtr bodyItemPtr; BodyPtr robot;
-            PoseSeqItemPtr poseSeqItemPtr; PoseSeqPtr poseSeqPtr;
-            BodyMotionItemPtr bodyMotionItemPtr; BodyMotionPtr motion;
-            if(!getSelectedPoseSeqSet(bodyItemPtr, robot, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion)) return;
-            WorldItemPtr worldItemPtr = bodyItemPtr->findOwnerItem<WorldItem>();
-            const double dt = 1.0/motion->frameRate();
 
-            for(int i=0; i<motion->numFrames(); ++i){
-                motion->frame(i) >> *robot;
-                robot->calcForwardKinematics();
-                worldItemPtr->updateCollisions();
+        // シグナル
+        // Signal<void()> sigTest;
+        // sigTest.connect(bind(&RhythmBalancerPlugin::test, this));
+        // sigTest();
 
-                const std::vector<CollisionLinkPairPtr>& collisions = bodyItemPtr->collisions();
-                cout << dt*i << " sec:" << collisions.size() << endl;
-                for(size_t i=0; i < collisions.size(); ++i){
-                    CollisionLinkPair& collisionPair = *collisions[i];
-                    cout << " " << collisionPair.link[0]->name() << " " << collisionPair.link[1]->name() << " " << collisionPair.isSelfCollision() << endl;
-                    for(std::vector<Collision>::iterator iter = collisionPair.collisions.begin(); iter != collisionPair.collisions.end(); ++iter){
-                        cout << " " << iter->point.transpose() << " " << iter->normal.transpose() << endl;
-                    }
-                }cout << endl;
-
-            }
-        }
+        // スレッド
+        boost::thread thr(&RhythmBalancerPlugin::test, this);
 
         // WorldItemへのアクセス
         {
@@ -208,6 +195,61 @@ public:
 
         MessageView::instance()->putln(ss.str());
     }
+
+    // collision取得
+    void test()
+    {
+        BodyItemPtr bodyItemPtr; BodyPtr robot;
+        PoseSeqItemPtr poseSeqItemPtr; PoseSeqPtr poseSeqPtr;
+        BodyMotionItemPtr bodyMotionItemPtr; BodyMotionPtr motion;
+        if(!getSelectedPoseSeqSet(bodyItemPtr, robot, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion)) return;
+        WorldItemPtr worldItemPtr = bodyItemPtr->findOwnerItem<WorldItem>();
+        const double dt = 1.0/motion->frameRate();
+
+        PointSetItemPtr pointSetItemPtr;
+        if(!(pointSetItemPtr = worldItemPtr->findItem<PointSetItem>("ContactPoint"))){
+            pointSetItemPtr = new PointSetItem();
+            pointSetItemPtr->setName("ContactPoint");
+            worldItemPtr->addChildItem(pointSetItemPtr);
+            ItemTreeView::mainInstance()->checkItem(pointSetItemPtr);// check + updateCollisions() -> segmentation fault
+        }
+
+        connections = bodyItemPtr->sigCollisionsUpdated().connect(boost::bind(&RhythmBalancerPlugin::test2, this, bodyItemPtr, robot, motion, pointSetItemPtr));
+        test2(bodyItemPtr, robot, motion, pointSetItemPtr);
+    }
+
+    void test2(BodyItemPtr& bodyItemPtr, BodyPtr& robot, BodyMotionPtr& motion, PointSetItemPtr& pointSetItemPtr)
+    {
+        static int idx = 0;
+        static const double dt = 1.0/motion->frameRate();
+
+        usleep(50*1000);
+
+        if(idx != 0){
+            pointSetItemPtr->clearAttentionPoint();
+            const std::vector<CollisionLinkPairPtr>& collisions = bodyItemPtr->collisions();
+            cout << dt*idx << " sec:";
+            cout << collisions.size() << endl;
+            for(size_t i=0; i < collisions.size(); ++i){
+                CollisionLinkPair& collisionPair = *collisions[i];
+                cout << " " << collisionPair.link[0]->name() << " " << collisionPair.link[1]->name() << " " << collisionPair.isSelfCollision();
+                for(std::vector<Collision>::iterator iter = collisionPair.collisions.begin(); iter != collisionPair.collisions.end(); ++iter){
+                    // cout << " " << iter->point.transpose() << " " << iter->normal.transpose() << endl;
+                    pointSetItemPtr->addAttentionPoint(iter->point);
+                }
+            }cout << endl;
+        }
+
+        if(idx < motion->numFrames()){
+            motion->frame(idx) >> *robot;
+            bodyItemPtr->notifyKinematicStateChange(true);
+            ++idx;
+        }else{
+            idx = 0;
+            connections.disconnect();// disconnect when finished
+        }
+    }
+
 };
 
 CNOID_IMPLEMENT_PLUGIN_ENTRY(RhythmBalancerPlugin)
