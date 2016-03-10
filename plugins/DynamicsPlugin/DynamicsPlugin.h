@@ -20,7 +20,10 @@
 
 #include "Jacobian.h"
 
-using namespace cnoid;
+namespace cnoid {
+
+// zmp計算
+void calcZMP( const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& zmpSeqPtr, const bool local = false );
 
 class DynamicsPlugin : public Plugin
 {
@@ -38,10 +41,7 @@ public:
     return true;
   }
 
-  // zmp計算
-  static void calcZMP( const BodyPtr& body, BodyMotionPtr motion, Vector3SeqPtr& zmpSeqPtr, const bool local = false );
-
 };
 
-
+}
 /* CNOID_IMPLEMENT_PLUGIN_ENTRY(DynamicsPlugin) */
