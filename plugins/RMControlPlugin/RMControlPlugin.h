@@ -44,65 +44,65 @@
 
 #include <UtilPlugin/UtilPlugin.h>
 
-namespace cnoid{
+namespace cnoid {
 
-    enum Constraint { Free , LLEG , RLEG };// 拘束条件
+enum Constraint { Free , LLEG , RLEG };// 拘束条件
 
-    class RMControlPlugin : public Plugin
+class RMControlPlugin : public Plugin
+{
+public:
+    std::vector<SubMass> mSubMasses;
+    BodyPtr mBody;
+    JointPathPtr mJpl;
+    JointPathPtr mJpr;
+    Link* mLFootLink;
+    Link* mRFootLink;
+    boost::filesystem::path mPoseSeqPath;
+
+    RMControlPlugin() : Plugin("RMControl")
     {
-    public:
-        std::vector<SubMass> mSubMasses;
-        BodyPtr mBody;
-        JointPathPtr mJpl;
-        JointPathPtr mJpr;
-        Link* mLFootLink;
-        Link* mRFootLink;
-        boost::filesystem::path mPoseSeqPath;
-
-        RMControlPlugin() : Plugin("RMControl")
-            {
-                require("Body");
-                require("PoseSeq");
-                // require("Dynamics");
-            }
+        require("Body");
+        require("PoseSeq");
+        // require("Dynamics");
+    }
     
-        virtual bool initialize()
-        {
-            ToolBar* bar = new ToolBar("RMControl");
+    virtual bool initialize()
+    {
+        ToolBar* bar = new ToolBar("RMControl");
 
-            bar->addButton("RMControl")
-                ->sigClicked().connect(boost::bind(&RMControlPlugin::RMControl, this));
+        bar->addButton("RMControl")
+            ->sigClicked().connect(boost::bind(&RMControlPlugin::RMControl, this));
 
-            addToolBar(bar);
+        addToolBar(bar);
 
-            return true;
-        }
+        return true;
+    }
 
-        // ロボットモデル依存の部分あり
-        // 各種行列を計算
-        void calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
-                           MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
-                           MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, std::vector<Constraint>& jointConstraintVec);
-
-
-        // スプライン補間
-        void splineInterpolation(const Vector3d f0, const Vector3d v0, const Vector3d f1, const Vector3d v1, const double tau,
-                                 Vector3d& a0, Vector3d& a1, Vector3d& a2, Vector3d& a3);
+    // ロボットモデル依存の部分あり
+    // 各種行列を計算
+    void calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
+                       MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
+                       MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, std::vector<Constraint>& jointConstraintVec);
 
 
-        // 目標運動量・角運動量軌道生成
-        // void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
-        void generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
-                               const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
-                               Vector3Seq& refPSeq, Vector3Seq& refLSeq);
+    // スプライン補間
+    void splineInterpolation(const Vector3d f0, const Vector3d v0, const Vector3d f1, const Vector3d v1, const double tau,
+                             Vector3d& a0, Vector3d& a1, Vector3d& a2, Vector3d& a3);
 
-        void loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
-                               const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
-                               Vector3Seq& refPSeq, Vector3Seq& refLSeq);
 
-        // 分解運動量制御
-        void RMControl();
+    // 目標運動量・角運動量軌道生成
+    // void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
+    void generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
+                           const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
+                           Vector3Seq& refPSeq, Vector3Seq& refLSeq);
 
-    };
+    void loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
+                       const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
+                       Vector3Seq& refPSeq, Vector3Seq& refLSeq);
+
+    // 分解運動量制御
+    void RMControl();
+
+};
 
 }
