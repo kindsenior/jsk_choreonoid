@@ -16,13 +16,15 @@ bool PreviewControlPlugin::initialize()
 }
 
 // 球面からZ座標を計算
-double PreviewControlPlugin::calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius ){
+double PreviewControlPlugin::calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius )
+{
     return centerPos.z() + sqrt( pow(radius,2) - pow(pos.x()-centerPos.x(), 2) - pow(pos.y()-centerPos.y(), 2) );
 }
 
 // 腰位置を可動域内に修正
 void PreviewControlPlugin::modifyWaistIntoRange
-( Vector3d& waistPos, const Vector3d lFootPos, const Vector3d rFootPos, const Vector3d lHipPos, const Vector3d rHipPos, const double legLength ){
+( Vector3d& waistPos, const Vector3d lFootPos, const Vector3d rFootPos, const Vector3d lHipPos, const Vector3d rHipPos, const double legLength )
+{
     // void modifyWaistIntoRange( Position waistPos, const Vector3d lFootPos, const Vector3d rFootPos, const Vector3d lHipPos, const Vector3d rHipPos, const double legLength ){
     // const double ratio = 1;
     const double ratio = 0.99;
@@ -36,7 +38,8 @@ void PreviewControlPlugin::modifyWaistIntoRange
 }
 
 // 予見制御
-void PreviewControlPlugin::execControl(){
+void PreviewControlPlugin::execControl()
+{
     cout << "\x1b[31m" << "Start Preview Control" << "\x1b[m" << endl;
 
     BodyItemPtr bodyItemPtr;
