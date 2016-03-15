@@ -10,7 +10,7 @@ using namespace std;
 
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
-int cnoid::getContactState( const PosePtr pose1, const PosePtr pose2, const int linkId )
+int cnoid::getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
 {
     std::cout << "getContactState()";
     int state = 0;
@@ -33,7 +33,7 @@ int cnoid::getContactState( const PosePtr pose1, const PosePtr pose2, const int 
 
 // どちらの足でもいいので次の接触ポーズにイテレータを進める
 // end()を返すこともある
-void cnoid::incContactPose( PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body )
+void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body)
 {
     std::cout << "incContactPose()";
     LeggedBodyHelperPtr lgh = getLeggedBodyHelper(body);
@@ -59,7 +59,7 @@ void cnoid::incContactPose( PoseSeq::iterator& poseIter, const PoseSeqPtr poseSe
 }
 
 // 特定のリンクの次のポーズを求める
-PoseSeq::iterator cnoid::getNextPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId )
+PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
     std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
@@ -78,7 +78,7 @@ PoseSeq::iterator cnoid::getNextPose( PoseSeq::iterator poseIter, PoseSeqPtr pos
 }
 
 // 特定リンクの前のポーズを求める
-PoseSeq::iterator cnoid::getPrevPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId )
+PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
     std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
@@ -97,7 +97,7 @@ PoseSeq::iterator cnoid::getPrevPose( PoseSeq::iterator poseIter, PoseSeqPtr pos
 }
 
 // poseIterが最後のポーズの時は-1を返す
-int cnoid::getNextContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId )
+int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
 {
     std::cout << "getNextContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator nextPoseIter = getNextPose( poseIter, poseSeq, linkId );
@@ -105,7 +105,7 @@ int cnoid::getNextContactState( const PoseSeq::iterator poseIter, const PoseSeqP
     return getContactState( getPrevPose( nextPoseIter, poseSeq, linkId )->get<Pose>(), nextPoseIter->get<Pose>(), linkId );
 }
 
-int cnoid::getPrevContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId )
+int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
 {
     std::cout << "getPrevContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator prevPoseIter = getPrevPose( poseIter, poseSeq, linkId );
@@ -130,7 +130,7 @@ Vector3d cnoid::getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeq
 }
 
 // 足の接触状態しか見ていない lgh要改良
-bool cnoid::isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body )
+bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body)
 {
     std::cout << "isContactStateChanging(" << poseIter->time() <<  "[sec])" << std::endl;
 
@@ -158,7 +158,7 @@ bool cnoid::isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseS
     return false;
 }
 
-void UtilPlugin::getFootLink( Link** plFootLink, Link** prFootLink, const BodyPtr& body )
+void UtilPlugin::getFootLink(Link** plFootLink, Link** prFootLink, const BodyPtr& body)
 {
   cout << "getFootLink()" << endl;
 
@@ -219,7 +219,7 @@ void cnoid::generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseS
     cout << "Generated motion" << endl;
 }
 
-void cnoid::updateBodyState( BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame )
+void cnoid::updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame)
 {
     int prevFrame = max(currentFrame-1, 0);
     int nextFrame = min(currentFrame+1, motion->numFrames()-1);

@@ -40,28 +40,28 @@ struct SubMass
 
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
-int getContactState( const PosePtr pose1, const PosePtr pose2, const int linkId );
+int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId);
 
 // どちらの足でもいいので次の接触ポーズにイテレータを進める
 // end()を返すこともある
-void incContactPose( PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body );
+void incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body);
 
 // 特定のリンクの次のポーズを求める
-PoseSeq::iterator getNextPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId );
+PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId);
 
 // 特定リンクの前のポーズを求める
-PoseSeq::iterator getPrevPose( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId );
+PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId);
 
 // poseIterが最後のポーズの時は-1を返す
-int getNextContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId );
+int getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
 
-int getPrevContactState( const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId );
+int getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
 
 Vector3d getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId);
 
 Vector3d getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
 
-bool isContactStateChanging( PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body );
+bool isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body);
 
 bool getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
                            PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
