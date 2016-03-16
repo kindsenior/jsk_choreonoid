@@ -50,11 +50,11 @@ public:
     
     virtual bool initialize();
 
-    double calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius );
+    double calcZFromSphere(const Vector3d centerPos, const Vector3d pos, const double radius);
 
     // 腰位置を可動域内に修正
     void modifyWaistIntoRange
-    ( Vector3d& waistPos, const Vector3d lFootPos, const Vector3d rFootPos, const Vector3d lHipPos, const Vector3d rHipPos, const double legLength );
+    (Vector3d& waistPos, const Vector3d lFootPos, const Vector3d rFootPos, const Vector3d lHipPos, const Vector3d rHipPos, const double legLength);
 
     // 予見制御
     void execControl();
