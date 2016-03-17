@@ -92,13 +92,13 @@ public:
 
     // 目標運動量・角運動量軌道生成
     // void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
-    void generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
-                           const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
-                           Vector3Seq& refPSeq, Vector3Seq& refLSeq);
+    void generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
+                          const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL,
+                          Vector3Seq& refPSeq, Vector3Seq& refLSeq);
 
-    void loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
-                       const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
-                       Vector3Seq& refPSeq, Vector3Seq& refLSeq);
+    void loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
+                      const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL,
+                      Vector3Seq& refPSeq, Vector3Seq& refLSeq);
 
     // 分解運動量制御
     void RMControl();

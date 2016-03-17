@@ -11,9 +11,9 @@ using namespace std;
 
 // ロボットモデル依存の部分あり
 // 各種行列を計算
-void RMControlPlugin::calcMatrixies( MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
-                                     MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
-                                     MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, vector<Constraint>& jointConstraintVec)
+void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
+                                    MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
+                                    MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, vector<Constraint>& jointConstraintVec)
 {
     stringstream ss;
 
@@ -126,9 +126,9 @@ void RMControlPlugin::splineInterpolation(const Vector3d f0, const Vector3d v0, 
 
 // 目標運動量・角運動量軌道生成
 // void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
-void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
-                                        const Vector3d initDCM, const Vector3d endDCM, const Vector3d initL, const Vector3d endL, 
-                                        Vector3Seq& refPSeq, Vector3Seq& refLSeq)
+void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
+                                       const Vector3d initDCM, const Vector3d endDCM, const Vector3d initL, const Vector3d endL,
+                                       Vector3Seq& refPSeq, Vector3Seq& refLSeq)
 {
 
     // BodyItem* bodyItem = motionItem->findOwnerItem<BodyItem>(true);// motionItemからbodyItemを見つける
@@ -323,9 +323,9 @@ void RMControlPlugin::generateRefPLSeq( BodyMotionItem* motionItem ,const PoseSe
     ofs.close();
 }
 
-void RMControlPlugin::loadRefPLSeq( BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
-                                        const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL, 
-                                        Vector3Seq& refPSeq, Vector3Seq& refLSeq)
+void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
+                                   const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL,
+                                   Vector3Seq& refPSeq, Vector3Seq& refLSeq)
 {
 
     // BodyItem* bodyItem = motionItem->findOwnerItem<BodyItem>(true);// motionItemからbodyItemを見つける
