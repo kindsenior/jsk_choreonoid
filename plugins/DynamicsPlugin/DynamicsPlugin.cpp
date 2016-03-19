@@ -67,7 +67,7 @@ Vector6 calcInverseDynamicsSub(Link* link, const Vector3& vo_parent, const Vecto
 }
 
 
-void cnoid::calcZMP( const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& zmpSeqPtr, const bool local )
+void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& zmpSeqPtr, const bool local)
 {
     int bodyItemIdx = 0,poseSeqIdx = 0;
     const double DEFAULT_GRAVITY_ACCELERATION = 9.80665;
