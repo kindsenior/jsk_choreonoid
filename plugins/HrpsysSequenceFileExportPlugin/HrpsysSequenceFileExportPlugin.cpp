@@ -7,7 +7,8 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
-void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport(){
+void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport()
+{
   cout << "\x1b[31m" << "Start HrpsysSequenceFileExport" << "\x1b[m" << endl;
 
   // BodyItem,BodyPtr
