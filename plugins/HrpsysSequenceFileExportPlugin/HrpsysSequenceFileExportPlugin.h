@@ -28,27 +28,27 @@ namespace cnoid{
 
 class HrpsysSequenceFileExportPlugin : public Plugin
 {
- public:
+public:
     
- HrpsysSequenceFileExportPlugin() : Plugin("HrpsysSequenceFileExport")
+    HrpsysSequenceFileExportPlugin() : Plugin("HrpsysSequenceFileExport")
     {
-      require("Body");
-      /* require("Dynamics"); */
-      require("Util");
+        require("Body");
+        /* require("Dynamics"); */
+        require("Util");
     }
     
-  virtual bool initialize()
-  {
-    ToolBar* bar = new ToolBar("HrpsysSequenceFileExportPlugin");
-    bar->addButton("Export")->sigClicked().connect(boost::bind(&HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport, this));
-    /* bar->setVisibleByDefault(true); */ /* 関係ない?? */
+    virtual bool initialize()
+    {
+        ToolBar* bar = new ToolBar("HrpsysSequenceFileExportPlugin");
+        bar->addButton("Export")->sigClicked().connect(boost::bind(&HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport, this));
+        /* bar->setVisibleByDefault(true); */ /* 関係ない?? */
 
-    addToolBar(bar);
+        addToolBar(bar);
 
-    return true;
-  }
+        return true;
+    }
 
-  void HrpsysSequenceFileExport();
+    void HrpsysSequenceFileExport();
 
 };
 
