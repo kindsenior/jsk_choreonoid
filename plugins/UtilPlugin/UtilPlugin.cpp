@@ -18,12 +18,12 @@ int cnoid::getContactState(const PosePtr pose1, const PosePtr pose2, const int l
     // 滑り判定(静止0 滑り1)
     double delta = 0.005;// 要検討 5[mm]
     // std::cout << pose1->ikLinkInfo(linkInfoIter->first)->p.transpose() << " " << pose2->ikLinkInfo(linkInfoIter->first)->p.transpose() << std::endl;
-    if( (pose1->ikLinkInfo(linkId)->p - pose2->ikLinkInfo(linkId)->p).norm() > delta ){
+    if((pose1->ikLinkInfo(linkId)->p - pose2->ikLinkInfo(linkId)->p).norm() > delta){
         state += 1;// 2^0
     }
 
     // 遊脚判定(接触0 非接触1)
-    if( !pose1->ikLinkInfo(linkId)->isTouching() || !pose2->ikLinkInfo(linkId)->isTouching() ){
+    if(!pose1->ikLinkInfo(linkId)->isTouching() || !pose2->ikLinkInfo(linkId)->isTouching()){
         state += 2;// 2^1
     }
 
@@ -43,8 +43,8 @@ void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq
         PosePtr pose = iter->get<Pose>();
         for( Pose::LinkInfoMap::iterator linkInfoIter = pose->ikLinkBegin(); linkInfoIter != pose->ikLinkEnd(); ++linkInfoIter ){// LinkInfoMap走査
             for( int i = 0; i < lgh->numFeet(); ++i ){
-                if( lgh->footLink(i)->index() == linkInfoIter->first // リンク番号比較
-                    && linkInfoIter->second.isTouching() ){// 接触確認
+                if(lgh->footLink(i)->index() == linkInfoIter->first // リンク番号比較
+                    && linkInfoIter->second.isTouching()){// 接触確認
                     poseIter = iter;
                     std::cout << " >>next contact pose is link:" << linkInfoIter->first << " time:" << poseIter->time() << std::endl;
                     return;
@@ -66,7 +66,7 @@ PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr pose
     for( iter = (++poseIter); iter != poseSeq->end(); ++iter ){
         // std::cout << " " << iter->time();
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
-        if( linkInfo ){
+        if(linkInfo){
             std::cout << " link" << linkId << "'s next pose time:" << iter->time() << std::endl;
             return iter;
         }
@@ -85,7 +85,7 @@ PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr pose
     for( iter = (--poseIter); iter != (--poseSeq->begin()); --iter ){
         // std::cout << " " << iter->time();
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
-        if( linkInfo ){
+        if(linkInfo){
             std::cout << " link" << linkId << "'s prev pose time:" << iter->time() << std::endl;
             return iter;
         }
@@ -101,7 +101,7 @@ int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPt
 {
     std::cout << "getNextContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator nextPoseIter = getNextPose( poseIter, poseSeq, linkId );
-    if( poseIter == nextPoseIter ){std::cout << " this is final pose" << std::endl; return -1;}
+    if(poseIter == nextPoseIter){std::cout << " this is final pose" << std::endl; return -1;}
     return getContactState( getPrevPose( nextPoseIter, poseSeq, linkId )->get<Pose>(), nextPoseIter->get<Pose>(), linkId );
 }
 
@@ -109,7 +109,7 @@ int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPt
 {
     std::cout << "getPrevContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator prevPoseIter = getPrevPose( poseIter, poseSeq, linkId );
-    if( poseIter == prevPoseIter ){std::cout << " this is first pose" << std::endl; return -1;}
+    if(poseIter == prevPoseIter){std::cout << " this is first pose" << std::endl; return -1;}
     return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId );
 }
 
@@ -125,7 +125,7 @@ Vector3d cnoid::getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeq
 {
     std::cout << "getPrevDirection(" << poseIter->time() << "[sec] linkid:" << linkId << ")" << std::endl;
     PoseSeq::iterator prevPoseIter = getPrevPose(poseIter, poseSeq, linkId);
-    if( poseIter == prevPoseIter ){std::cout << " this is first pose" << std::endl; return Vector3d::Zero();}
+    if(poseIter == prevPoseIter){std::cout << " this is first pose" << std::endl; return Vector3d::Zero();}
     return getDirection(prevPoseIter->get<Pose>(), getNextPose(prevPoseIter, poseSeq, linkId)->get<Pose>(), linkId);
 }
 
@@ -142,7 +142,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
     for( Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter ){
         std::cout << "  linkID:" << linkInfoIter->first << " link name:" << body->link(linkInfoIter->first)->name() << " " << linkInfoIter->second.isTouching() << std::endl;
         for( int i = 0; i < lbh->numFeet(); ++i ){
-            if( lbh->footLink(i)->index() == linkInfoIter->first && linkInfoIter->second.isTouching() ){// 足先リンクで且つ接触している
+            if(lbh->footLink(i)->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
                 int prevState,nextState;
                 if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
                     std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state changing at " << poseIter->time() << "[sec]: " << prevState << "->" << nextState << std::endl;
