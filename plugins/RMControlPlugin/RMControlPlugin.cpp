@@ -52,7 +52,7 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, Ma
     Hfree = MatrixXd(3, mBody->numJoints() - mJpl->numJoints() - mJpr->numJoints() );
     int idx = 0;
     for(int i = 0; i < jointConstraintVec.size(); ++i){
-        if( jointConstraintVec[i] == Free ){
+        if(jointConstraintVec[i] == Free){
             Mfree.col(idx) = M.col(i);
             Hfree.col(idx) = H.col(i);
             ++idx;
@@ -165,12 +165,12 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
         }
 
         // Poseの離着陸判定
-        if( prevTouchFlg && !TouchFlg ){
+        if(prevTouchFlg && !TouchFlg){
             takeoffPoseItr = --poseItr;
             initRMCPoseItr = --poseItr;
             ++poseItr;++poseItr;
         }
-        if( !prevTouchFlg && TouchFlg ){
+        if(!prevTouchFlg && TouchFlg){
             landingPoseItr = poseItr;
             endRMCPoseItr = ++poseItr;
             --poseItr;
@@ -263,21 +263,21 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 
 
         // 運動量
-        if( takeoffFrame < i && i < landingFrame){// 跳躍期
+        if(takeoffFrame < i && i < landingFrame){// 跳躍期
             refCMSeq[i] = takeoffCM + (landingCM - takeoffCM) * (i-takeoffFrame)*dt /jumptime;
             refCMSeq[i].z() = - 0.5 * g * (i-takeoffFrame)*dt * (i-landingFrame)*dt
                 + (landingCM.z()* (i-takeoffFrame)*dt - takeoffCM.z()* (i-landingFrame)*dt) / jumptime;
             refPSeq[i] = m * takeoffDCM;
             refPSeq[i].z() = - m * g * (i - takeoffFrame)*dt + m * takeoffDCM.z();
-        }else if ( initRMCFrame <= i && i <= endRMCFrame ){// 接地期
+        }else if(initRMCFrame <= i && i <= endRMCFrame){// 接地期
             int startFrame,endFrame;
             Vector3d f0,v0,f1,v1;
-            if( i <= takeoffFrame ){
+            if(i <= takeoffFrame){
                 startFrame = initRMCFrame;
                 endFrame = takeoffFrame;
                 f0 = initCM; v0 = initDCM;
                 f1 = takeoffCM; v1 = takeoffDCM;
-            }else if( landingFrame <= i ){
+            }else if(landingFrame <= i){
                 startFrame = landingFrame;
                 endFrame = endRMCFrame;
                 f0 = landingCM; v0 = landingDCM;
@@ -290,14 +290,14 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
             refPSeq[i] = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
 
             // 境界条件表示
-            if( i == initRMCFrame || i == landingFrame){
+            if(i == initRMCFrame || i == landingFrame){
                 cout << "time " << i*dt << endl;
                 cout << "f0 " << f0.transpose() << endl;
                 cout << "refCMSeq " << refCMSeq[i].transpose() << endl;
                 cout << "v0 " << v0.transpose() << endl;
                 cout << "refPSeq " << refPSeq[i].transpose() << endl;
                 cout << endl;
-            }else if( i == takeoffFrame || i == endRMCFrame ){
+            }else if(i == takeoffFrame || i == endRMCFrame){
                 cout << "time " << i*dt << endl;
                 cout << "f1 " << f1.transpose() << endl;
                 cout << "refCMSeq " << refCMSeq[i].transpose() << endl;
@@ -407,7 +407,7 @@ void RMControlPlugin::RMControl()
 
     // 足先リンク取得
     Listing& footLinkInfos = *mBody->info()->findListing("footLinks");
-    if( !footLinkInfos.isValid() ){
+    if(!footLinkInfos.isValid()){
         cout << " Please load model from yaml file" << endl;
         return;
     }
@@ -425,7 +425,7 @@ void RMControlPlugin::RMControl()
     // PoseSeqItem* pPoseSeqItem = dynamic_cast<PoseSeqItem*>(pChildItem);
     PoseSeqItemPtr pPoseSeqItem = ItemTreeView::mainInstance()->selectedItems<PoseSeqItem>()[0];
     mPoseSeqPath = boost::filesystem::path(pPoseSeqItem->filePath());
-    if( pPoseSeqItem ){
+    if(pPoseSeqItem){
         cout << "  PoseSeqName: " << pPoseSeqItem->name() << endl;
 
         BodyMotionItem* bodyMotionItem = pPoseSeqItem->bodyMotionItem();
@@ -449,7 +449,7 @@ void RMControlPlugin::RMControl()
             fnamess.str("");
             fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_PL_" << motion->frameRate() << "fps_" << i << ".dat";
             ofstream ofs( fnamess.str().c_str() );
-            if( !ofs ){ cerr << "File Open Error" << endl; return;}
+            if(!ofs){ cerr << "File Open Error" << endl; return;}
             ofs << "time CMx CMy CMz Px Py Pz Lx Ly Lz" << endl;
 
             double dt = 1.0/motion->frameRate();
@@ -688,14 +688,14 @@ void RMControlPlugin::RMControl()
                 motion->frame(currentFrame) >> *mBody;
                 mBody->rootLink()->p() += xib.block(0,0, 3,1) * dt;
                 Vector3d omega = xib.block(3,0, 3,1);
-                if( omega.norm() != 0 ) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
+                if(omega.norm() != 0) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
                 else cout << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
 
 
                 // // BaseLink更新
                 // mBody->link(BASE_LINK)->p += mBody->link(BASE_LINK)->v() * dt;
                 // Vector3d omega = mBody->link(BASE_LINK)->w();
-                // if( omega.norm() != 0 )mBody->link(BASE_LINK)->R() = mBody->link(BASE_LINK)->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
+                // if(omega.norm() != 0)mBody->link(BASE_LINK)->R() = mBody->link(BASE_LINK)->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
 
                 // q更新
                 for(int i = 0; i < mBody->numJoints(); ++i){
