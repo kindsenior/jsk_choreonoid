@@ -110,7 +110,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         // body->rootLink()->dv() = (p2 - 2.0 * p1 + p0) / dt2 + g;
         Vector3 dv = (p2 - 2.0 * p1 + p0) / dt2;
 
-        // if( (dv-lastdv).norm() < 0.15 ) body->rootLink()->dv() = dv;
+        // if((dv-lastdv).norm() < 0.15) body->rootLink()->dv() = dv;
         // else cout << " " << currentFrame*dt << " ddv is too large!" << endl;
         // lastdv = dv; fprintf(fp, "%f  %f\n", currentFrame*dt, (dv-lastdv).norm() );
 
@@ -137,7 +137,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         // AngleAxis aa2 = AngleAxis(  ( R2*R1.inverse() )*(( R1*R0.inverse() ).inverse()) );
         // Vector3d dw_ = aa2.axis()*aa2.angle() / (dt*dt);x
 
-        // if( omega_cross0(2,1) != 0 ){
+        // if(omega_cross0(2,1) != 0){
         // cout << currentFrame << endl;
         // cout << body->rootLink()->w.transpose() << " " << (aa.axis() * aa.angle() / (2*dt) ).transpose() << endl;
         // cout << "dot02: " << omega_cross0(2,1) << " " << omega_cross0(0,2) << " " << omega_cross0(1,0) << endl;
