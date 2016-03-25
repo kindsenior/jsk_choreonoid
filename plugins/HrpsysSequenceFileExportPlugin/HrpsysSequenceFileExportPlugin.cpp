@@ -29,7 +29,7 @@ void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport()
 
   stringstream ss;
   ss << poseSeqPath.parent_path().string() << "/" << poseSeqItem->name() << ".optionaldata";
-  FILE* fp = fopen(ss.str().c_str(),"w"); if( fp == NULL ){ cout << "\x1b[31m" << "optionaldata file("<< ss.str() << ") open error" << "\x1b[m" << endl; return; }
+  FILE* fp = fopen(ss.str().c_str(),"w"); if(fp == NULL){ cout << "\x1b[31m" << "optionaldata file("<< ss.str() << ") open error" << "\x1b[m" << endl; return; }
 
   double frameRate = motion->frameRate();
 
