@@ -34,7 +34,7 @@ void PreviewControlPlugin::modifyWaistIntoRange
                              waistPos.z() - rHipPos.z() + calcZFromSphere( rFootPos, rHipPos, legLength*ratio ) ) );
     // cout << " lhippos:" << lHipPos.z() << "  sphere z(l):" << calcZFromSphere( lFootPos, lHipPos, legLength*ratio ) << endl;
     // cout << " rhippos:" << rHipPos.z() << "  sphere z(r):" << calcZFromSphere( rFootPos, rHipPos, legLength*ratio ) << endl;
-    if( waistPos.z() < z ) cout << "down waist " << z-waistPos.z() << endl;
+    if(waistPos.z() < z) cout << "down waist " << z-waistPos.z() << endl;
 }
 
 // 予見制御
@@ -68,7 +68,7 @@ void PreviewControlPlugin::execControl()
 
     // motion生成
     cout << "numFrames: " << motion->numFrames() << endl;
-    if( motion->numFrames() == 0 ){
+    if(motion->numFrames() == 0){
         generateBodyMotionFromBar(body, poseSeqItemPtr, bodyMotionItemPtr);
     }else{
         cout << "Need not generate motion" << endl;
@@ -226,8 +226,8 @@ void PreviewControlPlugin::execControl()
             body->rootLink()->p() = tmpVec;// 腰位置修正は要改良
             body->calcForwardKinematics();// 状態更新
 
-            if( !jpl->calcInverseKinematics(lFootPos,lFootR) ) cout << "\x1b[31m" << i*dt << " lfoot IK fail" << "\x1b[m" << endl;
-            if( !jpr->calcInverseKinematics(rFootPos,rFootR) ) cout << "\x1b[31m" << i*dt << " rfoot IK fail" << "\x1b[m" << endl;
+            if(!jpl->calcInverseKinematics(lFootPos,lFootR)) cout << "\x1b[31m" << i*dt << " lfoot IK fail" << "\x1b[m" << endl;
+            if(!jpr->calcInverseKinematics(rFootPos,rFootR)) cout << "\x1b[31m" << i*dt << " rfoot IK fail" << "\x1b[m" << endl;
 
             motion->frame(i) << *body;
         }
