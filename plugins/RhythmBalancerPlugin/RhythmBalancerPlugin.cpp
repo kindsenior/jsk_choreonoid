@@ -118,7 +118,7 @@ public:
 
             for(int j=0;j < motion->numFrames(); ++j){// zmpSeq.numFrames()でもOK
 
-              if( j % 10 == 0 ){
+              if(j % 10 == 0){
                 // BodyMotion::Frame frame = motion->frame(j);
                 MultiValueSeq::Frame q = motion->jointPosSeq()->frame(j);// jはframe.frame()でもいい
                 MultiSE3Seq::Frame links = motion->linkPosSeq()->frame(j);
