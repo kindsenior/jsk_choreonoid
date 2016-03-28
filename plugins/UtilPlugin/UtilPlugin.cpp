@@ -171,7 +171,7 @@ void UtilPlugin::getFootLink(Link** plFootLink, Link** prFootLink, const BodyPtr
 
   // bodyのinfoからlisting
   // Listing& footLinkInfos = *body->info()->findListing("footLinks");
-  // if( !footLinkInfos.isValid() ){
+  // if(!footLinkInfos.isValid()){
   //   cout << "Please load model from yaml file" << endl;
   //   return;
   // }
