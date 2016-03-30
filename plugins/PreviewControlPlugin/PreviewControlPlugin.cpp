@@ -61,7 +61,7 @@ void PreviewControlPlugin::execControl()
     JointPathPtr jpr = getCustomJointPath( body, body->rootLink(), rFootLink );
 
     // 脚長さ計算
-    for( int i = 0; i < jpl->numJoints(); ++i ) jpl->joint(i)->q() =0;
+    for(int i = 0; i < jpl->numJoints(); ++i) jpl->joint(i)->q() =0;
     body->calcForwardKinematics();
     double legLength = ( jpl->joint(0)->p() - jpl->endLink()->p() ).norm();
     cout << "legLength: " << legLength << endl;
@@ -81,7 +81,7 @@ void PreviewControlPlugin::execControl()
     Vector3SeqPtr refZmpSeqPtr;
     // refZmpSeqPtr.reset( new Vector3Seq() );
     // refZmpSeqPtr->setNumFrames(motion->numFrames(), true);
-    // for (size_t i = 0; i < static_cast<size_t>(round(max_tm / dt)); i++) {
+    // for(size_t i = 0; i < static_cast<size_t>(round(max_tm / dt)); i++){
     //   poseSeqInterpolatorPtr->seek( i * dt );
 
     //   // poseSeqのZMP
@@ -131,7 +131,7 @@ void PreviewControlPlugin::execControl()
     cout << "control mode: " << modeStr << endl;
     string dfMode = mBar->dialog->controlModeCombo->itemText(DynamicsFilter).toStdString();
     string tpMode = mBar->dialog->controlModeCombo->itemText(TrajectoryPlanning).toStdString();
-    for(int loopNum = 0; loopNum < 5; ++loopNum ){
+    for(int loopNum = 0; loopNum < 5; ++loopNum){
         cout << "loop: " << loopNum << endl;
 
         zmpSeqPtr.reset( new Vector3Seq() );
@@ -141,7 +141,7 @@ void PreviewControlPlugin::execControl()
         // 予見制御用の実際のzmpと目標zmp、誤差zmp、時刻tmを計算
         std::queue<hrp::Vector3> ref_zmp_list;
         std::deque<double> tm_list;
-        for (size_t i = 0; i < static_cast<size_t>(round(max_tm / dt)); ++i){
+        for(size_t i = 0; i < static_cast<size_t>(round(max_tm / dt)); ++i){
             // tm_list
             double tmp_tm = i * dt;
             tm_list.push_back(tmp_tm);
