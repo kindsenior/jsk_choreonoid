@@ -154,7 +154,7 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     PoseSeq::iterator initRMCPoseItr = poseSeq->begin();
     PoseSeq::iterator endRMCPoseItr = poseSeq->begin();
     bool prevTouchFlg = true;
-    for( PoseSeq::iterator poseItr = poseSeq->begin(); poseItr != poseSeq->end(); ++poseItr){
+    for(PoseSeq::iterator poseItr = poseSeq->begin(); poseItr != poseSeq->end(); ++poseItr){
         bool TouchFlg = false;
 
         // Poseの接地判定
