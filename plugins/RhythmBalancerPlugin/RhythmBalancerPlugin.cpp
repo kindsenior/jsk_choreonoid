@@ -85,7 +85,7 @@ public:
             MessageView::instance()->putln("Print called !");
     
             // ItemList<PoseSeqItem> poseSeqItems = bodyItems[0]->getSubItems<PoseSeqItem>();// サブアイテムを取得
-            // for( size_t i = 0; i < poseSeqItems.size(); ++i){
+            // for(size_t i = 0; i < poseSeqItems.size(); ++i){
             //   ss << poseSeqItems[i]->name() << endl;
             // }
 
