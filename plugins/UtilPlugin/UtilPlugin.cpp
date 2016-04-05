@@ -38,11 +38,11 @@ void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq
     std::cout << "incContactPose()";
     LeggedBodyHelperPtr lgh = getLeggedBodyHelper(body);
     PoseSeq::iterator iter;
-    for( iter = (++poseIter); iter != poseSeq->end(); ++iter ){// PoseSeq走査
+    for(iter = (++poseIter); iter != poseSeq->end(); ++iter){// PoseSeq走査
         // std::cout << " " << iter->time();
         PosePtr pose = iter->get<Pose>();
-        for( Pose::LinkInfoMap::iterator linkInfoIter = pose->ikLinkBegin(); linkInfoIter != pose->ikLinkEnd(); ++linkInfoIter ){// LinkInfoMap走査
-            for( int i = 0; i < lgh->numFeet(); ++i ){
+        for(Pose::LinkInfoMap::iterator linkInfoIter = pose->ikLinkBegin(); linkInfoIter != pose->ikLinkEnd(); ++linkInfoIter){// LinkInfoMap走査
+            for(int i = 0; i < lgh->numFeet(); ++i){
                 if(lgh->footLink(i)->index() == linkInfoIter->first // リンク番号比較
                     && linkInfoIter->second.isTouching()){// 接触確認
                     poseIter = iter;
@@ -63,7 +63,7 @@ PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr pose
 {
     std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
-    for( iter = (++poseIter); iter != poseSeq->end(); ++iter ){
+    for(iter = (++poseIter); iter != poseSeq->end(); ++iter){
         // std::cout << " " << iter->time();
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
         if(linkInfo){
@@ -82,7 +82,7 @@ PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr pose
 {
     std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
-    for( iter = (--poseIter); iter != (--poseSeq->begin()); --iter ){
+    for(iter = (--poseIter); iter != (--poseSeq->begin()); --iter){
         // std::cout << " " << iter->time();
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
         if(linkInfo){
@@ -139,9 +139,9 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
     curPose = poseIter->get<Pose>();
 
     LeggedBodyHelperPtr lbh = getLeggedBodyHelper(body);
-    for( Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter ){
+    for(Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter){
         std::cout << "  linkID:" << linkInfoIter->first << " link name:" << body->link(linkInfoIter->first)->name() << " " << linkInfoIter->second.isTouching() << std::endl;
-        for( int i = 0; i < lbh->numFeet(); ++i ){
+        for(int i = 0; i < lbh->numFeet(); ++i){
             if(lbh->footLink(i)->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
                 int prevState,nextState;
                 if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
