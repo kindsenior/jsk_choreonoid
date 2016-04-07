@@ -169,7 +169,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         // // 西脇方式
         // double denom = 0;
         // Vector3d zmp = VectorXd::Zero(3);
-        // for(int i = 0; i < body->numLinks(); ++i){
+        // for(int i=0; i < body->numLinks(); ++i){
         //   Link* link = body->link(i);
         //   Matrix3d Iw = link->R().transpose() * link->I() * link->R();
         //   Vector3d accCM = link->dv() + link->dw().cross(link->R()*link->c()) + link->w().cross( link->w().cross( link->R()*link->c() ) );
