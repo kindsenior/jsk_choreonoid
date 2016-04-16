@@ -26,7 +26,7 @@ void MultiContactStabilizerPlugin::generateSeq()
     Vector3SeqPtr initCMSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM");
     Vector3SeqPtr initPSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
     Vector3SeqPtr initLSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initL");
-    for(int i = 0; i < numFrames; ++i){
+    for(int i=0; i < numFrames; ++i){
         updateBodyState(body, motion, i);
         body->calcForwardKinematics(true,true);
 
@@ -233,7 +233,7 @@ void MultiContactStabilizerPlugin::execControl()
         std::vector<ContactConstraintParam*> ccParamVec;
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
 
-        for(int i = backPoseIter->time()/dt; i < frontPoseIter->time()/dt; ++i){
+        for(int i=backPoseIter->time()/dt; i < frontPoseIter->time()/dt; ++i){
             processCycle(i, ccParamVec);
         }
     }
@@ -242,7 +242,7 @@ void MultiContactStabilizerPlugin::execControl()
         std::vector<ContactConstraintParam*> ccParamVec;
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, --poseSeqPtr->end(), poseSeqPtr);
 
-        for(int i = numFrames - 1; i < numFrames + mcs->numWindows; ++i){
+        for(int i=numFrames - 1; i < numFrames + mcs->numWindows; ++i){
             processCycle(i, ccParamVec);
         }
     }
