@@ -82,8 +82,8 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, Ma
     // Hb.block(0,3, 3,3) = mBody->rootLink()->subIw;
     // vector<SubMassInertia> subMassInertias(mBody->numLinks()); calcSubMassInertia( mBody->rootLink(), subMassInertias_);
     // Matrix3 I_ = subMassInertias_[mBody->rootLink()->index()].Iw;
-    // Hb.block(0,3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw;// とりあえず
-    Hb.block(0,3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw + mBody->mass() * D( mBody->centerOfMass() - mBody->rootLink()->p() );
+    Hb.block(0,3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw;// こっちであってる?
+    // Hb.block(0,3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw + mBody->mass() * D( mBody->centerOfMass() - mBody->rootLink()->p() );
 
     Mb = Mb - Ml * Fl - Mr * Fr;// 脚は左右とも動かない
     Hb = Hb - Hl * Fl - Hr * Fr;
