@@ -62,15 +62,15 @@ items:
                 InstanceName: "JAXON_RED"
                 bodyPeriodicRate: 0.002
                 RelativePathBase: "RTC directory"
-            - 
-              id: 4
-              name: "walk"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_walk.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
+            # - 
+            #   id: 4
+            #   name: "walk"
+            #   plugin: PoseSeq
+            #   class: PoseSeqItem
+            #   data: 
+            #     filename: "${PROJECT_DIR}/JAXON_RED_walk.pseq"
+            #     format: POSE-SEQ-YAML
+            #     barLength: 1
         - 
           id: 5
           name: "floor"
