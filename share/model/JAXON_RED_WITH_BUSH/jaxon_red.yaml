@@ -1,0 +1,111 @@
+## 
+## to read wrl from choreonoid
+##
+
+modelFile: "JAXON_JVRCmain_hrpsys_bush.wrl"
+
+standardPose: [
+0.0, 0.0, -20, 40, -20, 0.0,
+0.0, 0.0, -20, 40, -20, 0.0,
+0.0, 0.0, 0.0,
+0.0, 0.0,
+0.0, 40.0, -20.0, -5.0, -80.0, 0.0, 0.0, -20.0,
+0.0, 40.0,  20.0,  5.0, -80.0, 0.0, 0.0, -20.0]
+
+linkGroup:
+  - name: UPPER-BODY
+    links: 
+      - name: NECK
+        links: [ HEAD_JOINT0, HEAD_JOINT1 ]
+      - name: ARMS
+        links:
+          - name: R-ARM
+            links: [ RARM_JOINT0, RARM_JOINT1, RARM_JOINT2, RARM_JOINT3, RARM_JOINT4, RARM_JOINT5, RARM_JOINT6, RARM_JOINT7, RARM_F_JOINT0, RARM_F_JOINT1 ]
+          - name: L-ARM
+            links: [ LARM_JOINT0, LARM_JOINT1, LARM_JOINT2, LARM_JOINT3, LARM_JOINT4, LARM_JOINT5, LARM_JOINT6, LARM_JOINT7, LARM_F_JOINT0, LARM_F_JOINT1 ]
+      - name: CHEST
+        links: [ CHEST_JOINT0, CHEST_JOINT1, CHEST_JOINT2 ]
+  - WAIST
+  - name: LOWER-BODY
+    links:
+      - name: LEGS
+        links:
+        - name: R-LEG
+          links: [ RLEG_JOINT0, RLEG_JOINT1, RLEG_JOINT2, RLEG_JOINT3, RLEG_JOINT4, RLEG_JOINT5 ]
+        - name: L-LEG
+          links: [ LLEG_JOINT0, LLEG_JOINT1, LLEG_JOINT2, LLEG_JOINT3, LLEG_JOINT4, LLEG_JOINT5 ]
+
+possibleIkInterpolationLinks: [ WAIST, RLEG_JOINT5, LLEG_JOINT5, RARM_JOINT7, LARM_JOINT7 ]
+defaultIkInterpolationLinks:  [ WAIST, RLEG_JOINT5, LLEG_JOINT5, RARM_JOINT7, LARM_JOINT7 ]
+possibleSupportLinks: [ RLEG_JOINT5, LLEG_JOINT5 ]
+
+defaultIKsetup:
+  WAIST: [ RLEG_JOINT5, LLEG_JOINT5 ]
+  RLEG_JOINT5: [ WAIST ]
+  LLEG_JOINT5: [ WAIST ]
+  RARM_JOINT7: [ CHEST_JOINT2 ]
+  LARM_JOINT7: [ CHEST_JOINT2 ]
+
+footLinks:
+  - link: RLEG_JOINT5
+    soleCenter: [ 0.04, 0.005, -0.022 ]
+  - link: LLEG_JOINT5
+    soleCenter: [ 0.04, -0.005, -0.022 ]
+
+symmetricJoints:
+  - [ HEAD_JOINT0 ]
+  - [ CHEST_JOINT0 ]
+  - [ CHEST_JOINT2 ]
+  - [ LLEG_JOINT0,  RLEG_JOINT0, -1 ]
+  - [ LLEG_JOINT1,  RLEG_JOINT1, -1 ]
+  - [ LLEG_JOINT2,  RLEG_JOINT2, 1 ]
+  - [ LLEG_JOINT3,  RLEG_JOINT3, 1 ]
+  - [ LLEG_JOINT4,  RLEG_JOINT4, 1 ]
+  - [ LLEG_JOINT5,  RLEG_JOINT5, -1 ]
+  - [ LARM_JOINT0,  RARM_JOINT0, -1 ]
+  - [ LARM_JOINT1,  RARM_JOINT1, 1 ]
+  - [ LARM_JOINT2,  RARM_JOINT2, -1 ]
+  - [ LARM_JOINT3,  RARM_JOINT3, -1 ]
+  - [ LARM_JOINT4,  RARM_JOINT4, 1 ]
+  - [ LARM_JOINT5,  RARM_JOINT5, -1 ]
+  - [ LARM_JOINT6,  RARM_JOINT6, -1 ]
+  - [ LARM_JOINT7,  RARM_JOINT7, 1 ]
+
+symmetricIkLinks:
+  - [ WAIST ]
+  - [ LLEG_JOINT5, RLEG_JOINT5 ]
+
+divisionNumberOfPrimitiveGeometries: 10
+
+selfCollisionDetection:
+  excludeTreeDepth: 3
+  excludeLinks: [ ]
+
+poseConversionInfo:
+  - targetBodies: [ HRP4C ]
+    jointMap: [ 
+       0,  1,  2,  3,  4,  5,
+       7,  8,  9, 10, 11, 12,
+      12, -1, -1,
+      13, -1, -1,
+# faces
+      14, 15, -1, 16, -1, -1, -1, -1, -1,
+      17, 18, -1, 19, -1, -1, -1, -1, -1 ]
+    linkMap: { R_FOOT: RLEG_JOINT5, L_FOOT: LLEG_JOINT5 }
+
+#######################################################################
+## end-coords
+##
+## rleg-end-coords:
+##   translate : [0.0, 0, -0.091849]
+## lleg-end-coords:
+##   translate : [0.0, 0, -0.091849]
+## rarm-end-coords:
+##   translate : [0, 0, -0.1]
+##   rotate    : [0, 1, 0, 90]
+## larm-end-coords:
+##   translate : [0, 0, -0.1]
+##   rotate    : [0, 1, 0, 90]
+## head-end-coords:
+##   translate : [0.085, 0, 0.0]
+##   rotate    : [0, 1, 0, 90]
