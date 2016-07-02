@@ -177,7 +177,7 @@ void PreviewControlPlugin::execControl()
         cartZMPSeqPtr->setNumFrames(motion->numFrames(), true);
 
         // preview_dynamics_filter<preview_control> df(dt, 0.8, ref_zmp_list.front());
-        rats::preview_dynamics_filter<rats::extended_preview_control> df(dt, 0.8, ref_zmp_list.front());
+        rats2::preview_dynamics_filter<rats2::extended_preview_control> df(dt, 0.8, ref_zmp_list.front());
         double cart_zmp[3], refzmp[3];
         bool r = true;
         size_t index = 0;

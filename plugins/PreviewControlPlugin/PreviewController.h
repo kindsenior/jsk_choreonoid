@@ -7,7 +7,7 @@
 #include <hrpUtil/Eigen3d.h>
 #include <cnoid/Vector3Seq>
 
-namespace rats
+namespace rats2
 {
   template <std::size_t dim>
   struct riccati_equation

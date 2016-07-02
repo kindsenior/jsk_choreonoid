@@ -2,7 +2,7 @@
 #include "PreviewController.h"
 
 using namespace hrp;
-using namespace rats;
+using namespace rats2;
 
 template <std::size_t dim>
 void preview_control_base<dim>::update_x_k(const hrp::Vector3& pr)
