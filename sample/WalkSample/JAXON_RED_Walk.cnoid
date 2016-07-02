@@ -25,13 +25,12 @@ items:
             rootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
-              0, 0, 1 ]
+              -0, 0, 1 ]
             jointPositions: [ 
-               0.000000,  0.000000, -0.349066,  0.698132, -0.349066,  0.000000,  0.000000,  0.000000, -0.349066,  0.698132, 
-              -0.349066,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.698132, -0.349066, 
+               0.000000, -0.000000, -0.346623,  0.693245, -0.346623,  0.000000,  0.000000, -0.000000, -0.346623,  0.693245, 
+              -0.346623,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.698132, -0.349066, 
               -0.087266, -1.396263,  0.000000,  0.000000, -0.349066,  0.000000,  0.698132,  0.349066,  0.087266, -1.396263, 
-               0.000000,  0.000000, -0.349066,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000001, -0.000173, 
-              -0.002091, -0.000003,  0.002110,  0.003079 ]
+               0.000000,  0.000000, -0.349066,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000 ]
             initialRootPosition: [ 0, 0, 1.0185 ]
             initialRootAttitude: [ 
               2.22044605e-16, -1, 0, 
@@ -41,8 +40,8 @@ items:
                0.000054, -0.003093, -0.262419,  0.681091, -0.418672,  0.003093,  0.000054, -0.003093, -0.262401,  0.681084, 
               -0.418684,  0.003093,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.523599, -0.349066, 
               -0.087266, -1.396263,  0.000000,  0.000000, -0.349066,  0.000000,  0.523599,  0.349066,  0.087266, -1.396263, 
-               0.000000,  0.000000, -0.349066,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000 ]
-            zmp: [ 0, 0, 0 ]
+               0.000000,  0.000000, -0.349066,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000 ]
+            zmp: [ -2.23938997e-11, 0, 0 ]
             collisionDetection: true
             selfCollisionDetection: false
             isEditable: true
@@ -122,6 +121,7 @@ items:
             contactCorrectionVelocityRatio: 1
             kinematicWalking: false
             2Dmode: false
+            oldAccelSensorMode: false
           children: 
             - 
               id: 7
@@ -135,7 +135,6 @@ items:
                 maxFrameRate: 1000
                 maxLatency: 1
                 recordVisionData: false
-                useThread: true
                 useThreadsForSensors: true
                 bestEffort: false
                 allSceneObjects: false
@@ -155,7 +154,6 @@ items:
                 maxFrameRate: 1000
                 maxLatency: 1
                 recordVisionData: false
-                useThread: true
                 useThreadsForSensors: true
                 bestEffort: false
                 allSceneObjects: false
@@ -175,7 +173,6 @@ items:
                 maxFrameRate: 1000
                 maxLatency: 1
                 recordVisionData: false
-                useThread: true
                 useThreadsForSensors: true
                 bestEffort: false
                 allSceneObjects: false
@@ -201,9 +198,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 2, 6 ]
-      checked: [ 1, 2, 3, 5, 6, 7, 8, 9 ]
-      expanded: [ 1, 2, 3 ]
+      selected: [ 4 ]
+      checked: [ 1, 2, 5, 6, 7, 8, 9 ]
+      expanded: [ 1, 2 ]
   - 
     id: 3
     plugin: Base
@@ -251,9 +248,9 @@ views:
           fieldOfView: 0.6978
           near: 0.01
           far: 100
-          eye: [ 2.83982391, -2.45898149, 1.39192027 ]
-          direction: [ -0.633306328, 0.767331447, -0.100625766 ]
-          up: [ -0.0640520405, 0.0776072222, 0.994924346 ]
+          eye: [ 2.96188298, -3.5977474, 2.54274654 ]
+          direction: [ -0.45035926, 0.82437712, -0.3428978 ]
+          up: [ -0.164393959, 0.300921132, 0.939372715 ]
         - 
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -301,6 +298,10 @@ views:
     state: 
       listingMode: "Link List"
       currentBodyItem: 2
+      bodyItems: 
+        - 
+          id: 5
+          selectedLinks: [ 0 ]
   - 
     id: 9
     name: "Pose Roll"
@@ -314,6 +315,10 @@ views:
       autoUpdate: false
       timeSync: true
       listingMode: "Part Tree"
+      bodyItems: 
+        - 
+          id: 2
+          expandedParts: [ "LEGS", "LOWER-BODY", "UPPER-BODY", "Whole Body" ]
       timeLength: 10
       showLipSync: false
       gridInterval: 1
@@ -378,6 +383,24 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
+  "MultiContactStabilizerBar": 
+    numWindows: 13
+    numWindowsCheck: true
+    errorCMWeight: 100
+    errorCMWeightCheck: true
+    errorMomentumWeight: 10
+    errorMomentumWeightCheck: true
+    errorAngularMomentumWeight: 1000
+    errorAngularMomentumWeightCheck: true
+    inputForceWeight: 0.001
+    inputForceWeightCheck: true
+    inputMomentWeight: 10
+    inputMomentWeightCheck: true
+    saveParameterInFileName: true
+  "PreviewControl": 
+    controlMode: DynamicsFilter
+    controlModeCheck: true
+    saveParameterInFileName: true
 Body: 
   "BodyMotionEngine": 
     updateJointVelocities: false
@@ -387,7 +410,7 @@ Body:
         bodyItem: 2
         showCenterOfMass: false
         showPpcom: false
-        showZmp: false
+        showZmp: true
       - 
         bodyItem: 5
         showCenterOfMass: false
