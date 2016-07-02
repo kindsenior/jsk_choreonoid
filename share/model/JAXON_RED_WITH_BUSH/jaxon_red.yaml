@@ -4,7 +4,8 @@
 
 # modelFile: "JAXON_JVRCmain_hrpsys_bush.wrl"
 # modelFile: "/home/k-kojima/ros/indigo/src/rtm-ros-robotics/rtmros_choreonoid/jvrc_models/JAXON_JVRC/JAXON_JVRCmain_hrpsys_bush.wrl"
-modelFile: "../../../../../rtm-ros-robotics/rtmros_choreonoid/jvrc_models/JAXON_JVRC/JAXON_JVRCmain_hrpsys_bush.wrl"
+# modelFile: "../../../../../rtm-ros-robotics/rtmros_choreonoid/jvrc_models/JAXON_JVRC/JAXON_JVRCmain_hrpsys_bush.wrl"
+modelFile: "../../../../../rtm-ros-robotics/rtmros_choreonoid/jvrc_models/JAXON_JVRC/JAXON_JVRCmain_hrpsys.wrl"
 
 standardPose: [
 0.0, 0.0, -20, 40, -20, 0.0,
