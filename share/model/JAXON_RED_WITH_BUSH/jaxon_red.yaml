@@ -2,7 +2,9 @@
 ## to read wrl from choreonoid
 ##
 
-modelFile: "JAXON_JVRCmain_hrpsys_bush.wrl"
+# modelFile: "JAXON_JVRCmain_hrpsys_bush.wrl"
+# modelFile: "/home/k-kojima/ros/indigo/src/rtm-ros-robotics/rtmros_choreonoid/jvrc_models/JAXON_JVRC/JAXON_JVRCmain_hrpsys_bush.wrl"
+modelFile: "../../../../../rtm-ros-robotics/rtmros_choreonoid/jvrc_models/JAXON_JVRC/JAXON_JVRCmain_hrpsys_bush.wrl"
 
 standardPose: [
 0.0, 0.0, -20, 40, -20, 0.0,
