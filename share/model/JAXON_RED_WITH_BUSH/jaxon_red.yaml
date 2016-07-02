@@ -51,9 +51,9 @@ defaultIKsetup:
 
 footLinks:
   - link: RLEG_JOINT5
-    soleCenter: [ 0.04, 0.005, -0.022 ]
+    soleCenter: [ 0.0, 0.005, -0.022 ]
   - link: LLEG_JOINT5
-    soleCenter: [ 0.04, -0.005, -0.022 ]
+    soleCenter: [ 0.0, -0.005, -0.022 ]
 
 symmetricJoints:
   - [ HEAD_JOINT0 ]
