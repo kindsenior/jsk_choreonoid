@@ -1,4 +1,5 @@
 import yaml
+import time
 
 package_path = roslib.packages.get_pkg_dir("jsk_choreonoid")
 sample_path = os.path.join(package_path, "sample/WalkSample")
@@ -37,3 +38,20 @@ worldItem.addChildItem(floorItem)
 
 simulatorItem = AISTSimulatorItem()
 worldItem.addChildItem(simulatorItem)
+
+
+jpl = getCustomJointPath(robot, robot.link("LLEG_JOINT0"), robot.link("LLEG_JOINT5"))
+p = jpl.endLink().p
+R = jpl.endLink().R
+bp = jpl.baseLink().p
+bR = jpl.baseLink().R
+
+motion = poseSeqItem.find("motion").motion()
+
+dt = 1.0/motion.frameRate()
+
+def test(idx=10):
+    for i in range(min(motion.numFrames(),idx)):
+        motion.frame(i) >> robot
+        robotItem.notifyKinematicStateChange(True)
+        # time.sleep(dt)
