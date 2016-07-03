@@ -331,11 +331,11 @@ toolbars:
     numWindowsCheck: true
     errorCMWeight: 100
     errorCMWeightCheck: true
-    errorMomentumWeight: 10
+    errorMomentumWeight: 1
     errorMomentumWeightCheck: true
     errorAngularMomentumWeight: 1000
     errorAngularMomentumWeightCheck: true
-    inputForceWeight: 0.001
+    inputForceWeight: 5
     inputForceWeightCheck: true
     inputMomentWeight: 10
     inputMomentWeightCheck: true
