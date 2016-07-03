@@ -233,7 +233,7 @@ void MultiContactStabilizerPlugin::execControl()
         std::vector<ContactConstraintParam*> ccParamVec;
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
 
-        for(int i=backPoseIter->time()/dt; i < frontPoseIter->time()/dt; ++i){
+        for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
             processCycle(i, ccParamVec);
         }
     }
