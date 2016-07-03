@@ -107,7 +107,7 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
 
 void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
 {
-    cout << endl << "##############################" << endl << "turn:" << i << endl;
+    cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
 
     clock_t st = clock();
     double tmList[4] = {0,0,0,0};
@@ -234,6 +234,7 @@ void MultiContactStabilizerPlugin::execControl()
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
 
         for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            // if(i > mcs->numWindows + 200) goto BREAK;
             processCycle(i, ccParamVec);
         }
     }
@@ -247,6 +248,7 @@ void MultiContactStabilizerPlugin::execControl()
         }
     }
 
+ BREAK:
     free(mcs);
 
     setSubItem("refCM", mRefCMSeqPtr, mBodyMotionItemPtr);
