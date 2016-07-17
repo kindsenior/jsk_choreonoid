@@ -12,6 +12,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     QVBoxLayout* vbox = new QVBoxLayout();
 
+    // in order for saving param to file name
     numWindowsSpin = new SpinParamWidget();
     paramWidgetVec.push_back(numWindowsSpin);
     errorCMWeightSpin = new SpinParamWidget();
@@ -24,7 +25,10 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     paramWidgetVec.push_back(inputForceWeightSpin);
     inputMomentWeightSpin = new SpinParamWidget();
     paramWidgetVec.push_back(inputMomentWeightSpin);
+    blockSpinVec = new SpinVectorParamWidget();
+    paramWidgetVec.push_back(blockSpinVec);
 
+    // in order of param setup dialog
     QHBoxLayout* hbox = newRow(vbox);
     errorCMWeightSpin->setText("CM:");
     errorCMWeightSpin->setSaveName("CM");
@@ -75,6 +79,14 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     numWindowsSpin->addToLayout(hbox);
     hbox->addStretch();
 
+    hbox = newRow(vbox);
+    blockSpinVec->setText("Blocking:");
+    blockSpinVec->setSaveName("B");
+    blockSpinVec->setArchiveName("blockingList");
+    std::vector<int> vec{1,1,1,1,1,1,1,1,1,1,1,1,1};
+    blockSpinVec->setValue(vec);
+    blockSpinVec->addToLayout(hbox);
+    hbox->addStretch();
 
     hbox = newRow(vbox);
     saveParameterInFileNameCheck.setText("Save parameters in file name");
