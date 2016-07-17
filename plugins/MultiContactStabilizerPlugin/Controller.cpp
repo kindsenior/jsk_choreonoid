@@ -117,7 +117,7 @@ void ModelPredictiveController::calcInputWeightMatrix()
     int rowIdx = 0;
     for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
          int rows = (*iter)->inputWeightVec.rows();
-        inputWeightMat.block(rowIdx,rowIdx, rows,rows) = (*iter)->inputWeightVec.asDiagonal();
+         inputWeightMat.block(rowIdx,rowIdx, rows,rows) = (*iter)->inputWeightVec.asDiagonal();
         rowIdx += rows;
     }
 }

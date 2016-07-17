@@ -29,7 +29,9 @@ public:
         valueDim = nV;
         equalDim = nE;
         inequalDim = nIne;
-        // maxCalcCount = 10;
+        // maxCalcCount = 10;// fail
+        // maxCalcCount = 100;// fail
+        // maxCalcCount = 500;// success
         maxCalcCount = 1000;
     };
 
