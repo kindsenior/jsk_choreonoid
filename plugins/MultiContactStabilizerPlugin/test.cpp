@@ -35,7 +35,7 @@ void Test::testAugmentedMatrix()
         colIdx += inputDim;
     }
 
-    cout << "numWindows: " << mcs->numWindows << endl;
+    cout << "numWindows: " << mcs->numWindows() << endl;
     cout << "stateDim: " << stateDim << endl;
     cout << "x0:" << x0.transpose() << endl << endl;
     // cout << "phiMat (" << mcs->phiMat.rows() << "x" << mcs->phiMat.cols() << "):" << endl << mcs->phiMat << endl << endl;
@@ -85,7 +85,7 @@ void Test::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
     tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
     st = et;
 
-    if(mcs->mpcParamDeque.size() == mcs->numWindows){
+    if(mcs->mpcParamDeque.size() == mcs->numWindows()){
         mcs->calcAugmentedMatrix();
 
         mcs->setupQP();
@@ -94,7 +94,7 @@ void Test::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
         tmList[2] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
         st = et;
 
-        if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows);
+        if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows());
 
         et = clock();
         tmList[3] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
@@ -108,7 +108,7 @@ void Test::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
         P << x0[1],x0[3],0;
         L << x0[4],x0[5],0;
         CM /= mcs->m;
-        mOfs1 << (i - mcs->numWindows + 1)*mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
+        mOfs1 << (i - mcs->numWindows() + 1)*mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
 
         mcs->mpcParamDeque.pop_front();
     }

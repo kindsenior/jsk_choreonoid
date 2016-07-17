@@ -130,7 +130,7 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
 		tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
 		st = et;
 
-    if(mcs->mpcParamDeque.size() == mcs->numWindows){
+    if(mcs->mpcParamDeque.size() == mcs->numWindows()){
         mcs->calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
         mcs->setupQP();
 
@@ -138,7 +138,7 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
         tmList[2] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
         st = et;
 
-        if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows);
+        if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows());
 
 				et = clock();
 				tmList[3] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
@@ -152,10 +152,10 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
         P << x0[1],x0[3],0;
         L << x0[4],x0[5],0;
         CM /= body->mass();
-        mRefCMSeqPtr->at(i - mcs->numWindows + 1) = CM;
-        mRefPSeqPtr->at(i - mcs->numWindows + 1) = P;
-        mRefLSeqPtr->at(i - mcs->numWindows + 1) = L;
-        mOfs << (i - mcs->numWindows + 1)*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
+        mRefCMSeqPtr->at(i - mcs->numWindows() + 1) = CM;
+        mRefPSeqPtr->at(i - mcs->numWindows() + 1) = P;
+        mRefLSeqPtr->at(i - mcs->numWindows() + 1) = L;
+        mOfs << (i - mcs->numWindows() + 1)*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
 
         mcs->mpcParamDeque.pop_front();
     }
@@ -200,7 +200,7 @@ void MultiContactStabilizerPlugin::execControl()
     mcs = new MultiContactStabilizer();
     mcs->m = body->mass();
     mcs->dt = dt;
-    mcs->numWindows = mBar->dialog->numWindowsSpin->value();
+    mcs->setBlockVector(mBar->dialog->blockSpinVec->value());
     mcs->errorCMWeight = mBar->dialog->errorCMWeightSpin->value();
     mcs->errorMomentumWeight = mBar->dialog->errorMomentumWeightSpin->value();
     mcs->errorAngularMomentumWeight = mBar->dialog->errorAngularMomentumWeightSpin->value();
@@ -234,7 +234,7 @@ void MultiContactStabilizerPlugin::execControl()
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
 
         for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-            // if(i > mcs->numWindows + 200) goto BREAK;
+            // if(i > mcs->numWindows() + 200) goto BREAK;
             processCycle(i, ccParamVec);
         }
     }
@@ -243,7 +243,7 @@ void MultiContactStabilizerPlugin::execControl()
         std::vector<ContactConstraintParam*> ccParamVec;
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, --poseSeqPtr->end(), poseSeqPtr);
 
-        for(int i=numFrames - 1; i < numFrames + mcs->numWindows; ++i){
+        for(int i=numFrames - 1; i < numFrames + mcs->numWindows(); ++i){
             processCycle(i, ccParamVec);
         }
     }

@@ -45,6 +45,8 @@ class ModelPredictiveController
 protected:
     QP qpInterface;
 
+    std::vector<int> blockVec;
+
     dmatrix phiMat;
     dmatrix psiMat;
     dmatrix equalMat;
@@ -60,6 +62,7 @@ protected:
     dvector U;
 
 private:
+    int numWindows_;// N
     void calcPhiMatrix();
     void calcPsiMatrix();
     void calcEqualConstraints();
@@ -70,7 +73,6 @@ private:
     void calcInputWeightMatrix();
 
 public:
-    int numWindows;// N
     int stateDim;
     int psiCols, equalMatRows, inequalMatRows;
     bool isInitial;
@@ -79,6 +81,8 @@ public:
 
     ModelPredictiveController();
 
+    int numWindows(){return numWindows_;}
+    void setBlockVector(std::vector<int> vec){blockVec = vec; numWindows_ = blockVec.size();}
     void calcAugmentedMatrix();
     void updateX0Vector();
     virtual void setupQP() = 0;

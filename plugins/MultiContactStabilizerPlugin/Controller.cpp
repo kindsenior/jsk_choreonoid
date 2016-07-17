@@ -13,7 +13,7 @@ ModelPredictiveController::ModelPredictiveController()
 
 void ModelPredictiveController::calcPhiMatrix()
 {
-    phiMat = dmatrix(stateDim*numWindows,stateDim);
+    phiMat = dmatrix(stateDim*numWindows_,stateDim);
     dmatrix lastMat = dmatrix::Identity(stateDim,stateDim);
     for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
         int idx = std::distance(mpcParamDeque.begin(), iter);
@@ -24,7 +24,7 @@ void ModelPredictiveController::calcPhiMatrix()
 
 void ModelPredictiveController::calcPsiMatrix()
 {
-    psiMat = dmatrix::Zero(stateDim*numWindows,psiCols);
+    psiMat = dmatrix::Zero(stateDim*numWindows_,psiCols);
     int colIdx = 0;
     for(std::deque<ModelPredictiveControllerParam*>::iterator Biter = mpcParamDeque.begin(); Biter != mpcParamDeque.end(); ){// Biterは内側のforループでインクリメント
         dmatrix lastMat = (*Biter)->inputMat;
@@ -95,7 +95,7 @@ void ModelPredictiveController::calcBoundVectors()
 
 void ModelPredictiveController::calcRefXVector()
 {
-    refX = dvector(stateDim*numWindows);
+    refX = dvector(stateDim*numWindows_);
     for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
         int idx = std::distance(mpcParamDeque.begin(), iter);
         refX.block(stateDim*idx,0, stateDim,1) = (*iter)->refStateVec;
@@ -104,7 +104,7 @@ void ModelPredictiveController::calcRefXVector()
 
 void ModelPredictiveController::calcErrorWeightMatrix()
 {
-    errorWeightMat = dmatrix::Zero(stateDim*numWindows,stateDim*numWindows);
+    errorWeightMat = dmatrix::Zero(stateDim*numWindows_,stateDim*numWindows_);
     for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
         int idx = std::distance(mpcParamDeque.begin(), iter);
         errorWeightMat.block(stateDim*idx,stateDim*idx, stateDim,stateDim) = (*iter)->errorWeightVec.asDiagonal();

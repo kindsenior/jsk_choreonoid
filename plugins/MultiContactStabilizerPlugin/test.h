@@ -38,7 +38,8 @@ public:
 
         mcs->m = 60;
         mcs->dt = 0.05;
-        mcs->numWindows = 13;
+        std::vector<int> vec{1,1,1,1,1,1,1,1,1,1,1,1,1};
+        mcs->setBlockVector(vec);
         mcs->errorCMWeight = 150;
         mcs->errorMomentumWeight = 10;
         mcs->errorAngularMomentumWeight = 10000;
