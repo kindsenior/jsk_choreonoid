@@ -396,6 +396,8 @@ toolbars:
     inputForceWeightCheck: true
     inputMomentWeight: 10
     inputMomentWeightCheck: true
+    blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+    blockingListCheck: false
     saveParameterInFileName: true
   "PreviewControl": 
     controlMode: DynamicsFilter
