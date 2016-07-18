@@ -370,7 +370,7 @@ void MultiContactStabilizerParam::calcInputWeightVector()
 
 void MultiContactStabilizerParam::convertToMPCParam()
 {
-    inputDim = unitInputDim*ccParamVec.size();
+    inputDim = unitInputDim*ccParamVec.size();// 6*M_k
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         numEquals += (*iter)->numEquals;
         numInequals += (*iter)->numInequals;
