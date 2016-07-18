@@ -71,6 +71,7 @@ private:
     void calcRefXVector();
     void calcErrorWeightMatrix();
     void calcInputWeightMatrix();
+    void calcBlockMatrix();
 
 public:
     int stateDim;

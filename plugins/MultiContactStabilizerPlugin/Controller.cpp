@@ -122,6 +122,28 @@ void ModelPredictiveController::calcInputWeightMatrix()
     }
 }
 
+void ModelPredictiveController::calcBlockMatrix()
+{
+    blockMat = dmatrix::Zero(psiCols,URows);
+    blockMatInv = dmatrix::Zero(URows,psiCols);
+    std::vector<bool>::iterator blockFlagIter = blockFlagVec.begin();
+    std::deque<ModelPredictiveControllerParam*>::iterator colIter = mpcParamDeque.begin();
+    int count = 1, rowIdx = 0, colIdx = 0;
+    for(std::deque<ModelPredictiveControllerParam*>::iterator rowIter = mpcParamDeque.begin(); rowIter != mpcParamDeque.end(); ++rowIter, ++colIter){
+        int rows,cols;
+        rows = (*rowIter)->inputDim;
+        if(*blockFlagIter){
+            cols = (*colIter)->inputDim;
+            blockMatInv.block(colIdx,rowIdx, cols,rows) = dmatrix::Identity(cols,rows);// blockMatInv
+        }
+        blockMat.block(rowIdx,colIdx, rows,cols) = dmatrix::Identity(rows,cols);// blockMat
+        if(*(++blockFlagIter)){
+            colIdx += cols;
+        }
+        rowIdx += rows;
+    }
+}
+
 void ModelPredictiveController::updateX0Vector()
 {
     ModelPredictiveControllerParam* mpcParam = mpcParamDeque[0];
@@ -155,6 +177,7 @@ void ModelPredictiveController::calcAugmentedMatrix()
     calcRefXVector();
     calcErrorWeightMatrix();
     calcInputWeightMatrix();
+    calcBlockMatrix();
     U = dvector::Zero(psiCols);
 
 }
