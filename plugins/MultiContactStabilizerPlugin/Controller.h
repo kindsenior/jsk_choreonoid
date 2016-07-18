@@ -46,6 +46,7 @@ protected:
     QP qpInterface;
 
     std::vector<int> blockVec;
+    std::vector<bool> blockFlagVec;
 
     dmatrix phiMat;
     dmatrix psiMat;
@@ -60,6 +61,8 @@ protected:
     dmatrix errorWeightMat;// W1
     dmatrix inputWeightMat;// W2
     dvector U;
+    dmatrix blockMat;
+    dmatrix blockMatInv;
 
 private:
     int numWindows_;// N
@@ -75,7 +78,7 @@ private:
 
 public:
     int stateDim;
-    int psiCols, equalMatRows, inequalMatRows;
+    int psiCols, URows, equalMatRows, inequalMatRows;
     bool isInitial;
     std::deque<ModelPredictiveControllerParam*> mpcParamDeque;
     dvector x0;
@@ -83,7 +86,19 @@ public:
     ModelPredictiveController();
 
     int numWindows(){return numWindows_;}
-    void setBlockVector(std::vector<int> vec){blockVec = vec; numWindows_ = blockVec.size();}
+    void setBlockVector(std::vector<int> vec)
+    {
+        blockVec = vec;
+        // numWindows_ = blockVec.size();//変更
+        numWindows_ = std::accumulate(vec.begin(), vec.end(), 0);
+        blockFlagVec.clear();
+        for(std::vector<int>::iterator iter = blockVec.begin(); iter != blockVec.end(); ++iter){
+            blockFlagVec.push_back(true);
+            for(int i=(*iter)-1; i>0; --i){
+                blockFlagVec.push_back(false);
+            }
+        }
+    }
     void calcAugmentedMatrix();
     void updateX0Vector();
     virtual void setupQP() = 0;

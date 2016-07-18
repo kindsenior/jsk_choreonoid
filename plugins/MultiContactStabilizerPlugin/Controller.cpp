@@ -41,56 +41,72 @@ void ModelPredictiveController::calcPsiMatrix()
 }
 
 namespace {
-    template <typename containerClass, typename paramClass> void dumpMatrix(dmatrix& retMat, dmatrix paramClass::*inMat, containerClass& container, int rowIdx, int colIdx)
+    template <typename containerClass, typename paramClass> void dumpMatrix(dmatrix& retMat, dmatrix paramClass::*inMat, containerClass& container, int rowIdx, int colIdx, std::vector<bool> flagVec)
     {
-        for(typename containerClass::iterator iter = container.begin(); iter != container.end(); ++iter){
-            int rows = ((*iter)->*inMat).rows();
-            int cols = ((*iter)->*inMat).cols();
-            retMat.block(rowIdx,colIdx, rows,cols) = (*iter)->*inMat;
-            rowIdx += rows;
-            colIdx += cols;
+        std::vector<bool>::iterator flagIter = flagVec.begin();
+        for(typename containerClass::iterator iter = container.begin(); iter != container.end(); ++iter, ++flagIter){
+            if(*flagIter){
+                int rows = ((*iter)->*inMat).rows();
+                int cols = ((*iter)->*inMat).cols();
+                retMat.block(rowIdx,colIdx, rows,cols) = (*iter)->*inMat;
+                rowIdx += rows;
+                colIdx += cols;
+            }
         }
     }
+    template <typename containerClass, typename paramClass> void dumpMatrix(dmatrix& retMat, dmatrix paramClass::*inMat, containerClass& container, int rowIdx, int colIdx)
+    {
+        std::vector<bool> flagVec(container.size(), true);
+        ::dumpMatrix(retMat, inMat, container, rowIdx,colIdx, flagVec);
+    }
 
+    template <typename containerClass, typename paramClass> void dumpVector(dvector& retVec, dvector paramClass::*inVec, containerClass& container, int rowIdx, std::vector<bool> flagVec)
+    {
+        std::vector<bool>::iterator flagIter = flagVec.begin();
+        for(typename containerClass::iterator iter = container.begin(); iter != container.end(); ++iter, ++flagIter){
+            if(*flagIter){
+                int rows = ((*iter)->*inVec).rows();
+                retVec.block(rowIdx,0, rows,1) = (*iter)->*inVec;
+                rowIdx += rows;
+            }
+        }
+    }
     template <typename containerClass, typename paramClass> void dumpVector(dvector& retVec, dvector paramClass::*inVec, containerClass& container, int rowIdx)
     {
-        for(typename containerClass::iterator iter = container.begin(); iter != container.end(); ++iter){
-            int rows = ((*iter)->*inVec).rows();
-            retVec.block(rowIdx,0, rows,1) = (*iter)->*inVec;
-            rowIdx += rows;
-        }
+        std::vector<bool> flagVec(container.size(), true);
+        ::dumpVector(retVec, inVec, container, rowIdx, flagVec);
     }
 }
 
 void ModelPredictiveController::calcEqualConstraints()
 {
-    equalMat = dmatrix::Zero(equalMatRows,psiCols);
+    equalMat = dmatrix::Zero(equalMatRows,URows);
     equalVec = dvector(equalMatRows);
     int rowIdx = 0;
     int colIdx = 0;
-    ::dumpMatrix(equalMat, &ModelPredictiveControllerParam::equalMat, mpcParamDeque, rowIdx, colIdx);
-    ::dumpVector(equalVec, &ModelPredictiveControllerParam::equalVec, mpcParamDeque, rowIdx);
+    ::dumpMatrix(equalMat, &ModelPredictiveControllerParam::equalMat, mpcParamDeque, rowIdx, colIdx, blockFlagVec);
+    ::dumpVector(equalVec, &ModelPredictiveControllerParam::equalVec, mpcParamDeque, rowIdx, blockFlagVec);
 }
 
 void ModelPredictiveController::calcInequalConstraints()
 {
-    inequalMat = dmatrix::Zero(inequalMatRows,psiCols);
+    inequalMat = dmatrix::Zero(inequalMatRows,URows);
     inequalMinVec = dvector(inequalMatRows);
     inequalMaxVec = dvector(inequalMatRows);
     int rowIdx = 0;
     int colIdx = 0;
-    ::dumpMatrix(inequalMat, &ModelPredictiveControllerParam::inequalMat, mpcParamDeque, rowIdx, colIdx);
-    ::dumpVector(inequalMinVec, &ModelPredictiveControllerParam::inequalMinVec, mpcParamDeque, rowIdx);
-    ::dumpVector(inequalMaxVec, &ModelPredictiveControllerParam::inequalMaxVec, mpcParamDeque, rowIdx);
+    ::dumpMatrix(inequalMat, &ModelPredictiveControllerParam::inequalMat, mpcParamDeque, rowIdx, colIdx, blockFlagVec);
+    ::dumpVector(inequalMinVec, &ModelPredictiveControllerParam::inequalMinVec, mpcParamDeque, rowIdx, blockFlagVec);
+    ::dumpVector(inequalMaxVec, &ModelPredictiveControllerParam::inequalMaxVec, mpcParamDeque, rowIdx, blockFlagVec);
 }
 
 void ModelPredictiveController::calcBoundVectors()
 {
-    minVec = dvector(psiCols);
-    maxVec = dvector(psiCols);
+    minVec = dvector(URows);
+    maxVec = dvector(URows);
     int rowIdx = 0;
-    ::dumpVector(minVec, &ModelPredictiveControllerParam::minVec, mpcParamDeque, rowIdx);
-    ::dumpVector(maxVec, &ModelPredictiveControllerParam::maxVec, mpcParamDeque, rowIdx);
+    ::dumpVector(minVec, &ModelPredictiveControllerParam::minVec, mpcParamDeque, rowIdx, blockFlagVec);
+    ::dumpVector(maxVec, &ModelPredictiveControllerParam::maxVec, mpcParamDeque, rowIdx, blockFlagVec);
 }
 
 void ModelPredictiveController::calcRefXVector()
@@ -157,10 +173,15 @@ void ModelPredictiveController::calcAugmentedMatrix()
     psiCols = 0;
     equalMatRows = 0;
     inequalMatRows = 0;
-    for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+    URows = 0;
+    std::vector<bool>::iterator blockFlagIter = blockFlagVec.begin();
+    for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter, ++blockFlagIter){
         psiCols += (*iter)->inputMat.cols();
-        equalMatRows += (*iter)->equalMat.rows();
-        inequalMatRows += (*iter)->inequalMat.rows();
+        if(*blockFlagIter){
+            URows += (*iter)->inputDim;
+            equalMatRows += (*iter)->equalMat.rows();
+            inequalMatRows += (*iter)->inequalMat.rows();
+        }
     }
 
     if(isInitial){
@@ -178,7 +199,7 @@ void ModelPredictiveController::calcAugmentedMatrix()
     calcErrorWeightMatrix();
     calcInputWeightMatrix();
     calcBlockMatrix();
-    U = dvector::Zero(psiCols);
+    U = dvector::Zero(URows);
 
 }
 
@@ -191,14 +212,14 @@ MultiContactStabilizer::MultiContactStabilizer()
 
 void MultiContactStabilizer::setupQP()
 {
-    qpInterface = QP(psiCols, equalMatRows, inequalMatRows);
-
+    qpInterface = QP(URows, equalMatRows, inequalMatRows);
 }
 
 int MultiContactStabilizer::execQP()
 {
     static int count = 0;
     if(COUT){
+        cout << psiCols << " x " << URows << endl;
         cout << "psi:" << endl << psiMat << endl << endl;
         cout << "phi:" << endl << phiMat << endl << endl;
         cout << "refX:" << endl << refX.transpose() << endl << endl;
@@ -206,8 +227,13 @@ int MultiContactStabilizer::execQP()
         cout << "W1(error):" << endl << errorWeightMat << endl << endl;
         cout << "W2(input):" << endl << inputWeightMat << endl << endl;
     }
+    dmatrix blockMat2 = blockMatInv.transpose();
     int ret  = qpInterface.execQP(U,
-                                  psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat, psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+                                  // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+                                  // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMatInv*inputWeightMat*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+                                  // blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMat2.transpose()*inputWeightMat*blockMat2, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+                                  blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),// 1_6 2_7
+                                  // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
                                   equalMat, equalVec,
                                   inequalMat, inequalMinVec, inequalMaxVec,
                                   minVec, maxVec);
