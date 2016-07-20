@@ -1,6 +1,7 @@
 /**
    @author Kunio Kojima
 */
+#pragma once
 
 #include <iostream>
 #include <sstream>
@@ -19,7 +20,7 @@
 
 #include <cnoid/src/Body/Jacobian.h>
 #include <cnoid/src/PoseSeqPlugin/PoseSeqItem.h>
-#include <cnoid/src/PoseSeqPlugin/gettext.h>
+// #include <cnoid/src/PoseSeqPlugin/gettext.h>
 #include <cnoid/src/PoseSeqPlugin/BodyMotionGenerationBar.h>
 #include <cnoid/Vector3SeqItem>
 
@@ -44,12 +45,19 @@
 
 #include <UtilPlugin/UtilPlugin.h>
 
+#include "RMControlBar.h"
+
 namespace cnoid {
 
 enum Constraint { Free , LLEG , RLEG };// 拘束条件
 
+class RMControlBar;
+
 class RMControlPlugin : public Plugin
 {
+protected:
+    RMControlBar* mBar;
+
 public:
     std::vector<SubMass> mSubMasses;
     BodyPtr mBody;
@@ -66,17 +74,7 @@ public:
         // require("Dynamics");
     }
     
-    virtual bool initialize()
-    {
-        ToolBar* bar = new ToolBar("RMControl");
-
-        bar->addButton("RMControl")
-            ->sigClicked().connect(boost::bind(&RMControlPlugin::RMControl, this));
-
-        addToolBar(bar);
-
-        return true;
-    }
+    virtual bool initialize();
 
     // ロボットモデル依存の部分あり
     // 各種行列を計算
@@ -101,7 +99,7 @@ public:
                       Vector3Seq& refPSeq, Vector3Seq& refLSeq);
 
     // 分解運動量制御
-    void RMControl();
+    void execControl();
 
 };
 

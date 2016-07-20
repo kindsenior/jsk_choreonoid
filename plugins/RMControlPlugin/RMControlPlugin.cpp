@@ -9,6 +9,15 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
+bool RMControlPlugin::initialize()
+{
+    mBar = new RMControlBar(this);
+    addToolBar(mBar);
+
+    return true;
+}
+
+
 // ロボットモデル依存の部分あり
 // 各種行列を計算
 void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
@@ -371,7 +380,7 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
 }
 
 // 分解運動量制御
-void RMControlPlugin::RMControl()
+void RMControlPlugin::execControl()
 {
     stringstream ss,fnamess;
     MessageView::instance()->putln("RMControl called !");
@@ -440,9 +449,17 @@ void RMControlPlugin::RMControl()
         // 目標運動量軌道作成
         Vector3Seq refPSeq,refLSeq;
         Vector3d initDCM,endDCM,initL,endL;// initDCMとendPを明示的に0で初期化していない
-        // generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
-        loadRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
-        cout << " Generated ref P/L" << endl;
+        string modeStr = mBar->dialog->initialTrajectoryCombo->currentText().toStdString();
+        cout << "control mode: " << modeStr << endl;
+        string generateMode = mBar->dialog->initialTrajectoryCombo->itemText(Generate).toStdString();
+        string loadMode = mBar->dialog->initialTrajectoryCombo->itemText(Load).toStdString();
+        if(modeStr == generateMode){
+            generateRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
+            cout << " Generated ref P/L" << endl;
+        }else{
+            loadRefPLSeq( bodyMotionItem, pPoseSeqItem->poseSeq(), initDCM, endDCM, initL, endL, refPSeq, refLSeq );
+            cout << " Loaded ref P/L" << endl;
+        }
 
         // Item* pChildItem = bodyItems[0]->childItem();
         for(int i = 0; i < 3; ++i){
