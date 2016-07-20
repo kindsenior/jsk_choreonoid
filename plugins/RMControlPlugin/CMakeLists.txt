@@ -2,7 +2,7 @@ message("This is RMControlPlugin")
 
 set(TARGET CnoidRMControlPlugin)
 
-add_library(${TARGET} SHARED RMControlPlugin)
+add_library(${TARGET} SHARED RMControlPlugin RMControlBar)
 
 target_link_libraries(${TARGET} CnoidUtilPlugin)
 
