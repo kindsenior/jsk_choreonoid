@@ -18,7 +18,7 @@ RMControlSetupDialog::RMControlSetupDialog()
 
     // in order of param setup dialog
     QHBoxLayout* hbox = newRow(vbox);
-    initialTrajectoryCombo->setText("Generate Initial Trajectory:");
+    initialTrajectoryCombo->setText("Initial Trajectory:");
     initialTrajectoryCombo->setSaveName("");
     initialTrajectoryCombo->setArchiveName("initialTrajectory");
     initialTrajectoryCombo->insertItem(Generate, QString("Generate"));
