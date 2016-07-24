@@ -331,7 +331,7 @@ toolbars:
   "TimeBar": 
     minTime: 0
     maxTime: 12000
-    frameRate: 20
+    frameRate: 40
     playbackFrameRate: 50
     idleLoopDrivenMode: false
     currentTime: 0
@@ -386,17 +386,17 @@ toolbars:
   "MultiContactStabilizerBar": 
     numWindows: 13
     numWindowsCheck: true
-    errorCMWeight: 100
+    errorCMWeight: 1000
     errorCMWeightCheck: true
-    errorMomentumWeight: 1
+    errorMomentumWeight: 0.0001
     errorMomentumWeightCheck: true
-    errorAngularMomentumWeight: 10000
+    errorAngularMomentumWeight: 200
     errorAngularMomentumWeightCheck: true
-    inputForceWeight: 5
+    inputForceWeight: 10
     inputForceWeightCheck: true
-    inputMomentWeight: 10
+    inputMomentWeight: 20
     inputMomentWeightCheck: true
-    blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+    blockingList: 1,1,1,1,1,1,1,1,10,10,10,10,10
     blockingListCheck: false
     saveParameterInFileName: true
   "PreviewControl": 
