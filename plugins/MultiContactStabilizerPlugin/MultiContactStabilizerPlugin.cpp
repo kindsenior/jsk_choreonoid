@@ -105,7 +105,7 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
     lastP = P;
 }
 
-void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
+float MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
 {
     cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
 
@@ -155,12 +155,14 @@ void MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstr
         mRefCMSeqPtr->at(i - mcs->numWindows() + 1) = CM;
         mRefPSeqPtr->at(i - mcs->numWindows() + 1) = P;
         mRefLSeqPtr->at(i - mcs->numWindows() + 1) = L;
-        mOfs << (i - mcs->numWindows() + 1)*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
+        mOfs << (i - mcs->numWindows() + 1)*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << tmList[3] << endl;
 
         mcs->mpcParamDeque.pop_front();
     }
 
     cout << "  FK: " << tmList[0] << "[ms]  convert: " << tmList[1] << "[ms]  setup: " << tmList[2] << "[ms]  QP: " << tmList[3]  << "[ms]" << endl;
+
+    return tmList[3];
 }
 
 void MultiContactStabilizerPlugin::execControl()
@@ -208,12 +210,14 @@ void MultiContactStabilizerPlugin::execControl()
     mcs->inputMomentWeight = mBar->dialog->inputMomentWeightSpin->value();
 
     // モーション走査
+    float avgTime = 0;
+
     fnamess.str("");
     fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL";
     if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) fnamess << mBar->dialog->getParamString();
     fnamess << "_" << frameRate << "fps.dat";
     mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
-    mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
+    mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
 
     mRefCMSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
     mRefPSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
@@ -234,8 +238,8 @@ void MultiContactStabilizerPlugin::execControl()
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
 
         for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-            // if(i > mcs->numWindows() + 200) goto BREAK;
-            processCycle(i, ccParamVec);
+            // if(i > mcs->numWindows() + 1) goto BREAK;
+            avgTime += processCycle(i, ccParamVec);
         }
     }
 
@@ -244,7 +248,7 @@ void MultiContactStabilizerPlugin::execControl()
         generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, --poseSeqPtr->end(), poseSeqPtr);
 
         for(int i=numFrames - 1; i < numFrames + mcs->numWindows(); ++i){
-            processCycle(i, ccParamVec);
+            avgTime += processCycle(i, ccParamVec);
         }
     }
 
@@ -261,6 +265,7 @@ void MultiContactStabilizerPlugin::execControl()
     if(failIdxVec.empty()) cout << "All QP succeeded" << endl;
     failIdxVec.clear();
 
+    cout << "average time: " << avgTime/numFrames << "[msec]" << endl;
     cout << "Finished MultiContactStabilizer" << endl;
 }
 
