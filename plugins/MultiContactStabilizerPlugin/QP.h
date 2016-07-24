@@ -20,6 +20,14 @@ private:
 
 public:
     int maxCalcCount;
+
+    dmatrix HMat;
+    dvector gVec;
+    dmatrix equalMat;
+    dvector equalVec;
+    dmatrix inequalMat;
+    dvector inequalMinVec, inequalMaxVec;
+    dvector minVec, maxVec;
     
     QP(){};
 
@@ -35,12 +43,7 @@ public:
         maxCalcCount = 1000;
     };
 
-    int execQP(dvector& U,
-                const dmatrix& HMat, const dvector& gVec,
-                const dmatrix& equalMat, const dvector& equalVec,
-                const dmatrix& inequalMat, const dvector& inequalMinVec, const dvector& inequalMaxVec,
-                const dvector& minVec, const dvector& maxVec);
-
+    int execQP(dvector& U);
 };
 
 }

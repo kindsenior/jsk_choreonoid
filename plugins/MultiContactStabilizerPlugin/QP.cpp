@@ -7,11 +7,7 @@ using namespace hrp;
 using namespace qpOASES;
 using namespace std;
 
-int QP::execQP(dvector& U,
-                const dmatrix& HMat, const dvector& gVec,
-                const dmatrix& equalMat, const dvector& equalVec,
-                const dmatrix& inequalMat, const dvector& inequalMinVec, const dvector& inequalMaxVec,
-                const dvector& minVec, const dvector& maxVec)
+int QP::execQP(dvector& U)
 {
     static int count = 0;
     if(COUT){

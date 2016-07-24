@@ -64,6 +64,9 @@ protected:
     dmatrix blockMat;
     dmatrix blockMatInv;
 
+    dmatrix HMat;
+    dvector gVec;
+
 private:
     int numWindows_;// N
     void calcPhiMatrix();

@@ -213,6 +213,18 @@ MultiContactStabilizer::MultiContactStabilizer()
 void MultiContactStabilizer::setupQP()
 {
     qpInterface = QP(URows, equalMatRows, inequalMatRows);
+
+    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMatInv*inputWeightMat*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+    qpInterface.HMat = blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMatInv*inputWeightMat*blockMatInv.transpose();
+    qpInterface.gVec = blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX);
+    // blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),// 1_6 2_7
+    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+
+
+    qpInterface.equalMat = equalMat; qpInterface.equalVec = equalVec;
+    qpInterface.inequalMat = inequalMat; qpInterface.inequalMinVec = inequalMinVec; qpInterface.inequalMaxVec = inequalMaxVec;
+    qpInterface.minVec = minVec; qpInterface.maxVec = maxVec;
 }
 
 int MultiContactStabilizer::execQP()
@@ -227,16 +239,8 @@ int MultiContactStabilizer::execQP()
         cout << "W1(error):" << endl << errorWeightMat << endl << endl;
         cout << "W2(input):" << endl << inputWeightMat << endl << endl;
     }
-    dmatrix blockMat2 = blockMatInv.transpose();
-    int ret  = qpInterface.execQP(U,
-                                  // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
-                                  // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMatInv*inputWeightMat*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
-                                  // blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMat2.transpose()*inputWeightMat*blockMat2, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
-                                  blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),// 1_6 2_7
-                                  // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
-                                  equalMat, equalVec,
-                                  inequalMat, inequalMinVec, inequalMaxVec,
-                                  minVec, maxVec);
+    int ret  = qpInterface.execQP(U);
+
     ++count;
     return ret;
 }
