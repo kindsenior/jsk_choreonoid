@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 
 #include <cnoid/ToolBar>
 #include <cnoid/Dialog>
@@ -115,20 +116,24 @@ class SpinVectorParamWidget: public ParamWidget,
                              public std::vector<SpinBox*>
 {
 protected:
-    // std::vector<SpinBox*> spinBoxVector;//ポインタじゃないとerror: use of deleted function
     int maxRange;
     QBoxLayout* parentLayout;
+    PushButton* pulseButton;
+    PushButton* minusButton;
 
-    void addAllSpinWidget()
+    void addSpinBoxWidget(int x)
     {
-        if(parentLayout){
-            // for(std::vector<SpinBox*>::iterator iter = spinBoxVector.begin(); iter != spinBoxVector.end(); ++iter){
-            //     layout->addWidget((SpinBox*) *iter);
-            // }
-            for(std::vector<SpinBox*>::iterator iter = this->begin(); iter != this->end(); ++iter){
-                parentLayout->addWidget((SpinBox*) *iter);
-            }
-        }
+        SpinBox* sb = new SpinBox();
+        sb->setRange(0,maxRange);
+        sb->setValue(x);
+        this->push_back(sb);
+        if(parentLayout != NULL) parentLayout->addWidget(sb);
+    }
+
+    void removeSpinBoxWidget()
+    {
+        delete this->back();
+        this->pop_back();
     }
 
     void removeAllSpinWidet()
@@ -146,19 +151,28 @@ public:
     {
         maxRange = 1000;
         parentLayout = NULL;
+
+        pulseButton = new PushButton("+");
+        pulseButton->sigClicked().connect(boost::bind(&SpinVectorParamWidget::addSpinBoxWidget, this, 1));
+        pulseButton->setFixedWidth(20);
+
+        minusButton = new PushButton("-");
+        minusButton->sigClicked().connect(boost::bind(&SpinVectorParamWidget::removeSpinBoxWidget, this));
+        minusButton->setFixedWidth(20);
     }
 
     void addToLayout(QBoxLayout* layout)
     {
         parentLayout = layout;
         ParamWidget::addToLayout(layout);
-        addAllSpinWidget();
+        parentLayout->addWidget((PushButton*) pulseButton);
+        parentLayout->addWidget((QPushButton*) minusButton);
+        for(std::vector<SpinBox*>::iterator iter = this->begin(); iter != this->end(); ++iter) parentLayout->addWidget((SpinBox*) *iter);
     }
 
     std::string getParam()
     {
         std::stringstream ss;
-        // for(std::vector<SpinBox*>::iterator iter = spinBoxVector.begin(); iter != spinBoxVector.end(); ++iter){
         std::vector<SpinBox*>::iterator iter = this->begin();
         while(true){
             ss << (*iter)->value();
@@ -169,37 +183,24 @@ public:
     }
     void setParam(std::string param)
     {
-        // spinBoxVector.clear();
         removeAllSpinWidet();
-        // this->clear();
         std::vector<SpinBox*>::clear();
         std::vector<std::string> stringVec;
         boost::algorithm::split(stringVec, param, boost::is_any_of(","));
         for(std::vector<std::string>::iterator iter = stringVec.begin(); iter != stringVec.end(); ++iter){
-            SpinBox* sb = new SpinBox();
-            sb->setRange(0,maxRange);
-            sb->setValue(std::atoi(iter->c_str()));
-            // spinBoxVector.push_back(sb);
-            this->push_back(sb);
+            addSpinBoxWidget(std::atoi(iter->c_str()));
         }
-        // updateAllWidget();
-        addAllSpinWidget();
     }
 
     void setValue(std::vector<int> vec)
     {
-        // spinBoxVector.clear();
-        // this->clear();
+        removeAllSpinWidet();
         std::vector<SpinBox*>::clear();
         for(std::vector<int>::iterator iter = vec.begin(); iter != vec.end(); ++iter){
-            SpinBox* sb = new SpinBox();
-            sb->setRange(0,maxRange);
-            sb->setValue(*iter);
-            // spinBoxVector.push_back(sb);
-            this->push_back(sb);
+            addSpinBoxWidget(*iter);
         }
-        addAllSpinWidget();
     }
+
     std::vector<int> value()
     {
         std::vector<int> ret;
