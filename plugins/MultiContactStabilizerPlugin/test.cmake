@@ -33,5 +33,5 @@ if(ONLYTEST)
 	set(libs qpOASES ${openhrp3_link_shared_files})
 endif(ONLYTEST)
 
-add_executable(mcs-test test Controller ContactConstraint QP)
+add_executable(mcs-test test Controller ModelPredictiveController ContactConstraint QP)
 target_link_libraries(mcs-test ${libs})
