@@ -1,7 +1,7 @@
 /**
    @author Kunio Kojima
 */
-#include "Controller.h"
+#include "MultiContactStabilizer.h"
 
 using namespace hrp;
 using namespace std;
@@ -41,6 +41,8 @@ int MultiContactStabilizer::execQP()
         cout << "x0:" << endl << x0.transpose() << endl << endl;
         cout << "W1(error):" << endl << errorWeightMat << endl << endl;
         cout << "W2(input):" << endl << inputWeightMat << endl << endl;
+        cout << "block:" << endl << blockMat << endl << endl;
+        cout << "blockInv:" << endl << blockMatInv << endl << endl;
     }
     int ret  = qpInterface.execQP(U);
 

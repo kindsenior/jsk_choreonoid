@@ -3,7 +3,7 @@
 */
 #pragma once
 
-#include "Controller.h"
+#include "MultiContactStabilizer.h"
 #include <time.h>
 
 namespace hrp {

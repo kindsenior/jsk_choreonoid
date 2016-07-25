@@ -45,7 +45,7 @@
 // #include <DynamicsPlugin/DynamicsPlugin.h>
 #include <UtilPlugin/UtilPlugin.h>
 
-#include "Controller.h"
+#include "MultiContactStabilizer.h"
 #include "MultiContactStabilizerBar.h"
 
 namespace cnoid{
