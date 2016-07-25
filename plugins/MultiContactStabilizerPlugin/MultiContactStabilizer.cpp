@@ -17,12 +17,12 @@ void MultiContactStabilizer::setupQP()
 {
     qpInterface = QP(URows, equalMatRows, inequalMatRows);
 
-    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
-    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMatInv*inputWeightMat*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refXVec),
+    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMatInv*inputWeightMat*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refXVec),
     qpInterface.HMat = blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat)*blockMat + blockMatInv*inputWeightMat*blockMatInv.transpose();
-    qpInterface.gVec = blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX);
-    // blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),// 1_6 2_7
-    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refX),
+    qpInterface.gVec = blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refXVec);
+    // blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refXVec),// 1_6 2_7
+    // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refXVec),
 
 
     qpInterface.equalMat = equalMat; qpInterface.equalVec = equalVec;
@@ -37,7 +37,7 @@ int MultiContactStabilizer::execQP()
         cout << psiCols << " x " << URows << endl;
         cout << "psi:" << endl << psiMat << endl << endl;
         cout << "phi:" << endl << phiMat << endl << endl;
-        cout << "refX:" << endl << refX.transpose() << endl << endl;
+        cout << "refXVec:" << endl << refXVec.transpose() << endl << endl;
         cout << "x0:" << endl << x0.transpose() << endl << endl;
         cout << "W1(error):" << endl << errorWeightMat << endl << endl;
         cout << "W2(input):" << endl << inputWeightMat << endl << endl;

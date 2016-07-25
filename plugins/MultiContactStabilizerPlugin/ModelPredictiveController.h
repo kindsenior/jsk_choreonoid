@@ -97,7 +97,7 @@ protected:
     dvector inequalMaxVec;
     dvector minVec;
     dvector maxVec;
-    dvector refX;
+    dvector refXVec;
     dmatrix errorWeightMat;// W1
     dmatrix inputWeightMat;// W2
     dvector U;

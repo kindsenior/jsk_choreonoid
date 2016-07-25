@@ -74,10 +74,10 @@ void ModelPredictiveController::calcBoundVectors()
 
 void ModelPredictiveController::calcRefXVector()
 {
-    refX = dvector(stateDim*numWindows_);
+    refXVec = dvector(stateDim*numWindows_);
     for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
         int idx = std::distance(mpcParamDeque.begin(), iter);
-        refX.block(stateDim*idx,0, stateDim,1) = (*iter)->refStateVec;
+        refXVec.block(stateDim*idx,0, stateDim,1) = (*iter)->refStateVec;
     }
 }
 
