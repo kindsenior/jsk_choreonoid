@@ -117,8 +117,8 @@ void MultiContactStabilizerParam::calcEqualConstraints()
     colIdx = 0;
     calcMatrix(&ContactConstraintParam::calcEqualMatrix);
     calcVector(&ContactConstraintParam::calcEqualVector);
-    ::dumpMatrix(equalMat, &ContactConstraintParam::equalMat, ccParamVec, rowIdx, colIdx);
-    ::dumpVector(equalVec, &ContactConstraintParam::equalVec, ccParamVec, rowIdx);
+    hrp::dumpMatrix(equalMat, &ContactConstraintParam::equalMat, ccParamVec, rowIdx, colIdx);
+    hrp::dumpVector(equalVec, &ContactConstraintParam::equalVec, ccParamVec, rowIdx);
 }
 
 void MultiContactStabilizerParam::calcInequalConstraints()
@@ -130,9 +130,9 @@ void MultiContactStabilizerParam::calcInequalConstraints()
     calcMatrix(&ContactConstraintParam::calcInequalMatrix);
     calcVector(&ContactConstraintParam::calcInequalMinimumVector);
     calcVector(&ContactConstraintParam::calcInequalMaximumVector);
-    ::dumpMatrix(inequalMat, &ContactConstraintParam::inequalMat, ccParamVec, rowIdx, colIdx);
-    ::dumpVector(inequalMinVec, &ContactConstraintParam::inequalMinVec, ccParamVec, rowIdx);
-    ::dumpVector(inequalMaxVec, &ContactConstraintParam::inequalMaxVec, ccParamVec, rowIdx);
+    hrp::dumpMatrix(inequalMat, &ContactConstraintParam::inequalMat, ccParamVec, rowIdx, colIdx);
+    hrp::dumpVector(inequalMinVec, &ContactConstraintParam::inequalMinVec, ccParamVec, rowIdx);
+    hrp::dumpVector(inequalMaxVec, &ContactConstraintParam::inequalMaxVec, ccParamVec, rowIdx);
 }
 
 void MultiContactStabilizerParam::calcBoundVectors()
@@ -142,8 +142,8 @@ void MultiContactStabilizerParam::calcBoundVectors()
     maxVec.resize(inputDim);
     calcVector(&ContactConstraintParam::calcMinimumVector);
     calcVector(&ContactConstraintParam::calcMaximumVector);
-    ::dumpVector(minVec, &ContactConstraintParam::minVec, ccParamVec, rowIdx);
-    ::dumpVector(maxVec, &ContactConstraintParam::maxVec, ccParamVec, rowIdx);
+    hrp::dumpVector(minVec, &ContactConstraintParam::minVec, ccParamVec, rowIdx);
+    hrp::dumpVector(maxVec, &ContactConstraintParam::maxVec, ccParamVec, rowIdx);
 }
 
 void MultiContactStabilizerParam::calcRefStateVector()

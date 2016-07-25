@@ -47,8 +47,8 @@ void ModelPredictiveController::calcEqualConstraints()
     equalVec = dvector(equalMatRows);
     int rowIdx = 0;
     int colIdx = 0;
-    ::dumpMatrix(equalMat, &ModelPredictiveControllerParam::equalMat, mpcParamDeque, rowIdx, colIdx, blockFlagVec);
-    ::dumpVector(equalVec, &ModelPredictiveControllerParam::equalVec, mpcParamDeque, rowIdx, blockFlagVec);
+    hrp::dumpMatrix(equalMat, &ModelPredictiveControllerParam::equalMat, mpcParamDeque, rowIdx, colIdx, blockFlagVec);
+    hrp::dumpVector(equalVec, &ModelPredictiveControllerParam::equalVec, mpcParamDeque, rowIdx, blockFlagVec);
 }
 
 void ModelPredictiveController::calcInequalConstraints()
@@ -58,9 +58,9 @@ void ModelPredictiveController::calcInequalConstraints()
     inequalMaxVec = dvector(inequalMatRows);
     int rowIdx = 0;
     int colIdx = 0;
-    ::dumpMatrix(inequalMat, &ModelPredictiveControllerParam::inequalMat, mpcParamDeque, rowIdx, colIdx, blockFlagVec);
-    ::dumpVector(inequalMinVec, &ModelPredictiveControllerParam::inequalMinVec, mpcParamDeque, rowIdx, blockFlagVec);
-    ::dumpVector(inequalMaxVec, &ModelPredictiveControllerParam::inequalMaxVec, mpcParamDeque, rowIdx, blockFlagVec);
+    hrp::dumpMatrix(inequalMat, &ModelPredictiveControllerParam::inequalMat, mpcParamDeque, rowIdx, colIdx, blockFlagVec);
+    hrp::dumpVector(inequalMinVec, &ModelPredictiveControllerParam::inequalMinVec, mpcParamDeque, rowIdx, blockFlagVec);
+    hrp::dumpVector(inequalMaxVec, &ModelPredictiveControllerParam::inequalMaxVec, mpcParamDeque, rowIdx, blockFlagVec);
 }
 
 void ModelPredictiveController::calcBoundVectors()
@@ -68,8 +68,8 @@ void ModelPredictiveController::calcBoundVectors()
     minVec = dvector(URows);
     maxVec = dvector(URows);
     int rowIdx = 0;
-    ::dumpVector(minVec, &ModelPredictiveControllerParam::minVec, mpcParamDeque, rowIdx, blockFlagVec);
-    ::dumpVector(maxVec, &ModelPredictiveControllerParam::maxVec, mpcParamDeque, rowIdx, blockFlagVec);
+    hrp::dumpVector(minVec, &ModelPredictiveControllerParam::minVec, mpcParamDeque, rowIdx, blockFlagVec);
+    hrp::dumpVector(maxVec, &ModelPredictiveControllerParam::maxVec, mpcParamDeque, rowIdx, blockFlagVec);
 }
 
 void ModelPredictiveController::calcRefXVector()
