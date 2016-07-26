@@ -255,7 +255,26 @@ void MultiContactStabilizerPlugin::execControl()
     }
     for(int i=0; i < numFrames + mcs->numWindows(); ++i){
         // if(i > mcs->numWindows() + 1) goto BREAK;
-        avgTime += processCycle(i);
+
+        cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
+        float processedTime;
+        if(mcs->processCycle(processedTime)) failIdxVec.push_back(i - mcs->numWindows());
+        avgTime += processedTime;
+
+        if(i >= mcs->numWindows()){
+            VectorXd x0(mcs->stateDim);
+            x0 = mcs->x0;
+
+            Vector3d CM,P,L;
+            CM << x0[0],x0[2],0;
+            P << x0[1],x0[3],0;
+            L << x0[4],x0[5],0;
+            CM /= body->mass();
+            mRefCMSeqPtr->at(i - mcs->numWindows()) = CM;
+            mRefPSeqPtr->at(i - mcs->numWindows()) = P;
+            mRefLSeqPtr->at(i - mcs->numWindows()) = L;
+            mOfs << (i - mcs->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
+        }
     }
 
  BREAK:
