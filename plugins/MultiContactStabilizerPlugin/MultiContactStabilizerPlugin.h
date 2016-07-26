@@ -60,8 +60,6 @@ namespace cnoid{
         Vector3d lastP;
         std::vector<int> failIdxVec;
 
-        float processCycle(int i);
-
     public:
         BodyPtr body;
         BodyMotionItemPtr mBodyMotionItemPtr;

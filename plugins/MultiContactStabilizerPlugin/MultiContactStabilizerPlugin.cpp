@@ -105,62 +105,6 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
     lastP = P;
 }
 
-float MultiContactStabilizerPlugin::processCycle(int i)
-{
-    cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
-
-    clock_t st = clock(), et;
-    double tmList[4] = {0,0,0,0};
-
-    if(mcs->mpcParamDeque.size() == mcs->numWindows()){
-        mcs->calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
-        mcs->setupQP();
-
-        et = clock();
-        tmList[2] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-        st = et;
-
-        if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows());
-
-				et = clock();
-				tmList[3] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-				st = et;
-
-        mcs->updateX0Vector();
-        VectorXd x0(mcs->stateDim);
-        x0 = mcs->x0;
-        Vector3d CM,P,L;
-        CM << x0[0],x0[2],0;
-        P << x0[1],x0[3],0;
-        L << x0[4],x0[5],0;
-        CM /= body->mass();
-        mRefCMSeqPtr->at(i - mcs->numWindows()) = CM;
-        mRefPSeqPtr->at(i - mcs->numWindows()) = P;
-        mRefLSeqPtr->at(i - mcs->numWindows()) = L;
-        mOfs << (i - mcs->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << tmList[3] << endl;
-
-        mcs->mpcParamDeque.pop_front();
-    }
-
-    MultiContactStabilizerParam* mcsParam = (MultiContactStabilizerParam*) mcs->preMpcParamDeque.front();
-    if(mcs->preMpcParamDeque.size() > 1) mcs->preMpcParamDeque.pop_front();//cascadeではwait処理に変更
-
-    et = clock();
-    tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-    st = et;
-
-    mcsParam->convertToMPCParam();
-    mcs->mpcParamDeque.push_back(mcsParam);
-
-		et = clock();
-		tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-		st = et;
-
-    cout << "  FK: " << tmList[0] << "[ms]  convert: " << tmList[1] << "[ms]  setup: " << tmList[2] << "[ms]  QP: " << tmList[3]  << "[ms]" << endl;
-
-    return tmList[3];
-}
-
 void MultiContactStabilizerPlugin::execControl()
 {
     stringstream ss,fnamess;
