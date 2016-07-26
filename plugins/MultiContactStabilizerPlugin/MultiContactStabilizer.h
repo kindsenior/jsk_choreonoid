@@ -50,8 +50,6 @@ public:
         stateDim = controller->stateDim;
         unitInputDim = controller->unitInputDim;
         dt = controller->dt;
-        numEquals = 1;//Fzの合計
-        numInequals = 0;
     }
 
     void calcInputMatrix();
