@@ -61,7 +61,7 @@ public:
     void calcRefStateVector();
     void calcErrorWeightVector();
     void calcInputWeightVector();
-    void convertToMPCParam();
+    void convertToMpcParam();
 };
 
 }

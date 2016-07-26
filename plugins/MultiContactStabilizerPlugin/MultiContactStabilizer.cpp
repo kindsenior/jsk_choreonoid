@@ -45,7 +45,7 @@ int MultiContactStabilizer::processCycle(float &processedTime)
     tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
     st = et;
 
-    mcsParam->convertToMPCParam();
+    mcsParam->convertToMpcParam();
     mpcParamDeque.push_back(mcsParam);
 
 		et = clock();
@@ -222,7 +222,7 @@ void MultiContactStabilizerParam::calcInputWeightVector()
     }
 }
 
-void MultiContactStabilizerParam::convertToMPCParam()
+void MultiContactStabilizerParam::convertToMpcParam()
 {
     inputDim = unitInputDim*ccParamVec.size();// 6*M_k
     numEquals = 1;//Fzの合計

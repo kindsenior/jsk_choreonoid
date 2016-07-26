@@ -78,6 +78,8 @@ public:
     // dmatrix outputMat;
 
     ModelPredictiveControllerParam(){};
+
+    virtual void convertToMpcParam() = 0;
 };
 
 class ModelPredictiveController

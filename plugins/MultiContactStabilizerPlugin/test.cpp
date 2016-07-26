@@ -78,7 +78,7 @@ void Test::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
     tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
     st = et;
 
-    mcsParam->convertToMPCParam();
+    mcsParam->convertToMpcParam();
     mcs->mpcParamDeque.push_back(mcsParam);
 
     et = clock();
