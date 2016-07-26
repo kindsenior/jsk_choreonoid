@@ -60,7 +60,7 @@ namespace cnoid{
         Vector3d lastP;
         std::vector<int> failIdxVec;
 
-        float processCycle(int i, std::vector<hrp::ContactConstraintParam*>& ccParamVec);
+        float processCycle(int i);
 
     public:
         BodyPtr body;

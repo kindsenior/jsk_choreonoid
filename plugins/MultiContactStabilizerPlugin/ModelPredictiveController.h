@@ -123,6 +123,7 @@ public:
     int stateDim;
     int psiCols, URows, equalMatRows, inequalMatRows;
     bool isInitial;
+    std::deque<ModelPredictiveControllerParam*> preMpcParamDeque;
     std::deque<ModelPredictiveControllerParam*> mpcParamDeque;
     dvector x0;
 

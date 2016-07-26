@@ -105,30 +105,12 @@ void MultiContactStabilizerPlugin::generateMultiContactStabilizerParam(MultiCont
     lastP = P;
 }
 
-float MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
+float MultiContactStabilizerPlugin::processCycle(int i)
 {
     cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
 
-    clock_t st = clock();
+    clock_t st = clock(), et;
     double tmList[4] = {0,0,0,0};
-
-    updateBodyState(body, motion, min(i,numFrames-1));
-    body->calcForwardKinematics(true, true);
-
-    MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(mcs);
-    // 動作軌道に依存するパラメータの設定
-    generateMultiContactStabilizerParam(mcsParam, body, ccParamVec);
-
-    clock_t et = clock();
-    tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-    st = et;
-
-    mcsParam->convertToMPCParam();
-    mcs->mpcParamDeque.push_back(mcsParam);
-
-		et = clock();
-		tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-		st = et;
 
     if(mcs->mpcParamDeque.size() == mcs->numWindows()){
         mcs->calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
@@ -152,13 +134,27 @@ float MultiContactStabilizerPlugin::processCycle(int i, std::vector<ContactConst
         P << x0[1],x0[3],0;
         L << x0[4],x0[5],0;
         CM /= body->mass();
-        mRefCMSeqPtr->at(i - mcs->numWindows() + 1) = CM;
-        mRefPSeqPtr->at(i - mcs->numWindows() + 1) = P;
-        mRefLSeqPtr->at(i - mcs->numWindows() + 1) = L;
-        mOfs << (i - mcs->numWindows() + 1)*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << tmList[3] << endl;
+        mRefCMSeqPtr->at(i - mcs->numWindows()) = CM;
+        mRefPSeqPtr->at(i - mcs->numWindows()) = P;
+        mRefLSeqPtr->at(i - mcs->numWindows()) = L;
+        mOfs << (i - mcs->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << tmList[3] << endl;
 
         mcs->mpcParamDeque.pop_front();
     }
+
+    MultiContactStabilizerParam* mcsParam = (MultiContactStabilizerParam*) mcs->preMpcParamDeque.front();
+    if(mcs->preMpcParamDeque.size() > 1) mcs->preMpcParamDeque.pop_front();//cascadeではwait処理に変更
+
+    et = clock();
+    tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+    st = et;
+
+    mcsParam->convertToMPCParam();
+    mcs->mpcParamDeque.push_back(mcsParam);
+
+		et = clock();
+		tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+		st = et;
 
     cout << "  FK: " << tmList[0] << "[ms]  convert: " << tmList[1] << "[ms]  setup: " << tmList[2] << "[ms]  QP: " << tmList[3]  << "[ms]" << endl;
 
@@ -209,6 +205,33 @@ void MultiContactStabilizerPlugin::execControl()
     mcs->inputForceWeight = mBar->dialog->inputForceWeightSpin->value();
     mcs->inputMomentWeight = mBar->dialog->inputMomentWeightSpin->value();
 
+    {
+        Vector3d tmpL;
+        updateBodyState(body, motion, 0);
+        body->calcForwardKinematics(true, true);
+        body->calcCenterOfMass();
+        body->calcTotalMomentum(lastP,tmpL);
+    }
+    // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
+    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
+        if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
+
+        // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
+        std::vector<ContactConstraintParam*> ccParamVec;
+        generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
+
+        for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            updateBodyState(body, motion, min(i,numFrames-1));
+            body->calcForwardKinematics(true, true);
+
+            MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(mcs);
+            // 動作軌道に依存するパラメータの設定
+            generateMultiContactStabilizerParam(mcsParam, body, ccParamVec);
+
+            mcs->preMpcParamDeque.push_back((MultiContactStabilizerParam*) mcsParam);
+        }
+    }
+
     // モーション走査
     float avgTime = 0;
 
@@ -230,26 +253,9 @@ void MultiContactStabilizerPlugin::execControl()
         body->calcCenterOfMass();
         body->calcTotalMomentum(lastP,tmpL);
     }
-    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
-        if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
-
-        // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
-        std::vector<ContactConstraintParam*> ccParamVec;
-        generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, frontPoseIter, poseSeqPtr);
-
-        for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-            // if(i > mcs->numWindows() + 1) goto BREAK;
-            avgTime += processCycle(i, ccParamVec);
-        }
-    }
-
-    {// numWindows回数 Dequeの最後を取り出して最後に追加しながらproc
-        std::vector<ContactConstraintParam*> ccParamVec;
-        generateContactConstraintParamVec(ccParamVec, contactLinkCantidateSet, --poseSeqPtr->end(), poseSeqPtr);
-
-        for(int i=numFrames - 1; i < numFrames + mcs->numWindows(); ++i){
-            avgTime += processCycle(i, ccParamVec);
-        }
+    for(int i=0; i < numFrames + mcs->numWindows(); ++i){
+        // if(i > mcs->numWindows() + 1) goto BREAK;
+        avgTime += processCycle(i);
     }
 
  BREAK:
