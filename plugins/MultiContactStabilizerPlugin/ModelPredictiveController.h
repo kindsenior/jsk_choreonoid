@@ -140,6 +140,7 @@ private:
 protected:
     ModelPredictiveController* controller_;
     int index_;
+    bool isInitial_;
 
 public:
     int stateDim;
@@ -161,10 +162,18 @@ public:
 
     ModelPredictiveControllerParam()
     {
+        isInitial_ = true;
     };
 
     virtual void convertToMpcParam() = 0;
     int index(){return index_;}
+    void setRefStateVector(const dvector& refStateVec_)
+    {
+        if(isInitial_){
+            refStateVec = refStateVec_;
+            isInitial_ = false;
+        }
+    }
 };
 
 }
