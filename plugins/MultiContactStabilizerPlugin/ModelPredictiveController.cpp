@@ -172,3 +172,14 @@ ModelPredictiveController* ModelPredictiveController::rootController()
     if(parent != NULL) return parent->rootController();
     return this;
 }
+
+void ModelPredictiveController::pushAllPreMPCParamFromRoot()
+{
+    ModelPredictiveController* root = rootController();
+    int stepNum = dt/root->dt;// root->dtで割り切れる?
+    std::deque<ModelPredictiveControllerParam*>::iterator iter = root->preMpcParamDeque.begin();
+    while(iter != root->preMpcParamDeque.end()){
+        preMpcParamDeque.push_back(copyMpcParam(this ,*iter));
+        for(int i=0; i<stepNum && iter !=root->preMpcParamDeque.end(); ++i, ++iter);
+    }
+}

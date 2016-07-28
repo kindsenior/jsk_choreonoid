@@ -129,6 +129,7 @@ public:
     void updateX0Vector();
     virtual void setupQP() = 0;
     virtual int execQP() = 0;
+    void pushAllPreMPCParamFromRoot();
 };
 
 class ModelPredictiveControllerParam
