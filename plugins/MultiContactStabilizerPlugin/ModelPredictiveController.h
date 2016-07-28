@@ -85,6 +85,7 @@ protected:
     dmatrix HMat;
     dvector gVec;
 
+    ModelPredictiveController* rootController();
     virtual ModelPredictiveControllerParam* copyMpcParam(ModelPredictiveController* container, ModelPredictiveControllerParam* fromMpcParam) = 0;
 
 private:
@@ -107,6 +108,7 @@ public:
     std::deque<ModelPredictiveControllerParam*> preMpcParamDeque;
     std::deque<ModelPredictiveControllerParam*> mpcParamDeque;
     dvector x0;
+    ModelPredictiveController* parent;
 
     ModelPredictiveController();
 

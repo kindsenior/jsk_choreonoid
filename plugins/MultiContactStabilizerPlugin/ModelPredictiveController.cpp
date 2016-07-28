@@ -10,6 +10,7 @@ using namespace std;
 ModelPredictiveController::ModelPredictiveController()
 {
     isInitial = true;
+    parent = NULL;
 }
 
 void ModelPredictiveController::calcPhiMatrix()
@@ -164,4 +165,10 @@ void ModelPredictiveController::calcAugmentedMatrix()
     calcBlockMatrix();
     U = dvector::Zero(URows);
 
+}
+
+ModelPredictiveController* ModelPredictiveController::rootController()
+{
+    if(parent != NULL) return parent->rootController();
+    return this;
 }
