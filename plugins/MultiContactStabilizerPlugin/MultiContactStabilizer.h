@@ -12,6 +12,9 @@ class MultiContactStabilizerParam;
 class MultiContactStabilizer : public ModelPredictiveController
 {
     friend class Test;
+protected:
+    ModelPredictiveControllerParam* copyMpcParam(ModelPredictiveController* controller, ModelPredictiveControllerParam* fromMpcParam);
+
 public:
     double m;
     int unitInputDim;// 接触点ごとの入力次元

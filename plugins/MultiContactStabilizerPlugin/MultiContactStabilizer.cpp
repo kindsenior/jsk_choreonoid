@@ -95,6 +95,13 @@ int MultiContactStabilizer::execQP()
     return ret;
 }
 
+
+ModelPredictiveControllerParam* MultiContactStabilizer::copyMpcParam(ModelPredictiveController* controller, ModelPredictiveControllerParam* fromMpcParam)
+{
+    MultiContactStabilizerParam* toMpcParam = new MultiContactStabilizerParam((MultiContactStabilizer*) controller, (MultiContactStabilizerParam*)fromMpcParam);
+    return (ModelPredictiveControllerParam*) toMpcParam;
+}
+
 void MultiContactStabilizerParam::calcSystemMatrix()
 {
     double dt = controller()->dt;
