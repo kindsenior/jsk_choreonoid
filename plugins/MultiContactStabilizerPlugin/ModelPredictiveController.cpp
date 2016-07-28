@@ -129,7 +129,38 @@ void ModelPredictiveController::updateX0Vector()
     ModelPredictiveControllerParam* mpcParam = mpcParamDeque[0];
     // U->u0
     // x0 = A0*x0 + B'0*u0
-    x0 = mpcParam->systemMat*x0 + mpcParam->inputMat*U.block(0,0, mpcParam->inputMat.cols(),1);
+    dmatrix x1 = mpcParam->systemMat*x0 + mpcParam->inputMat*U.block(0,0, mpcParam->inputMat.cols(),1);
+
+
+    if(parent != NULL){
+        ModelPredictiveController* root = rootController();
+        int stepNum = parent->dt/root->dt;// root->dtで割り切れる?
+        // int nextPushIndex;
+        // if(!parent->preMpcParamDeque.empty()) nextPushIndex = parent->preMpcParamDeque.back()->index() + stepNum;
+        // else if(!parent->mpcParamDeque.empty()) nextPushIndex = parent->mpcParamDeque.back()->index() + stepNum;
+        // else nextPushIndex = 0;
+
+        int x0Index = mpcParamDeque[0]->index();
+        int x1Index = mpcParamDeque[1]->index();// 0除算の可能性 最後以降は補間しないから大丈夫?
+        cout << x0Index << ": " << x0.transpose() << endl;
+        cout << x1Index << ": " << x1.transpose() << endl;
+        cout << "root: " << root->dt << "  parent:" << parent->dt << endl;
+        std::deque<ModelPredictiveControllerParam*>::iterator rootPreDequeIter = root->preMpcParamDeque.begin();
+        ModelPredictiveControllerParam* targetMpcParam;
+        while((*rootPreDequeIter)->index() < x0Index) rootPreDequeIter += stepNum;
+        while((*rootPreDequeIter)->index() < x1Index){
+            if(root == parent){
+                targetMpcParam = *rootPreDequeIter;
+            }else{
+                parent->preMpcParamDeque.push_back(copyMpcParam(parent, *rootPreDequeIter));// pickup mpcParam from root mpc dtが変わるので行列は生成し直す
+                targetMpcParam = parent->preMpcParamDeque.back();
+            }
+            targetMpcParam->setRefStateVector(x0 + (x1-x0)*((*rootPreDequeIter)->index() - x0Index)/(double)(x1Index - x0Index)); // interpolate refX,U
+            rootPreDequeIter += stepNum;
+        }
+    }
+
+    x0 = x1;
 }
 
 void ModelPredictiveController::calcAugmentedMatrix()
