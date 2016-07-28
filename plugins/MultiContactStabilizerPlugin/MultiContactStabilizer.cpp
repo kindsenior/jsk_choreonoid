@@ -97,8 +97,9 @@ int MultiContactStabilizer::execQP()
 
 void MultiContactStabilizerParam::calcSystemMatrix()
 {
+    double dt = controller()->dt;
     systemMat = dmatrix::Identity(stateDim,stateDim);
-    const double m = controller->m;
+    const double m = controller()->m;
     double Fz = F(2);
     systemMat(0,1) = dt;
     systemMat(2,3) = dt;
@@ -108,6 +109,7 @@ void MultiContactStabilizerParam::calcSystemMatrix()
 
 void MultiContactStabilizerParam::calcInputMatrix()
 {
+    double dt = controller()->dt;
     inputMat = dmatrix::Zero(stateDim,inputDim);
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
@@ -208,14 +210,14 @@ void MultiContactStabilizerParam::calcRefStateVector()
 void MultiContactStabilizerParam::calcErrorWeightVector()
 {
     errorWeightVec = dvector(stateDim);
-    double errorCMWeight = controller->errorCMWeight, errorMomentumWeight = controller->errorMomentumWeight, errorAngularMomentumWeight = controller->errorAngularMomentumWeight;
+    double errorCMWeight = controller()->errorCMWeight, errorMomentumWeight = controller()->errorMomentumWeight, errorAngularMomentumWeight = controller()->errorAngularMomentumWeight;
     errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight;
 }
 
 void MultiContactStabilizerParam::calcInputWeightVector()
 {
     inputWeightVec = dvector(inputDim);
-    double inputForceWeight = controller->inputForceWeight, inputMomentWeight = controller->inputMomentWeight;
+    double inputForceWeight = controller()->inputForceWeight, inputMomentWeight = controller()->inputMomentWeight;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         int idx = std::distance(ccParamVec.begin(), iter);
         inputWeightVec.block(unitInputDim*idx,0, unitInputDim,1) << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;

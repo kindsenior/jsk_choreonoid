@@ -13,7 +13,7 @@ class MultiContactStabilizer : public ModelPredictiveController
 {
     friend class Test;
 public:
-    double m,dt;
+    double m;
     int unitInputDim;// 接触点ごとの入力次元
     double errorCMWeight,errorMomentumWeight,errorAngularMomentumWeight;
     double inputForceWeight,inputMomentWeight;
@@ -28,12 +28,12 @@ public:
 class MultiContactStabilizerParam : public ModelPredictiveControllerParam
 {
 private:
-    MultiContactStabilizer* controller;
     int unitInputDim;
-    double dt;
 
     void calcMatrix(void (ContactConstraintParam::*func)(void));
     void calcVector(void (ContactConstraintParam::*func)(void));
+
+    MultiContactStabilizer* controller(){return (MultiContactStabilizer*)controller_;}
 
 public:
     std::vector<ContactConstraintParam*> ccParamVec;
@@ -44,13 +44,27 @@ public:
     Vector3 L;
     Vector3 F;
 
-    MultiContactStabilizerParam(MultiContactStabilizer* mcs)
+    MultiContactStabilizerParam(MultiContactStabilizer* mcs, MultiContactStabilizerParam* mcsParam)
         : ModelPredictiveControllerParam()
     {
-        controller = mcs;
-        stateDim = controller->stateDim;
-        unitInputDim = controller->unitInputDim;
-        dt = controller->dt;
+        if(mcsParam != NULL) *this = *mcsParam;
+        controller_ = mcs;
+        stateDim = controller()->stateDim;
+        unitInputDim = controller()->unitInputDim;
+    }
+
+    MultiContactStabilizerParam(int index, MultiContactStabilizer* mcs, MultiContactStabilizerParam* mcsParam)
+        : ModelPredictiveControllerParam()
+    {
+        *this = MultiContactStabilizerParam(mcs, mcsParam);
+        index_ = index;
+    }
+
+
+    MultiContactStabilizerParam(int index, MultiContactStabilizer* mcs)
+        : ModelPredictiveControllerParam()
+    {
+        *this = MultiContactStabilizerParam(index, mcs, NULL);
     }
 
     void calcInputMatrix();

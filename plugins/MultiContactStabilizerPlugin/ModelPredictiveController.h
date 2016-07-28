@@ -57,31 +57,7 @@ inline void dumpVector(dvector& retVec, dvector paramClass::*inVec, containerCla
     hrp::dumpVector(retVec, inVec, container, rowIdx, flagVec);
 }
 
-class ModelPredictiveControllerParam
-{
-public:
-    int stateDim;
-    int inputDim;
-
-    dmatrix systemMat;// A
-    dmatrix inputMat;// B
-    dmatrix equalMat;
-    dvector equalVec;
-    dmatrix inequalMat;
-    dvector inequalMinVec;
-    dvector inequalMaxVec;
-    dvector minVec;
-    dvector maxVec;
-    dvector refStateVec;
-    dvector errorWeightVec;
-    dvector inputWeightVec;
-    // dmatrix outputMat;
-
-    ModelPredictiveControllerParam(){};
-
-    virtual void convertToMpcParam() = 0;
-};
-
+class ModelPredictiveControllerParam;
 class ModelPredictiveController
 {
 protected:
@@ -122,6 +98,7 @@ private:
     void calcBlockMatrix();
 
 public:
+    double dt;
     int stateDim;
     int psiCols, URows, equalMatRows, inequalMatRows;
     bool isInitial;
@@ -148,6 +125,41 @@ public:
     void updateX0Vector();
     virtual void setupQP() = 0;
     virtual int execQP() = 0;
+};
+
+class ModelPredictiveControllerParam
+{
+private:
+    ModelPredictiveController* controller(){return controller_;};
+
+protected:
+    ModelPredictiveController* controller_;
+    int index_;
+
+public:
+    int stateDim;
+    int inputDim;
+
+    dmatrix systemMat;// A
+    dmatrix inputMat;// B
+    dmatrix equalMat;
+    dvector equalVec;
+    dmatrix inequalMat;
+    dvector inequalMinVec;
+    dvector inequalMaxVec;
+    dvector minVec;
+    dvector maxVec;
+    dvector refStateVec;
+    dvector errorWeightVec;
+    dvector inputWeightVec;
+    // dmatrix outputMat;
+
+    ModelPredictiveControllerParam()
+    {
+    };
+
+    virtual void convertToMpcParam() = 0;
+    int index(){return index_;}
 };
 
 }

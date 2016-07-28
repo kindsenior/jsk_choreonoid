@@ -157,6 +157,7 @@ void MultiContactStabilizerPlugin::execControl()
         body->calcTotalMomentum(lastP,tmpL);
     }
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
+    int index = 0;
     for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
 
@@ -168,11 +169,12 @@ void MultiContactStabilizerPlugin::execControl()
             updateBodyState(body, motion, min(i,numFrames-1));
             body->calcForwardKinematics(true, true);
 
-            MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(mcs);
+            MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(index, mcs);
             // 動作軌道に依存するパラメータの設定
             generateMultiContactStabilizerParam(mcsParam, body, ccParamVec);
 
             mcs->preMpcParamDeque.push_back((MultiContactStabilizerParam*) mcsParam);
+            ++index;
         }
     }
 

@@ -54,7 +54,7 @@ void Test::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
     clock_t st = clock();
     double tmList[4] = {0,0,0,0};
 
-    MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(mcs);
+    MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(i, mcs);
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         (*iter)->p = pMap[(*iter)->linkName];
         (*iter)->R = RMap[(*iter)->linkName];
