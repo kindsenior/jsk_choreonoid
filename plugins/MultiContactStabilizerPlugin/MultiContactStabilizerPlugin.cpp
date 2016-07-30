@@ -192,13 +192,6 @@ void MultiContactStabilizerPlugin::execControl()
     mRefPSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     mRefLSeqPtr = mBodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
 
-    {
-        Vector3d tmpL;
-        updateBodyState(body, motion, 0);
-        body->calcForwardKinematics(true, true);
-        body->calcCenterOfMass();
-        body->calcTotalMomentum(lastP,tmpL);
-    }
     for(int i=0; i < numFrames + mcs->numWindows(); ++i){
         // if(i > mcs->numWindows() + 1) goto BREAK;
 
