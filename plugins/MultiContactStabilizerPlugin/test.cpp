@@ -47,79 +47,32 @@ void Test::testAugmentedMatrix()
     cout << "recurrence: " << xk.transpose() << endl << "matrix:     " << xk_.transpose() << endl << endl;
 }
 
-void Test::processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec)
-{
-    cout << endl << "##############################" << endl << "turn:" << i << endl;
-
-    clock_t st = clock();
-    double tmList[4] = {0,0,0,0};
-
-    MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(i, mcs);
-    for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        (*iter)->p = pMap[(*iter)->linkName];
-        (*iter)->R = RMap[(*iter)->linkName];
-    }
-    mcsParam->ccParamVec = ccParamVec;
-
-    static Vector3 g;
-    g << 0,0,9.8;
-    {
-        CM += dCM;
-        mcsParam->CM = CM;
-        mcsParam->P = dCM*mcs->m;
-        mcsParam->L << 0,0,0;
-        mcsParam->F = mcs->m*dCM/mcs->dt + mcs->m*g;
-
-        mOfs0 << i*mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << endl;
-        mOfs2 << i*mcs->dt << " "<< pMap["lleg"].transpose() << " " << pMap["rleg"].transpose() << endl;
-    }
-
-    clock_t et = clock();
-    tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-    st = et;
-
-    mcsParam->convertToMpcParam();
-    mcs->mpcParamDeque.push_back(mcsParam);
-
-    et = clock();
-    tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-    st = et;
-
-    if(mcs->mpcParamDeque.size() == mcs->numWindows()){
-        mcs->calcAugmentedMatrix();
-
-        mcs->setupQP();
-
-        et = clock();
-        tmList[2] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-        st = et;
-
-        if(mcs->execQP()) failIdxVec.push_back(i - mcs->numWindows());
-
-        et = clock();
-        tmList[3] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
-        st = et;
-
-        mcs->updateX0Vector();
-        dvector x0(mcs->stateDim);
-        x0 = mcs->x0;
-        Vector3 CM,P,L;
-        CM << x0[0],x0[2],0;
-        P << x0[1],x0[3],0;
-        L << x0[4],x0[5],0;
-        CM /= mcs->m;
-        mOfs1 << (i - mcs->numWindows() + 1)*mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
-
-        mcs->mpcParamDeque.pop_front();
-    }
-
-    cout << "  FK: " << tmList[0] << "[ms]  convert: " << tmList[1] << "[ms]  setup: " << tmList[2] << "[ms]  QP: " << tmList[3]  << "[ms]" << endl;
-}
 
 void Test::generateMotion(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec)
 {
+    static Vector3 g;
+    g << 0,0,9.8;
     for(int i=from; i<to; ++i){
-        processCycle(i,ccParamVec);
+        MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(i, mcs);
+        for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+            (*iter)->p = pMap[(*iter)->linkName];
+            (*iter)->R = RMap[(*iter)->linkName];
+        }
+        mcsParam->ccParamVec = ccParamVec;
+
+        {
+            CM += dCM;
+            mcsParam->CM = CM;
+            mcsParam->P = dCM*mcs->m;
+            mcsParam->L << 0,0,0;
+            mcsParam->F = mcs->m*dCM/mcs->dt + mcs->m*g;
+
+            mOfs0 << i*mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << endl;
+            mOfs2 << i*mcs->dt << " "<< pMap["lleg"].transpose() << " " << pMap["rleg"].transpose() << endl;
+        }
+
+        mcsParam->convertToMpcParam();
+        mcs->preMpcParamDeque.push_back(mcsParam);
     }
 }
 
@@ -206,6 +159,29 @@ int main(void)
     ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
     ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
     test.generateMotion(test.cycle*k, test.cycle*(k+test.r), ccParamVec);
+
+    float avgTime = 0;
+    std::vector<int> failIdxVec;
+    int numFrames = test.mcs->preMpcParamDeque.size();
+    for(int i=0; i < numFrames + test.mcs->numWindows(); ++i){
+        cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
+        float processedTime;
+        if(test.mcs->processCycle(processedTime)) failIdxVec.push_back(i - test.mcs->numWindows());
+        avgTime += processedTime;
+
+        if(i >= test.mcs->numWindows()){
+            dvector x0(test.mcs->stateDim);
+            x0 = test.mcs->x0;
+
+            Vector3 CM,P,L;
+            CM << x0[0],x0[2],0;
+            P << x0[1],x0[3],0;
+            L << x0[4],x0[5],0;
+            CM /= test.mcs->m;
+            test.mOfs1 << (i - test.mcs->numWindows())*test.mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
+        }
+    }
+    cout << "average time: " << avgTime/numFrames << "[msec]" << endl;
 
     FILE* p;
     p = popen("gnuplot","w");
