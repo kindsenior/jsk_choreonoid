@@ -202,7 +202,12 @@ int main(void)
     fprintf(p, "set yrange [-0.3:0.3]\n");
     fprintf(p, "plot '/tmp/mcs-test_init.dat' u 1:%d t columnhead, '/tmp/mcs-test_init.dat' u 1:%d t columnhead, '/tmp/mcs-test_ref.dat' u 1:%d t columnhead, '/tmp/mcs-test_ref.dat' u 1:%d t columnhead\n", 8,9,8,9);// angular momentum
     fflush(p);
-    while(fgetc(stdin) != '\n');    pclose(p);
+    while(fgetc(stdin) != '\n');
+    fprintf(p, "set yrange [0:20]\n");
+    fprintf(p, "plot '/tmp/mcs-test_ref.dat' u 1:%d t columnhead\n", 11);// process time
+    fflush(p);
+    while(fgetc(stdin) != '\n');
+    pclose(p);
 
     test.testAugmentedMatrix();
 }
