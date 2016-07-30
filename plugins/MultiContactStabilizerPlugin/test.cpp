@@ -48,7 +48,7 @@ void Test::testAugmentedMatrix()
 }
 
 
-void Test::generateMotion(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec)
+void Test::generateOnePhase(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec)
 {
     static Vector3 g;
     g << 0,0,9.8;
@@ -76,21 +76,15 @@ void Test::generateMotion(int from, int to, std::vector<ContactConstraintParam*>
     }
 }
 
-int main(void)
+void Test::generateMotion()
 {
-    cout << "test function" << endl;
-
-    Test test;
-
-    std::deque<ModelPredictiveControllerParam*> mpcParamDeque;
-
     Vector3 pl,pr;
     pl << 0, 0.1,0;
     pr << 0,-0.1,0;
-    test.pMap["lleg"] = pl;
-    test.pMap["rleg"] = pr;
-    test.RMap["lleg"] = Matrix33::Identity();
-    test.RMap["rleg"] = Matrix33::Identity();
+    pMap["lleg"] = pl;
+    pMap["rleg"] = pr;
+    RMap["lleg"] = Matrix33::Identity();
+    RMap["rleg"] = Matrix33::Identity();
 
     std::vector<Vector3> edgeVec;
     hrp::Vector3 edge;
@@ -103,85 +97,97 @@ int main(void)
     edge << 0, 1, 0.05;
     edgeVec.push_back(edge);
 
-    test.mOfs0 << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
-    test.mOfs1 << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
-    test.mOfs2 << "time lx ly lz rx ry rz" << endl;
+    mOfs0 << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
+    mOfs1 << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
+    mOfs2 << "time lx ly lz rx ry rz" << endl;
     int k = 0;
     std::vector<ContactConstraintParam*> ccParamVec;
-    test.dCM = test.stride/(2*2*test.cycle);
+    dCM = stride/(2*2*cycle);
     ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
     ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
-    test.generateMotion(test.cycle*k, test.cycle*(k+test.r), ccParamVec);
+    generateOnePhase(cycle*k, cycle*(k+r), ccParamVec);
     ccParamVec.clear();
     ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
-    test.generateMotion(test.cycle*(k+test.r), test.cycle*(k+1), ccParamVec);
-    test.pMap["rleg"] += test.stride/2;
+    generateOnePhase(cycle*(k+r), cycle*(k+1), ccParamVec);
+    pMap["rleg"] += stride/2;
     ++k;
 
-    test.dCM = test.stride/(2*test.cycle);
+    dCM = stride/(2*cycle);
 
     for(int turn = 0; turn < 4; ++turn){
         ccParamVec.clear();
         ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
         ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
-        test.generateMotion(test.cycle*k, test.cycle*(k+test.r), ccParamVec);
+        generateOnePhase(cycle*k, cycle*(k+r), ccParamVec);
         ccParamVec.clear();
         ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
-        test.generateMotion(test.cycle*(k+test.r), test.cycle*(k+1), ccParamVec);
-        test.pMap["lleg"] += test.stride;
+        generateOnePhase(cycle*(k+r), cycle*(k+1), ccParamVec);
+        pMap["lleg"] += stride;
         ++k;
 
         ccParamVec.clear();
         ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
         ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
-        test.generateMotion(test.cycle*k, test.cycle*(k+test.r), ccParamVec);
+        generateOnePhase(cycle*k, cycle*(k+r), ccParamVec);
         ccParamVec.clear();
         ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
-        test.generateMotion(test.cycle*(k+test.r), test.cycle*(k+1), ccParamVec);
-        test.pMap["rleg"] += test.stride;
+        generateOnePhase(cycle*(k+r), cycle*(k+1), ccParamVec);
+        pMap["rleg"] += stride;
         ++k;
     }
 
-    test.dCM = test.stride/(2*2*test.cycle);
+    dCM = stride/(2*2*cycle);
 
     ccParamVec.clear();
     ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
     ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
-    test.generateMotion(test.cycle*k, test.cycle*(k+test.r), ccParamVec);
+    generateOnePhase(cycle*k, cycle*(k+r), ccParamVec);
     ccParamVec.clear();
     ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
-    test.generateMotion(test.cycle*(k+test.r), test.cycle*(k+1), ccParamVec);
-    test.pMap["lleg"] += test.stride/2;
+    generateOnePhase(cycle*(k+r), cycle*(k+1), ccParamVec);
+    pMap["lleg"] += stride/2;
     ++k;
 
-    test.stride = Vector3::Zero();
+    stride = Vector3::Zero();
     ccParamVec.clear();
     ccParamVec.push_back(new SimpleContactConstraintParam("lleg",edgeVec));
     ccParamVec.push_back(new SimpleContactConstraintParam("rleg",edgeVec));
-    test.generateMotion(test.cycle*k, test.cycle*(k+test.r), ccParamVec);
+    generateOnePhase(cycle*k, cycle*(k+r), ccParamVec);
+}
 
+void Test::execControl()
+{
     float avgTime = 0;
     std::vector<int> failIdxVec;
-    int numFrames = test.mcs->preMpcParamDeque.size();
-    for(int i=0; i < numFrames + test.mcs->numWindows(); ++i){
+    int numFrames = mcs->preMpcParamDeque.size();
+    for(int i=0; i < numFrames + mcs->numWindows(); ++i){
         cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
         float processedTime;
-        if(test.mcs->processCycle(processedTime)) failIdxVec.push_back(i - test.mcs->numWindows());
+        if(mcs->processCycle(processedTime)) failIdxVec.push_back(i - mcs->numWindows());
         avgTime += processedTime;
 
-        if(i >= test.mcs->numWindows()){
-            dvector x0(test.mcs->stateDim);
-            x0 = test.mcs->x0;
+        // file output for plot
+        if(i >= mcs->numWindows()){
+            dvector x0 = mcs->x0;
 
             Vector3 CM,P,L;
             CM << x0[0],x0[2],0;
             P << x0[1],x0[3],0;
             L << x0[4],x0[5],0;
-            CM /= test.mcs->m;
-            test.mOfs1 << (i - test.mcs->numWindows())*test.mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
+            CM /= mcs->m;
+            mOfs1 << (i - mcs->numWindows())*mcs->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
         }
     }
     cout << "average time: " << avgTime/numFrames << "[msec]" << endl;
+}
+
+int main(void)
+{
+    cout << "test function" << endl;
+
+    Test test;
+    test.generateMotion();
+    test.execControl();
 
     FILE* p;
     p = popen("gnuplot","w");

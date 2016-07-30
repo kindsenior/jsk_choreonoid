@@ -49,9 +49,9 @@ public:
 
     void testAugmentedMatrix();
 
-    void processCycle(int i, std::vector<ContactConstraintParam*>& ccParamVec);
-
-    void generateMotion(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec);
+    void generateOnePhase(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec);
+    void generateMotion();
+    void execControl();
 };
 
 }
