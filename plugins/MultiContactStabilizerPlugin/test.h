@@ -8,7 +8,7 @@
 
 namespace hrp {
 
-class Test
+class OneMCSTest
 {
 public:
     MultiContactStabilizer* mcs;
@@ -19,7 +19,7 @@ public:
     std::map<std::string,Vector3> pMap;
     std::map<std::string,Matrix33> RMap;
 
-    Test()
+    OneMCSTest()
     {
         mOfs0.open("/tmp/mcs-test_init.dat");
         mOfs1.open("/tmp/mcs-test_ref.dat");

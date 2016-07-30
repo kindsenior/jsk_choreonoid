@@ -6,7 +6,7 @@
 using namespace std;
 using namespace hrp;
 
-void Test::testAugmentedMatrix()
+void OneMCSTest::testAugmentedMatrix()
 {
     cout << endl << "augmented matrix test" << endl;
 
@@ -48,7 +48,7 @@ void Test::testAugmentedMatrix()
 }
 
 
-void Test::generateOnePhase(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec)
+void OneMCSTest::generateOnePhase(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec)
 {
     static Vector3 g;
     g << 0,0,9.8;
@@ -75,7 +75,7 @@ void Test::generateOnePhase(int from, int to, std::vector<ContactConstraintParam
     }
 }
 
-void Test::generateMotion()
+void OneMCSTest::generateMotion()
 {
     int cycle = stepTime/mcs->dt;
 
@@ -156,7 +156,7 @@ void Test::generateMotion()
     generateOnePhase(cycle*k, cycle*(k+r), ccParamVec);
 }
 
-void Test::execControl()
+void OneMCSTest::execControl()
 {
     float avgTime = 0;
     std::vector<int> failIdxVec;

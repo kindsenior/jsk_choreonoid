@@ -11,7 +11,7 @@ class Test;
 class MultiContactStabilizerParam;
 class MultiContactStabilizer : public ModelPredictiveController
 {
-    friend class Test;
+    friend class OneMCSTest;
 protected:
     ModelPredictiveControllerParam* copyMpcParam(ModelPredictiveController* controller, ModelPredictiveControllerParam* fromMpcParam);
 
