@@ -44,10 +44,49 @@ public:
         mcs->inputMomentWeight = 10;
     };
 
-    void testAugmentedMatrix();
+    virtual void testAugmentedMatrix();
 
     void generateOnePhase(int from, int to, std::vector<ContactConstraintParam*>& ccParamVec);
     void generateMotion();
+    virtual void execControl();
+};
+
+class TwoStepMCSTest : public OneMCSTest
+{
+protected:
+    MultiContactStabilizer* mcs1;
+    std::ofstream mOfs3;
+
+public:
+    TwoStepMCSTest()
+        : OneMCSTest()
+    {
+        mcs->m = 60;
+        mcs->dt = 0.002;// 2ms
+        std::vector<int> vec{1,1,1,1,1};
+        mcs->setBlockVector(vec);
+        mcs->errorCMWeight = 100000000;
+        mcs->errorMomentumWeight = 1;
+        mcs->errorAngularMomentumWeight = 200;
+        mcs->inputForceWeight = 10;
+        mcs->inputMomentWeight = 20;
+
+        mcs1 = new MultiContactStabilizer();
+
+        mcs1->parent = mcs;
+        mcs1->m = mcs->m;
+        mcs1->dt = 0.1;// 100ms
+        std::vector<int> vec1{1,1,1,1,1,1,1};
+        mcs1->setBlockVector(vec1);
+        mcs1->errorCMWeight = 1000;
+        mcs1->errorMomentumWeight = 0.0001;
+        mcs1->errorAngularMomentumWeight = 200;
+        mcs1->inputForceWeight = 10;
+        mcs1->inputMomentWeight = 20;
+
+        mOfs3.open("/tmp/mcs-test_ref_sparse.dat");
+    }
+
     void execControl();
 };
 

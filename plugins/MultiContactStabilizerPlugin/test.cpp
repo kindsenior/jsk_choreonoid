@@ -182,6 +182,37 @@ void OneMCSTest::execControl()
     cout << "average time: " << avgTime/numFrames << "[msec]" << endl;
 }
 
+void TwoStepMCSTest::execControl()
+{
+    mcs1->pushAllPreMPCParamFromRoot();
+    mOfs3 << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
+
+    float avgTime = 0;
+    std::vector<int> failIdxVec;
+    int numFrames = mcs1->preMpcParamDeque.size();
+    for(int i=0; i < numFrames + mcs1->numWindows(); ++i){
+        cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
+        float processedTime;
+        if(mcs1->processCycle(processedTime)) failIdxVec.push_back(i - mcs1->numWindows());
+        avgTime += processedTime;
+
+        // file output for plot
+        if(i >= mcs1->numWindows()){
+            dvector x0 = mcs1->x0;
+
+            Vector3 CM,P,L;
+            CM << x0[0],x0[2],0;
+            P << x0[1],x0[3],0;
+            L << x0[4],x0[5],0;
+            CM /= mcs1->m;
+            mOfs3 << (i - mcs1->numWindows())*mcs1->dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
+        }
+    }
+    cout << "average time: " << avgTime/numFrames << "[msec]" << endl;
+
+    OneMCSTest::execControl();
+}
+
 int main(void)
 {
     cout << "test function" << endl;
