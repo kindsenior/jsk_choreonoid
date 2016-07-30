@@ -213,13 +213,39 @@ void TwoStepMCSTest::execControl()
     OneMCSTest::execControl();
 }
 
-int main(void)
+void printUsage(std::vector<string> argvStringVec)
 {
-    cout << "test function" << endl;
+    cout << "Usage: mcs-test [mode]" << endl;
+    cout << " [mode] is one of";
+    for(std::vector<string>::iterator iter = argvStringVec.begin(); iter != argvStringVec.end(); ++iter){
+        cout << " " << *iter;
+    }
+    cout << endl;
+}
 
-    Test test;
-    test.generateMotion();
-    test.execControl();
+int main(int argc, char** argv)
+{
+    OneMCSTest* test;
+    std::vector<string> argvStringVec {"one", "two"};
+    if(argc > 1){
+        string argvStr = argv[1];
+        if(argvStr ==  argvStringVec[0]){
+            cout << "execute OneMCSTest" << endl;
+            test = (OneMCSTest*) new OneMCSTest();
+        }else if(argvStr == argvStringVec[1]){
+            cout << "execute TwoStepMCSTest" << endl;
+            test = (OneMCSTest*) new TwoStepMCSTest();
+        }else{
+            printUsage(argvStringVec);
+            return 0;
+        }
+    }else{
+        printUsage(argvStringVec);
+        return 0;
+    }
+
+    test->generateMotion();
+    test->execControl();
 
     FILE* p;
     p = popen("gnuplot","w");
@@ -247,5 +273,5 @@ int main(void)
     while(fgetc(stdin) != '\n');
     pclose(p);
 
-    test.testAugmentedMatrix();
+    test->testAugmentedMatrix();
 }
