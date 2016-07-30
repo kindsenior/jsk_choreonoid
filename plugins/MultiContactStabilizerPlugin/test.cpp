@@ -99,7 +99,7 @@ void OneMCSTest::generateMotion()
     edgeVec.push_back(edge);
 
     mOfs0 << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
-    mOfs1 << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
+    mOfs1 << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
     mOfs2 << "time lx ly lz rx ry rz" << endl;
     int k = 0;
     std::vector<ContactConstraintParam*> ccParamVec;
