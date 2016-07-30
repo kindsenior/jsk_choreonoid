@@ -71,13 +71,14 @@ void Test::generateOnePhase(int from, int to, std::vector<ContactConstraintParam
             mOfs2 << i*mcs->dt << " "<< pMap["lleg"].transpose() << " " << pMap["rleg"].transpose() << endl;
         }
 
-        mcsParam->convertToMpcParam();
         mcs->preMpcParamDeque.push_back(mcsParam);
     }
 }
 
 void Test::generateMotion()
 {
+    int cycle = stepTime/mcs->dt;
+
     Vector3 pl,pr;
     pl << 0, 0.1,0;
     pr << 0,-0.1,0;

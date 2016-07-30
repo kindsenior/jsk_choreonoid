@@ -16,7 +16,6 @@ public:
     std::vector<int> failIdxVec;
     Vector3 stride,dCM,CM,P,L,F;
     double stepTime,r;
-    int cycle,frameRate;
     std::map<std::string,Vector3> pMap;
     std::map<std::string,Matrix33> RMap;
 
@@ -29,8 +28,6 @@ public:
         stride << 0.4,0,0;
         // stride << 0,0,0;
         stepTime = 1.25;
-        frameRate = 20;
-        cycle = stepTime*frameRate;
         r = 0.25/stepTime;// double support ratio
         CM << 0,0,1;
 
