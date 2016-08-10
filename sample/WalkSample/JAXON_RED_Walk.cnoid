@@ -399,6 +399,10 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
+  "RMControlBar": 
+    initialTrajectory: Load
+    initialTrajectoryCheck: false
+    saveParameterInFileName: false
   "PreviewControl": 
     controlMode: DynamicsFilter
     controlModeCheck: true
