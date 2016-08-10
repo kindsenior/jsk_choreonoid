@@ -95,17 +95,14 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     hbox->addWidget(&saveParameterInFileNameCheck);
     hbox->addStretch();
 
-    QVBoxLayout* topVBox = new QVBoxLayout();
-    topVBox->addLayout(vbox);
-
     QPushButton* okButton = new QPushButton("&Ok");
     okButton->setDefault(true);
     QDialogButtonBox* buttonBox = new QDialogButtonBox(this);
     buttonBox->addButton(okButton, QDialogButtonBox::AcceptRole);
     connect(buttonBox,SIGNAL(accepted()), this, SLOT(accept()));
-    topVBox->addWidget(buttonBox);
+    vbox->addWidget(buttonBox);
 
-    setLayout(topVBox);
+    setLayout(vbox);
 }
 
 MultiContactStabilizerBar::MultiContactStabilizerBar(MultiContactStabilizerPlugin* plugin)
