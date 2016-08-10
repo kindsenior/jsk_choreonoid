@@ -338,6 +338,22 @@ toolbars:
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
+  "MultiContactStabilizerBar": 
+    numWindows: 13
+    numWindowsCheck: true
+    errorCMWeight: 1e+08
+    errorCMWeightCheck: true
+    errorMomentumWeight: 1
+    errorMomentumWeightCheck: true
+    errorAngularMomentumWeight: 200
+    errorAngularMomentumWeightCheck: true
+    inputForceWeight: 10
+    inputForceWeightCheck: true
+    inputMomentWeight: 20
+    inputMomentWeightCheck: true
+    blockingList: 1,1,1,1,1
+    blockingListCheck: false
+    saveParameterInFileName: true
   "KinematicsBar": 
     mode: AUTO
     enablePositionDragger: true
@@ -383,22 +399,6 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
-  "MultiContactStabilizerBar": 
-    numWindows: 13
-    numWindowsCheck: true
-    errorCMWeight: 1000
-    errorCMWeightCheck: true
-    errorMomentumWeight: 0.0001
-    errorMomentumWeightCheck: true
-    errorAngularMomentumWeight: 200
-    errorAngularMomentumWeightCheck: true
-    inputForceWeight: 10
-    inputForceWeightCheck: true
-    inputMomentWeight: 20
-    inputMomentWeightCheck: true
-    blockingList: 1,1,1,1,1,1,1,1,10,10,10,10,10
-    blockingListCheck: false
-    saveParameterInFileName: true
   "PreviewControl": 
     controlMode: DynamicsFilter
     controlModeCheck: true

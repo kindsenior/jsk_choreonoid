@@ -30,6 +30,7 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     // in order of param setup dialog
     QHBoxLayout* hbox = newRow(vbox);
+    errorCMWeightSpin->setRange(0,1000000000);
     errorCMWeightSpin->setText("CM:");
     errorCMWeightSpin->setSaveName("CM");
     errorCMWeightSpin->setArchiveName("errorCMWeight");
