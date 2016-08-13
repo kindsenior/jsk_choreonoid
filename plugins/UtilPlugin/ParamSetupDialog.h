@@ -43,15 +43,7 @@ public:
 
     std::string getParamString()
     {
-        std::stringstream ss;
-        for(std::vector<ParamWidget*>::iterator iter = paramWidgetVec.begin(); iter != paramWidgetVec.end(); ++iter){
-            if((*iter)->isChecked()){
-                ss << "_" << (*iter)->getParam() << (*iter)->saveName();
-            }
-        }
-        std::string str = ss.str();
-        replace(str.begin(), str.end(), '.', '-');
-        return str;
+        return paramNodes->getParamString();
     }
 
     virtual void storeState(Archive& archive)

@@ -36,11 +36,32 @@ public:
         setChecked(true);
     }
 
+    void storeState(Archive& archive)
+    {
+        // std::string archiveName = archiveName();// no mathing function call?
+        archive.write(archiveName_, getParam());
+        archive.write(archiveName_+"Check", isChecked());
+    };
+    void restoreState(const Archive& archive)
+    {
+        // std::string archiveName = archiveName();// no matching function call?
+        setParam(archive.get(archiveName_, getParam()));
+        setChecked(archive.get(archiveName_+"Check", isChecked()));
+    };
+
     void addToLayout(QBoxLayout* layout)
     {
         layout->addWidget((CheckBox*)this);
     }
 
+    std::string getParamString()
+    {
+        std::stringstream ss;
+        if(isChecked()){
+            ss << "_" << getParam() << saveName();
+        }
+        return ss.str();
+    }
 
     virtual std::string getParam()=0;
     virtual void setParam(std::string param)=0;
