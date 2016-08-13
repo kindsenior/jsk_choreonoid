@@ -30,7 +30,6 @@ public:
     SpinParamWidget* errorAngularMomentumWeightSpin;
     SpinParamWidget* inputForceWeightSpin;
     SpinParamWidget* inputMomentWeightSpin;
-    SpinParamWidget* numWindowsSpin;
     SpinVectorParamWidget* blockSpinVec;
 
     MultiContactStabilizerSetupDialog();

@@ -16,7 +16,6 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     paramNodes->setArchiveName("MCS");
 
     // in order for saving param to file name
-    numWindowsSpin = new SpinParamWidget();
     errorCMWeightSpin = new SpinParamWidget();
     paramNodes->addParamNode(errorCMWeightSpin);
     errorMomentumWeightSpin = new SpinParamWidget();
@@ -68,18 +67,6 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     inputMomentWeightSpin->setArchiveName("inputMomentWeight");
     inputMomentWeightSpin->setValue(10);
     inputMomentWeightSpin->addToLayout(hbox);
-    hbox->addStretch();
-
-
-    hbox = newRow(vbox);
-    numWindowsSpin->setText("Window:");
-    numWindowsSpin->setSaveName("N");
-    numWindowsSpin->setArchiveName("numWindows");
-    numWindowsSpin->setDecimals(0);
-    numWindowsSpin->setRange(1, 1000);
-    numWindowsSpin->setSingleStep(1);
-    numWindowsSpin->setValue(13);
-    numWindowsSpin->addToLayout(hbox);
     hbox->addStretch();
 
     hbox = newRow(vbox);
