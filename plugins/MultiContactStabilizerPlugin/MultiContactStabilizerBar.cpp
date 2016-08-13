@@ -12,21 +12,23 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     QVBoxLayout* vbox = new QVBoxLayout();
 
+    paramNodes = new ParamMap();
+    paramNodes->setArchiveName("MCS");
+
     // in order for saving param to file name
     numWindowsSpin = new SpinParamWidget();
-    paramWidgetVec.push_back(numWindowsSpin);
     errorCMWeightSpin = new SpinParamWidget();
-    paramWidgetVec.push_back(errorCMWeightSpin);
+    paramNodes->addParamNode(errorCMWeightSpin);
     errorMomentumWeightSpin = new SpinParamWidget();
-    paramWidgetVec.push_back(errorMomentumWeightSpin);
+    paramNodes->addParamNode(errorMomentumWeightSpin);
     errorAngularMomentumWeightSpin = new SpinParamWidget();
-    paramWidgetVec.push_back(errorAngularMomentumWeightSpin);
+    paramNodes->addParamNode(errorAngularMomentumWeightSpin);
     inputForceWeightSpin = new SpinParamWidget();
-    paramWidgetVec.push_back(inputForceWeightSpin);
+    paramNodes->addParamNode(inputForceWeightSpin);
     inputMomentWeightSpin = new SpinParamWidget();
-    paramWidgetVec.push_back(inputMomentWeightSpin);
+    paramNodes->addParamNode(inputMomentWeightSpin);
     blockSpinVec = new SpinVectorParamWidget();
-    paramWidgetVec.push_back(blockSpinVec);
+    paramNodes->addParamNode(blockSpinVec);
 
     // in order of param setup dialog
     QHBoxLayout* hbox = newRow(vbox);

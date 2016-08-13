@@ -12,11 +12,15 @@ class ParamSetupDialog : public Dialog
 {
 protected:
     std::vector<ParamWidget*> paramWidgetVec;
+    ParamNode* paramNodes;
 
 public:
     CheckBox saveParameterInFileNameCheck;
 
-    ParamSetupDialog() : Dialog() {};
+    ParamSetupDialog() : Dialog()
+    {
+        paramNodes = NULL;
+    };
 
     QHBoxLayout* newRow(QVBoxLayout* vbox)
     {
@@ -54,6 +58,8 @@ public:
             archive.write(archiveName+"Check",(*iter)->isChecked());
         }
         archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
+
+        if(paramNodes != NULL) paramNodes->storeState(archive);
     }
 
     virtual void restoreState(const Archive& archive)
@@ -64,6 +70,8 @@ public:
             (*iter)->setChecked(archive.get(archiveName+"Check", (*iter)->isChecked()));
         }
         saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
+
+        if(paramNodes != NULL) paramNodes->restoreState(archive);
     }
 };
 
