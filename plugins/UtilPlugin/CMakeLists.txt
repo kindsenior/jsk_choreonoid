@@ -4,6 +4,7 @@ set(PLUGIN_NAME UtilPlugin)
 set(TARGET Cnoid${PLUGIN_NAME})
 set(headers
 	UtilPlugin.h
+	ParamNode.h
 	ParamWidget.h
 	ParamSetupDialog.h
 	SetupToolBar.h)

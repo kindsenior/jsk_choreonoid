@@ -20,22 +20,20 @@
 #include <cnoid/ComboBox>
 #include <QDialogButtonBox>
 
+#include "ParamNode.h"
+
 namespace cnoid {
 
-class ParamWidget : public CheckBox
+class ParamWidget : public CheckBox,
+                    public ParamNode
 {
-private:
-    std::string saveName_;
-    std::string archiveName_;
-
 public:
     ParamWidget()
-        : CheckBox()
+        : CheckBox(),
+          ParamNode()
     {
         setText("default text");
         setChecked(true);
-        saveName_ = "defaultSaveName";
-        archiveName_ = "defaultArchiveName";
     }
 
     void addToLayout(QBoxLayout* layout)
@@ -43,10 +41,6 @@ public:
         layout->addWidget((CheckBox*)this);
     }
 
-    void setSaveName(const std::string& name){saveName_ = name;}
-    std::string saveName(){return saveName_;}
-    void setArchiveName(const std::string& name){archiveName_ = name;}
-    std::string archiveName(){return archiveName_;}
 
     virtual std::string getParam()=0;
     virtual void setParam(std::string param)=0;
