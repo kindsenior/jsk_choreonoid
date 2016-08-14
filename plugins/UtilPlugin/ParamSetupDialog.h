@@ -3,8 +3,7 @@
 */
 #pragma once
 
-#include <cnoid/Archive>
-#include "ParamWidget.h"
+#include "ParamSetupLayout.h"
 
 namespace cnoid {
 
@@ -13,13 +12,14 @@ class ParamSetupDialog : public Dialog
 protected:
     std::vector<ParamWidget*> paramWidgetVec;
     ParamNode* paramNodes;
+    ParamSetupLayout* layout_;
 
 public:
     CheckBox saveParameterInFileNameCheck;
 
     ParamSetupDialog() : Dialog()
     {
-        paramNodes = NULL;
+        layout_ = NULL;
     };
 
     QHBoxLayout* newRow(QVBoxLayout* vbox)
@@ -47,7 +47,8 @@ public:
 
     std::string getParamString()
     {
-        return paramNodes->getParamString();
+        if(layout_ == NULL) return "";
+        else return layout_->getParamString();
     }
 
     virtual void storeState(Archive& archive)
@@ -59,7 +60,7 @@ public:
         }
         archive.write("saveParameterInFileName", saveParameterInFileNameCheck.isChecked());
 
-        if(paramNodes != NULL) paramNodes->storeState(archive);
+        if(layout_ != NULL) layout_->storeState(archive);
     }
 
     virtual void restoreState(const Archive& archive)
@@ -71,7 +72,7 @@ public:
         }
         saveParameterInFileNameCheck.setChecked(archive.get("saveParameterInFileName", saveParameterInFileNameCheck.isChecked()));
 
-        if(paramNodes != NULL) paramNodes->restoreState(archive);
+        if(layout_ != NULL) layout_->restoreState(archive);
     }
 };
 

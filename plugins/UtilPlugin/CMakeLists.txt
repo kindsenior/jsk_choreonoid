@@ -6,6 +6,7 @@ set(headers
 	UtilPlugin.h
 	ParamNode.h
 	ParamWidget.h
+	ParamSetupLayout.h
 	ParamSetupDialog.h
 	SetupToolBar.h)
 
