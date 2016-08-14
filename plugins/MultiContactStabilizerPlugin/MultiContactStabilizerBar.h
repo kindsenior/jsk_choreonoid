@@ -22,7 +22,7 @@ namespace cnoid {
 
 class MultiContactStabilizerPlugin;
 
-class MultiContactStabilizerSetupDialog : public ParamSetupDialog
+class MultiContactStabilizerSetupLayout : public ParamSetupLayout
 {
 public:
     SpinParamWidget* errorCMWeightSpin;
@@ -32,9 +32,15 @@ public:
     SpinParamWidget* inputMomentWeightSpin;
     SpinVectorParamWidget* blockSpinVec;
 
-    MultiContactStabilizerSetupDialog();
+    MultiContactStabilizerSetupLayout(QVBoxLayout* vbox);
 };
 
+class MultiContactStabilizerSetupDialog : public ParamSetupDialog
+{
+public:
+    MultiContactStabilizerSetupDialog();
+    MultiContactStabilizerSetupLayout* layout(){return (MultiContactStabilizerSetupLayout*) layout_;}
+};
 
 class MultiContactStabilizerBar : public SetupToolBar
 {

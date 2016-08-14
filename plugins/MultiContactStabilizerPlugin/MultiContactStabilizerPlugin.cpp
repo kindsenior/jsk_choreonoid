@@ -142,12 +142,12 @@ void MultiContactStabilizerPlugin::execControl()
     mcs = new MultiContactStabilizer();
     mcs->m = body->mass();
     mcs->dt = dt;
-    mcs->setBlockVector(mBar->dialog->blockSpinVec->value());
-    mcs->errorCMWeight = mBar->dialog->errorCMWeightSpin->value();
-    mcs->errorMomentumWeight = mBar->dialog->errorMomentumWeightSpin->value();
-    mcs->errorAngularMomentumWeight = mBar->dialog->errorAngularMomentumWeightSpin->value();
-    mcs->inputForceWeight = mBar->dialog->inputForceWeightSpin->value();
-    mcs->inputMomentWeight = mBar->dialog->inputMomentWeightSpin->value();
+    mcs->setBlockVector((mBar->dialog->layout())->blockSpinVec->value());
+    mcs->errorCMWeight = (mBar->dialog->layout())->errorCMWeightSpin->value();
+    mcs->errorMomentumWeight = (mBar->dialog->layout())->errorMomentumWeightSpin->value();
+    mcs->errorAngularMomentumWeight = (mBar->dialog->layout())->errorAngularMomentumWeightSpin->value();
+    mcs->inputForceWeight = (mBar->dialog->layout())->inputForceWeightSpin->value();
+    mcs->inputMomentWeight = (mBar->dialog->layout())->inputMomentWeightSpin->value();
 
     {
         Vector3d tmpL;
@@ -183,7 +183,7 @@ void MultiContactStabilizerPlugin::execControl()
 
     fnamess.str("");
     fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL";
-    if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) fnamess << mBar->dialog->getParamString();
+    fnamess << mBar->dialog->layout()->getParamString();
     fnamess << "_" << frameRate << "fps.dat";
     mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
     mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;

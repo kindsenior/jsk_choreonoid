@@ -5,13 +5,9 @@
 
 using namespace cnoid;
 
-MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
-    : ParamSetupDialog()
+MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout* vbox)
+    : ParamSetupLayout(vbox)
 {
-    setWindowTitle("Multi Contact Stabilizer Setup");
-
-    QVBoxLayout* vbox = new QVBoxLayout();
-
     paramNodes = new ParamMap();
     paramNodes->setArchiveName("MCS");
 
@@ -79,10 +75,20 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
     hbox->addStretch();
 
     hbox = newRow(vbox);
-    saveParameterInFileNameCheck.setText("Save parameters in file name");
-    saveParameterInFileNameCheck.setChecked(true);
-    hbox->addWidget(&saveParameterInFileNameCheck);
+    saveParameterInFileNameCheck_.setText("Save parameters in file name");
+    saveParameterInFileNameCheck_.setChecked(true);
+    hbox->addWidget(&saveParameterInFileNameCheck_);
     hbox->addStretch();
+}
+
+MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
+    : ParamSetupDialog()
+{
+    setWindowTitle("Multi Contact Stabilizer Setup");
+
+    QVBoxLayout* vbox = new QVBoxLayout();
+
+    layout_ = (ParamSetupLayout*) new MultiContactStabilizerSetupLayout(vbox);
 
     QPushButton* okButton = new QPushButton("&Ok");
     okButton->setDefault(true);
