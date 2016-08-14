@@ -49,7 +49,6 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout
     errorAngularMomentumWeightSpin->addToLayout(hbox);
     hbox->addStretch();
 
-
     hbox = newRow(vbox);
     inputForceWeightSpin->setText("Force:");
     inputForceWeightSpin->setArchiveName("inputForceWeight");

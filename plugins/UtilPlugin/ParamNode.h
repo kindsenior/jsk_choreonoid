@@ -5,7 +5,7 @@
 
 #include <cnoid/Archive>
 
-namespace cnoid{
+namespace cnoid {
 
 class ParamNode
 {
