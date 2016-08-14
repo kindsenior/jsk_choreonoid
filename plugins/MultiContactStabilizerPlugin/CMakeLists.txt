@@ -34,6 +34,21 @@ include(test.cmake)
 set_target_properties(${TARGET}
   PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/choreonoid-${choreonoid_VER})
 
+set(headers
+	MultiContactStabilizerBar.h
+	ModelPredictiveController.h
+	MultiContactStabilizer.h
+	ContactConstraint.h)
+set(INCLUDE_DEST_DIR ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${PLUGIN_NAME})
+execute_process(
+  COMMAND cmake -E make_directory ${INCLUDE_DEST_DIR}
+  RESULT_VARIABLE _make_failed)
+foreach(header ${headers})
+	execute_process(
+		COMMAND cmake -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${header} ${INCLUDE_DEST_DIR}
+		RESULT_VARIABLE _copy_failed)
+endforeach()
+
 if(BUILD_PREVIEWCONTROL)
 
 endif()
