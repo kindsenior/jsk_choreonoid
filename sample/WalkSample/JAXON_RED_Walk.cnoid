@@ -402,6 +402,8 @@ toolbars:
       inputMomentWeightCheck: true
       blockingList: 1,1,1,1,1
       blockingListCheck: true
+      dt: 25
+      dtCheck: true
   "PreviewControl": 
     controlMode: DynamicsFilter
     controlModeCheck: true

@@ -24,9 +24,21 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout
     paramNodes->addParamNode(inputMomentWeightSpin);
     blockSpinVec = new SpinVectorParamWidget();
     paramNodes->addParamNode(blockSpinVec);
+    dtSpin = new SpinParamWidget();
+    paramNodes->addParamNode(dtSpin);
 
     // in order of param setup dialog
     QHBoxLayout* hbox = newRow(vbox);
+    dtSpin->setRange(1,1000);
+    dtSpin->setText("dt [msec]:");
+    dtSpin->setSaveName("dt");
+    dtSpin->setArchiveName("dt");
+    dtSpin->setValue(100);
+    dtSpin->setDecimals(0);
+    dtSpin->addToLayout(hbox);
+    hbox->addStretch();
+
+    hbox = newRow(vbox);
     errorCMWeightSpin->setRange(0,1000000000);
     errorCMWeightSpin->setText("CM:");
     errorCMWeightSpin->setSaveName("CM");

@@ -25,6 +25,7 @@ class MultiContactStabilizerPlugin;
 class MultiContactStabilizerSetupLayout : public ParamSetupLayout
 {
 public:
+    SpinParamWidget* dtSpin;
     SpinParamWidget* errorCMWeightSpin;
     SpinParamWidget* errorMomentumWeightSpin;
     SpinParamWidget* errorAngularMomentumWeightSpin;
