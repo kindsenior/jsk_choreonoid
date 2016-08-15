@@ -34,6 +34,52 @@ public:
     std::string archiveName(){return archiveName_;}
 };
 
+class ParamVector : public ParamNode,
+                    public std::vector<ParamNode*>
+{
+public:
+    ParamVector()
+        : ParamNode(),
+          std::vector<ParamNode*>()
+    {
+    }
+
+    virtual void storeState(Archive& archive)
+    {
+        Listing& listing = *archive.createListing(archiveName_);
+        for(std::vector<ParamNode*>::iterator iter = this->begin(); iter != this->end(); ++iter){
+            (*iter)->storeState((Archive&) listing);
+        }
+    }
+
+    virtual void restoreState(const Archive& archive)
+    {
+        Listing& listing = *archive.findListing(archiveName_);
+        if(listing.isValid() && !listing.empty()){
+            for(std::vector<ParamNode*>::iterator iter = this->begin(); iter != this->end(); ++iter){
+                (*iter)->restoreState((Archive&) listing);
+            }
+        }
+    }
+
+    virtual std::string getParamString()
+    {
+        std::stringstream ss;
+        ss << "_" << archiveName_;
+        for(std::vector<ParamNode*>::iterator iter = this->begin(); iter != this->end(); ++iter){
+            ss << (*iter)->getParamString();
+        }
+        return ss.str();
+    }
+
+    virtual void addParamNode(ParamNode* paramNode)
+    {
+        std::stringstream ss;
+        ss << size() << paramNode->archiveName();
+        this->push_back(paramNode);
+    };
+};
+
 class ParamMap : public ParamNode,
                  public std::map<std::string,ParamNode*>
 {
