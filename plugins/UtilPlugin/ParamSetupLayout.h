@@ -10,7 +10,7 @@ namespace cnoid {
 class ParamSetupLayout : public QVBoxLayout
 {
 protected:
-    ParamNode* paramNodes;
+    ParamNode* paramNodes_;
     CheckBox saveParameterInFileNameCheck_;
 
     QHBoxLayout* newRow()
@@ -25,22 +25,24 @@ protected:
 public:
     ParamSetupLayout()
     {
-        paramNodes = NULL;
+        paramNodes_ = NULL;
     }
+
+    ParamNode* paramNodes(){return paramNodes_;}
 
     virtual void storeState(Archive& archive)
     {
-        if(paramNodes != NULL) paramNodes->storeState(archive);
+        if(paramNodes_ != NULL) paramNodes_->storeState(archive);
     }
     virtual void restoreState(const Archive& archive)
     {
-        if(paramNodes != NULL) paramNodes->restoreState(archive);
+        if(paramNodes_ != NULL) paramNodes_->restoreState(archive);
     }
 
     virtual std::string getParamString()
     {
         std::stringstream ss;
-        if(saveParameterInFileNameCheck_.isChecked() && paramNodes != NULL) ss << paramNodes->getParamString();
+        if(saveParameterInFileNameCheck_.isChecked() && paramNodes_ != NULL) ss << paramNodes_->getParamString();
         return ss.str();
     }
 };

@@ -8,24 +8,24 @@ using namespace cnoid;
 MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout()
     : ParamSetupLayout()
 {
-    paramNodes = new ParamMap();
-    paramNodes->setArchiveName("MCS");
+    paramNodes_ = new ParamMap();
+    paramNodes_->setArchiveName("MCS");
 
     // in order for saving param to file name
     errorCMWeightSpin = new SpinParamWidget();
-    paramNodes->addParamNode(errorCMWeightSpin);
+    paramNodes_->addParamNode(errorCMWeightSpin);
     errorMomentumWeightSpin = new SpinParamWidget();
-    paramNodes->addParamNode(errorMomentumWeightSpin);
+    paramNodes_->addParamNode(errorMomentumWeightSpin);
     errorAngularMomentumWeightSpin = new SpinParamWidget();
-    paramNodes->addParamNode(errorAngularMomentumWeightSpin);
+    paramNodes_->addParamNode(errorAngularMomentumWeightSpin);
     inputForceWeightSpin = new SpinParamWidget();
-    paramNodes->addParamNode(inputForceWeightSpin);
+    paramNodes_->addParamNode(inputForceWeightSpin);
     inputMomentWeightSpin = new SpinParamWidget();
-    paramNodes->addParamNode(inputMomentWeightSpin);
+    paramNodes_->addParamNode(inputMomentWeightSpin);
     blockSpinVec = new SpinVectorParamWidget();
-    paramNodes->addParamNode(blockSpinVec);
+    paramNodes_->addParamNode(blockSpinVec);
     dtSpin = new SpinParamWidget();
-    paramNodes->addParamNode(dtSpin);
+    paramNodes_->addParamNode(dtSpin);
 
     // in order of param setup dialog
     QHBoxLayout* hbox = newRow();
