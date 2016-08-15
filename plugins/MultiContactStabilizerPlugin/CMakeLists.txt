@@ -34,6 +34,7 @@ include(test.cmake)
 set_target_properties(${TARGET}
   PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/choreonoid-${choreonoid_VER})
 
+set(PLUGIN_NAME MultiContactStabilizerPlugin)
 set(headers
 	MultiContactStabilizerBar.h
 	ModelPredictiveController.h
