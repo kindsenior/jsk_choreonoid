@@ -10,23 +10,21 @@ namespace cnoid {
 class ParamSetupLayout : public QVBoxLayout
 {
 protected:
-    QBoxLayout* vbox_;
     ParamNode* paramNodes;
     CheckBox saveParameterInFileNameCheck_;
 
-    QHBoxLayout* newRow(QVBoxLayout* vbox)
+    QHBoxLayout* newRow()
     {
         QHBoxLayout* hbox = new QHBoxLayout();
         hbox->setSpacing(2);
         hbox->setContentsMargins(2, 2, 2, 2);
-        vbox->addLayout(hbox);
+        this->addLayout(hbox);
         return hbox;
     }
 
 public:
-    ParamSetupLayout(QVBoxLayout* vbox)
+    ParamSetupLayout()
     {
-        vbox_ = vbox;
         paramNodes = NULL;
     }
 

@@ -5,8 +5,8 @@
 
 using namespace cnoid;
 
-MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout* vbox)
-    : ParamSetupLayout(vbox)
+MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout()
+    : ParamSetupLayout()
 {
     paramNodes = new ParamMap();
     paramNodes->setArchiveName("MCS");
@@ -28,7 +28,7 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout
     paramNodes->addParamNode(dtSpin);
 
     // in order of param setup dialog
-    QHBoxLayout* hbox = newRow(vbox);
+    QHBoxLayout* hbox = newRow();
     dtSpin->setRange(1,1000);
     dtSpin->setText("dt [msec]:");
     dtSpin->setSaveName("dt");
@@ -38,7 +38,7 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout
     dtSpin->addToLayout(hbox);
     hbox->addStretch();
 
-    hbox = newRow(vbox);
+    hbox = newRow();
     errorCMWeightSpin->setRange(0,1000000000);
     errorCMWeightSpin->setText("CM:");
     errorCMWeightSpin->setSaveName("CM");
@@ -61,7 +61,7 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout
     errorAngularMomentumWeightSpin->addToLayout(hbox);
     hbox->addStretch();
 
-    hbox = newRow(vbox);
+    hbox = newRow();
     inputForceWeightSpin->setText("Force:");
     inputForceWeightSpin->setArchiveName("inputForceWeight");
     inputForceWeightSpin->setSaveName("f");
@@ -76,7 +76,7 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout
     inputMomentWeightSpin->addToLayout(hbox);
     hbox->addStretch();
 
-    hbox = newRow(vbox);
+    hbox = newRow();
     blockSpinVec->setText("Blocking:");
     blockSpinVec->setSaveName("B");
     blockSpinVec->setArchiveName("blockingList");
@@ -85,7 +85,7 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout(QVBoxLayout
     blockSpinVec->addToLayout(hbox);
     hbox->addStretch();
 
-    hbox = newRow(vbox);
+    hbox = newRow();
     saveParameterInFileNameCheck_.setText("Save parameters in file name");
     saveParameterInFileNameCheck_.setChecked(true);
     hbox->addWidget(&saveParameterInFileNameCheck_);
@@ -99,7 +99,8 @@ MultiContactStabilizerSetupDialog::MultiContactStabilizerSetupDialog()
 
     QVBoxLayout* vbox = new QVBoxLayout();
 
-    layout_ = (ParamSetupLayout*) new MultiContactStabilizerSetupLayout(vbox);
+    layout_ = (ParamSetupLayout*) new MultiContactStabilizerSetupLayout();
+    vbox->addLayout(layout_);
 
     QPushButton* okButton = new QPushButton("&Ok");
     okButton->setDefault(true);

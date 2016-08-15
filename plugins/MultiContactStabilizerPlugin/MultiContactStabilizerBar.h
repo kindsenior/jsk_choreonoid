@@ -33,7 +33,7 @@ public:
     SpinParamWidget* inputMomentWeightSpin;
     SpinVectorParamWidget* blockSpinVec;
 
-    MultiContactStabilizerSetupLayout(QVBoxLayout* vbox);
+    MultiContactStabilizerSetupLayout();
 };
 
 class MultiContactStabilizerSetupDialog : public ParamSetupDialog
