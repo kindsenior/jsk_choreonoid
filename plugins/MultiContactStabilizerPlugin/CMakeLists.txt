@@ -36,6 +36,7 @@ set_target_properties(${TARGET}
 
 set(PLUGIN_NAME MultiContactStabilizerPlugin)
 set(headers
+	MultiContactStabilizerPlugin.h
 	MultiContactStabilizerBar.h
 	ModelPredictiveController.h
 	MultiContactStabilizer.h

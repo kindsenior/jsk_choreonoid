@@ -49,6 +49,11 @@
 #include "MultiContactStabilizerBar.h"
 
 namespace cnoid{
+    void generatePreModelPredictiveControlParamDeque(hrp::MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet);
+    void generateContactConstraintParamVec(std::vector<hrp::ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);
+    void generateMultiContactStabilizerParam(hrp::MultiContactStabilizerParam* mcsParam, Vector3d& lastP, BodyPtr body, std::vector<hrp::ContactConstraintParam*>& ccParamVec, double dt);
+    void sweepControl(std::ofstream& ofs, hrp::MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr);
+
     class MultiContactStabilizerBar;
 
     class MultiContactStabilizerPlugin : public Plugin
@@ -80,10 +85,6 @@ namespace cnoid{
         }
     
         virtual bool initialize();
-
-        void generateSeq();
-        void generateContactConstraintParamVec(std::vector<hrp::ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCantidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);
-        void generateMultiContactStabilizerParam(hrp::MultiContactStabilizerParam* mcsParam, BodyPtr body, std::vector<hrp::ContactConstraintParam*>& ccParamVec);
         void execControl();
 
     };
