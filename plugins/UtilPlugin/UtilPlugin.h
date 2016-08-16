@@ -22,6 +22,7 @@
 #include <cnoid/LeggedBodyHelper>
 #include <cnoid/src/Body/Jacobian.h>
 #include <cnoid/Vector3SeqItem>
+#include <cnoid/FileUtil>
 
 namespace cnoid{
 
@@ -37,6 +38,10 @@ struct SubMass
         return *this;
     }
 };
+
+void generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr);
+
+void calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet, BodyPtr body, const PoseSeqPtr& poseSeqPtr);
 
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚

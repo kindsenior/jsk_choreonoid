@@ -8,6 +8,60 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
+// calc COM, Momentum, Angular Momentum
+void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
+{
+    boost::filesystem::path poseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
+    BodyMotionItemPtr bodyMotionItemPtr = poseSeqItemPtr->bodyMotionItem();
+    BodyMotionPtr motion = bodyMotionItemPtr->motion();
+    const int frameRate = motion->frameRate();
+    const double dt = 1.0/frameRate;
+
+    stringstream ss;
+    ss << poseSeqPath.stem().string() << "_initCM_" << frameRate << "fps.dat";
+    ofstream ofs( ((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str() );
+    ofs << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
+
+    Vector3SeqPtr initCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM");
+    Vector3SeqPtr initPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
+    Vector3SeqPtr initLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initL");
+    int numFrames = motion->numFrames();
+    for(int i=0; i < numFrames; ++i){
+        updateBodyState(body, motion, i);
+        body->calcForwardKinematics(true,true);
+
+        Vector3d P,L,CM;
+        CM = body->calcCenterOfMass();
+        body->calcTotalMomentum(P,L);
+        // L -= CM.cross(P);// convert to around CoM
+        L << 0,0,0;
+
+        initCMSeqPtr->at(i) =  CM;
+        initPSeqPtr->at(i) = P;
+        initLSeqPtr->at(i) = L;
+
+        ofs << i*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
+    }
+    setSubItem("initCM", initCMSeqPtr, bodyMotionItemPtr);
+    setSubItem("initP", initPSeqPtr, bodyMotionItemPtr);
+    setSubItem("initL", initLSeqPtr, bodyMotionItemPtr);
+
+    ofs.close();
+}
+
+void cnoid::calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet, BodyPtr body, const PoseSeqPtr& poseSeqPtr)
+{
+    for(PoseSeq::iterator poseIter = (++poseSeqPtr->begin()); poseIter != poseSeqPtr->end(); incContactPose(poseIter,poseSeqPtr,body)){
+        cout << endl << endl;
+        if(!isContactStateChanging(poseIter, poseSeqPtr, body))continue;
+        PosePtr curPosePtr = poseIter->get<Pose>();
+        for(Pose::LinkInfoMap::iterator linkInfoIter = curPosePtr->ikLinkBegin(); linkInfoIter != curPosePtr->ikLinkEnd(); ++linkInfoIter){
+            //接触している且つslaveでない
+            if(linkInfoIter->second.isTouching() && !linkInfoIter->second.isSlave()) contactLinkCandidateSet.insert(body->link(linkInfoIter->first));
+        }
+    }
+}
+
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
 int cnoid::getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
