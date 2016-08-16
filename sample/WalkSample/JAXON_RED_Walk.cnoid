@@ -346,6 +346,23 @@ toolbars:
     snapDistance: 0.025
     penetrationBlockDepth: 0.0005
     lazyCollisionDetectionMode: true
+  "MultiContactStabilizerBar": 
+    saveParameterInFileName: true
+    MCS: 
+      errorCMWeight: 1000
+      errorCMWeightCheck: true
+      errorMomentumWeight: 0.0001
+      errorMomentumWeightCheck: true
+      errorAngularMomentumWeight: 200
+      errorAngularMomentumWeightCheck: true
+      inputForceWeight: 10
+      inputForceWeightCheck: true
+      inputMomentWeight: 20
+      inputMomentWeightCheck: true
+      blockingList: 1,1,1,1,1,1,1,1
+      blockingListCheck: true
+      dt: 25
+      dtCheck: true
   "BodyBar": 
     current: 2
   "LeggedBodyBar": 
@@ -387,23 +404,6 @@ toolbars:
     initialTrajectory: Load
     initialTrajectoryCheck: false
     saveParameterInFileName: false
-  "MultiContactStabilizerBar": 
-    saveParameterInFileName: true
-    MCS: 
-      errorCMWeight: 1e+08
-      errorCMWeightCheck: true
-      errorMomentumWeight: 1
-      errorMomentumWeightCheck: true
-      errorAngularMomentumWeight: 200
-      errorAngularMomentumWeightCheck: true
-      inputForceWeight: 10
-      inputForceWeightCheck: true
-      inputMomentWeight: 20
-      inputMomentWeightCheck: true
-      blockingList: 1,1,1,1,1
-      blockingListCheck: true
-      dt: 25
-      dtCheck: true
   "PreviewControl": 
     controlMode: DynamicsFilter
     controlModeCheck: true
