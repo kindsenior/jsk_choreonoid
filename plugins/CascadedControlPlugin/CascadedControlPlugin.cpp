@@ -75,14 +75,14 @@ void CascadedControlPlugin::execControl()
 
     // childモーション走査
     fnamess.str("");
-    fnamess << mPoseSeqPath.stem().string() << "_refPL" << childMcsLayout->getParamString() << "_" << frameRate << "fps.dat";
+    fnamess << mPoseSeqPath.stem().string() << "_CC_refPL" << childMcsLayout->getParamString() << "_" << frameRate << "fps.dat";
     ofstream ofs;
     ofs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
     sweepControl(ofs, childMcs, body, mBodyMotionItemPtr);
 
     // parentモーション走査
     fnamess.str("");
-    fnamess << mPoseSeqPath.stem().string() << "_refPL" << parentMcsLayout->getParamString() << "_" << frameRate << "fps.dat";
+    fnamess << mPoseSeqPath.stem().string() << "_CC_refPL" << parentMcsLayout->getParamString() << "_" << frameRate << "fps.dat";
     mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
     sweepControl(mOfs, parentMcs, body, mBodyMotionItemPtr);
 
