@@ -22,7 +22,7 @@ public:
 
     // virtual void storeState(Archive& archive)=0;
     // virtual void restoreState(const Archive& archive)=0;
-    virtual void storeState(Archive& archive){};
+    virtual void storeState(Archive& archive){std::cout << "ParamNode::storeState()" << std::endl;}
     virtual void restoreState(const Archive& archive){};
 
     virtual std::string getParamString(){std::cout << "Prease implement getParamString() of each kind of ParamNode()" << std::endl;};
@@ -81,8 +81,6 @@ public:
 
     virtual void addParamNode(ParamNode* paramNode)
     {
-        std::stringstream ss;
-        ss << size() << paramNode->archiveName();
         this->push_back(paramNode);
     };
 };
@@ -107,7 +105,6 @@ public:
 
     virtual void restoreState(const Archive& archive)
     {
-        std::cout << "ParamMap::restoreState()" << std::endl;
         Mapping& mapping = *archive.findMapping(archiveName_);
         if(mapping.isValid() && !mapping.empty()){
             for(std::map<std::string, ParamNode*>::iterator iter = this->begin(); iter != this->end(); ++iter){
