@@ -223,6 +223,51 @@ public:
         parent = NULL;
     }
 
+    int processCycle(float &processedTime)
+    {
+        processedTime = 0;
+        int ret = 0;
+        clock_t st = clock(), et;
+        double tmList[4] = {0,0,0,0};
+
+        if(mpcParamDeque.size() == numWindows()){
+            calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
+            setupQP();
+
+            et = clock();
+            tmList[2] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+            st = et;
+
+            ret = execQP();
+
+            et = clock();
+            tmList[3] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+            st = et;
+
+            updateX0Vector();
+            mpcParamDeque.pop_front();
+        }
+
+        ParamClass* controllerParam =  preMpcParamDeque.front();
+        if(preMpcParamDeque.size() > 1) preMpcParamDeque.pop_front();//cascadeではwait処理に変更
+
+        et = clock();
+        tmList[0] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+        st = et;
+
+        controllerParam->convertToMpcParam();
+        mpcParamDeque.push_back(controllerParam);
+
+        et = clock();
+        tmList[1] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
+        st = et;
+
+        std::cout << "  FK: " << tmList[0] << "[ms]  convert: " << tmList[1] << "[ms]  setup: " << tmList[2] << "[ms]  QP: " << tmList[3]  << "[ms]" << std::endl;
+
+        processedTime = tmList[3];
+        return ret;
+    }
+
     ControllerClass* rootController()
     {
         if(parent != NULL) return parent->rootController();

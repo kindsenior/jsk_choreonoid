@@ -21,7 +21,6 @@ public:
 
     MultiContactStabilizer();
 
-    int processCycle(float &processedTime);
     void setupQP();
     int execQP();
 };
