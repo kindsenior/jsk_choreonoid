@@ -17,8 +17,8 @@ bool MultiContactStabilizerPlugin::initialize()
 
 void cnoid::sweepControl(ofstream& ofs, MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr)
 {
-    const double dt = 1.0/bodyMotionItemPtr->motion()->frameRate();
-    const int numFrames = bodyMotionItemPtr->motion()->numFrames();
+    const double dt = mcs->dt;
+    const int numFrames = bodyMotionItemPtr->motion()->numFrames()*mcs->rootController()->dt/mcs->dt;
 
     float avgTime = 0;
     std::vector<int> failIdxVec;

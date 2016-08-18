@@ -29,12 +29,12 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout()
 
     // in order of param setup dialog
     QHBoxLayout* hbox = newRow();
-    dtSpin->setRange(1,1000);
-    dtSpin->setText("dt [msec]:");
+    dtSpin->setRange(0.001,1);
+    dtSpin->setText("dt [sec]:");
     dtSpin->setSaveName("dt");
     dtSpin->setArchiveName("dt");
     dtSpin->setValue(100);
-    dtSpin->setDecimals(0);
+    dtSpin->setDecimals(3);
     dtSpin->addToLayout(hbox);
     hbox->addStretch();
 
