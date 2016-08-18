@@ -63,6 +63,9 @@ void cnoid::sweepControl(ofstream& ofs, MultiContactStabilizer* mcs, BodyPtr& bo
     for(std::vector<int>::iterator iter = failIdxVec.begin(); iter != failIdxVec.end(); ++iter) cout << "Failed in " << *iter << ":(" << (*iter)*dt << " sec)" << endl;
     if(failIdxVec.empty()) cout << "All QP succeeded" << endl;
     failIdxVec.clear();
+
+    cout << "total time: " << avgTime/1000.0 << "[sec]" << endl;
+    cout << "average time: " << avgTime/numFrames << "[msec]" << endl;
 }
 
 void cnoid::generatePreModelPredictiveControlParamDeque(MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet)
