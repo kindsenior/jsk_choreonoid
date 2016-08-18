@@ -7,7 +7,7 @@ using namespace hrp;
 using namespace std;
 
 MultiContactStabilizer::MultiContactStabilizer()
-    : ModelPredictiveController()
+    : ModelPredictiveController<MultiContactStabilizer, MultiContactStabilizerParam>()
 {
     unitInputDim = 6;// 接触点ごとの入力次元
     stateDim = 6;
@@ -93,13 +93,6 @@ int MultiContactStabilizer::execQP()
 
     ++count;
     return ret;
-}
-
-
-ModelPredictiveControllerParam* MultiContactStabilizer::copyMpcParam(ModelPredictiveController* controller, ModelPredictiveControllerParam* fromMpcParam)
-{
-    MultiContactStabilizerParam* toMpcParam = new MultiContactStabilizerParam((MultiContactStabilizer*) controller, (MultiContactStabilizerParam*)fromMpcParam);
-    return (ModelPredictiveControllerParam*) toMpcParam;
 }
 
 void MultiContactStabilizerParam::calcSystemMatrix()

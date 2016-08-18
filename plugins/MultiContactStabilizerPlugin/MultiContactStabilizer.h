@@ -9,11 +9,9 @@ namespace hrp {
 
 class Test;
 class MultiContactStabilizerParam;
-class MultiContactStabilizer : public ModelPredictiveController
+class MultiContactStabilizer : public ModelPredictiveController<MultiContactStabilizer, MultiContactStabilizerParam>
 {
     friend class OneMCSTest;
-protected:
-    ModelPredictiveControllerParam* copyMpcParam(ModelPredictiveController* controller, ModelPredictiveControllerParam* fromMpcParam);
 
 public:
     double m;
@@ -28,15 +26,13 @@ public:
     int execQP();
 };
 
-class MultiContactStabilizerParam : public ModelPredictiveControllerParam
+class MultiContactStabilizerParam : public ModelPredictiveControllerParam<MultiContactStabilizer,MultiContactStabilizerParam>
 {
 private:
     int unitInputDim;
 
     void calcMatrix(void (ContactConstraintParam::*func)(void));
     void calcVector(void (ContactConstraintParam::*func)(void));
-
-    MultiContactStabilizer* controller(){return (MultiContactStabilizer*)controller_;}
 
 public:
     std::vector<ContactConstraintParam*> ccParamVec;
@@ -48,7 +44,7 @@ public:
     Vector3 F;
 
     MultiContactStabilizerParam(MultiContactStabilizer* mcs, MultiContactStabilizerParam* mcsParam)
-        : ModelPredictiveControllerParam()
+        : ModelPredictiveControllerParam<MultiContactStabilizer, MultiContactStabilizerParam>()
     {
         if(mcsParam != NULL) *this = *mcsParam;
         controller_ = mcs;
@@ -57,7 +53,7 @@ public:
     }
 
     MultiContactStabilizerParam(int index, MultiContactStabilizer* mcs, MultiContactStabilizerParam* mcsParam)
-        : ModelPredictiveControllerParam()
+        : ModelPredictiveControllerParam<MultiContactStabilizer, MultiContactStabilizerParam>()
     {
         *this = MultiContactStabilizerParam(mcs, mcsParam);
         index_ = index;
@@ -65,7 +61,7 @@ public:
 
 
     MultiContactStabilizerParam(int index, MultiContactStabilizer* mcs)
-        : ModelPredictiveControllerParam()
+        : ModelPredictiveControllerParam<MultiContactStabilizer, MultiContactStabilizerParam>()
     {
         *this = MultiContactStabilizerParam(index, mcs, NULL);
     }

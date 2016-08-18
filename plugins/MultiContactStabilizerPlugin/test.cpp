@@ -12,7 +12,7 @@ void OneMCSTest::testAugmentedMatrix()
 
     mcs->calcAugmentedMatrix();
 
-    std::deque<ModelPredictiveControllerParam*> mpcParamDeque =  mcs->mpcParamDeque;
+    typename std::deque<MultiContactStabilizerParam*> mpcParamDeque =  mcs->mpcParamDeque;
     int stateDim = mcs->stateDim;
     dvector U(mcs->psiCols);
     dvector xk(stateDim);
@@ -20,7 +20,7 @@ void OneMCSTest::testAugmentedMatrix()
     dvector x0(stateDim);
     x0 = mcs->x0;
     int colIdx = 0;
-    for(std::deque<ModelPredictiveControllerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
+    for(typename std::deque<MultiContactStabilizerParam*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
         int idx = std::distance(mpcParamDeque.begin(), iter);
         dmatrix inputMat = (*iter)->inputMat;
         int inputDim = inputMat.cols();
