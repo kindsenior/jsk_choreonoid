@@ -48,7 +48,8 @@ public:
     {
         Listing& listing = *archive.createListing(archiveName_);
         for(std::vector<ParamNode*>::iterator iter = this->begin(); iter != this->end(); ++iter){
-            (*iter)->storeState((Archive&) listing);
+            Mapping& mapping  = *listing.newMapping();
+            (*iter)->storeState((Archive&) mapping);
         }
     }
 
@@ -56,8 +57,14 @@ public:
     {
         Listing& listing = *archive.findListing(archiveName_);
         if(listing.isValid() && !listing.empty()){
-            for(std::vector<ParamNode*>::iterator iter = this->begin(); iter != this->end(); ++iter){
-                (*iter)->restoreState((Archive&) listing);
+            Listing::iterator listingIter = listing.begin();
+            for(std::vector<ParamNode*>::iterator iter = this->begin(); iter != this->end(); ++iter,++listingIter){
+                if(listingIter == listing.end()){
+                    (*iter)->restoreState((Archive&) *listing.newMapping());
+                }
+                else{
+                    (*iter)->restoreState((Archive&) *(*listingIter)->toMapping());
+                }
             }
         }
     }
