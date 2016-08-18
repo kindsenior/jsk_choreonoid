@@ -85,7 +85,6 @@ protected:
     dmatrix HMat;
     dvector gVec;
 
-    ModelPredictiveController* rootController();
     virtual ModelPredictiveControllerParam* copyMpcParam(ModelPredictiveController* container, ModelPredictiveControllerParam* fromMpcParam) = 0;
 
 private:
@@ -112,6 +111,7 @@ public:
 
     ModelPredictiveController();
 
+    ModelPredictiveController* rootController();
     int numWindows(){return numWindows_;}
     void setBlockVector(std::vector<int> vec)
     {
