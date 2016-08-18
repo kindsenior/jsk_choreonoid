@@ -36,13 +36,13 @@ public:
         setChecked(true);
     }
 
-    void storeState(Archive& archive)
+    virtual void storeState(Archive& archive)
     {
         // std::string archiveName = archiveName();// no mathing function call?
         archive.write(archiveName_, getParam());
         archive.write(archiveName_+"Check", isChecked());
     };
-    void restoreState(const Archive& archive)
+    virtual void restoreState(const Archive& archive)
     {
         // std::string archiveName = archiveName();// no matching function call?
         setParam(archive.get(archiveName_, getParam()));
