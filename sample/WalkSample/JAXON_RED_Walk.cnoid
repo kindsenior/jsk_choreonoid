@@ -331,7 +331,7 @@ toolbars:
   "TimeBar": 
     minTime: 0
     maxTime: 12000
-    frameRate: 40
+    frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
     currentTime: 0
@@ -408,6 +408,41 @@ toolbars:
     controlMode: DynamicsFilter
     controlModeCheck: true
     saveParameterInFileName: true
+  "CascadedControlBar": 
+    saveParameterInFileName: false
+    CC: 
+      - 
+        MCS: 
+          errorCMWeight: 1e+08
+          errorCMWeightCheck: true
+          errorMomentumWeight: 1
+          errorMomentumWeightCheck: true
+          errorAngularMomentumWeight: 200
+          errorAngularMomentumWeightCheck: true
+          inputForceWeight: 10
+          inputForceWeightCheck: true
+          inputMomentWeight: 20
+          inputMomentWeightCheck: true
+          blockingList: 1,1,1,1,1
+          blockingListCheck: true
+          dt: 0.002
+          dtCheck: true
+      - 
+        MCS: 
+          errorCMWeight: 1000
+          errorCMWeightCheck: true
+          errorMomentumWeight: 0.0001
+          errorMomentumWeightCheck: true
+          errorAngularMomentumWeight: 200
+          errorAngularMomentumWeightCheck: true
+          inputForceWeight: 10
+          inputForceWeightCheck: true
+          inputMomentWeight: 20
+          inputMomentWeightCheck: true
+          blockingList: 1,1,1,1,1,1,1
+          blockingListCheck: true
+          dt: 0.1
+          dtCheck: true
 Body: 
   "BodyMotionEngine": 
     updateJointVelocities: false
