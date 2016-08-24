@@ -87,7 +87,7 @@ public:
     }
 };
 
-class SimpleContactConstraintParam : public ContactConstraintParam
+class SimpleContactConstraintParam : virtual public ContactConstraintParam
 {
 protected:
     void initialize()
@@ -232,6 +232,25 @@ public:
         inputWeightConvertMat = inputForceConvertMat;
         inputWeightConvertMat.block(3,0, 2,inputDim) = dmatrix::Zero(2,inputDim);
     };
+};
+
+class DistributedForceStaticContactConstraintParam : public StaticContactConstraintParam,
+                                                     public DistributedForceContactConstraintParam
+{
+public:
+    DistributedForceStaticContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, const int rows, const int cols, const double mu_)
+        : ContactConstraintParam(linkName_, vertexVec_),
+          StaticContactConstraintParam(linkName_, vertexVec_, mu_),
+          DistributedForceContactConstraintParam(linkName_, vertexVec_, rows, cols)
+    {
+        numInequals = 4 + edgeVec.size();// overwrite DFCCP
+    }
+
+    void calcInequalMatrix(){StaticContactConstraintParam::calcInequalMatrix();}
+    void calcInequalMinimumVector(){StaticContactConstraintParam::calcInequalMinimumVector();}
+    void calcInequalMaximumVector(){StaticContactConstraintParam::calcInequalMaximumVector();}
+    void calcMinimumVector(){DistributedForceContactConstraintParam::calcMinimumVector();}
+    void calcMaximumVector(){StaticContactConstraintParam::calcMaximumVector();}
 };
 
 }
