@@ -39,7 +39,6 @@ namespace cnoid{
         Vector3SeqPtr mRefCMSeqPtr, mRefPSeqPtr, mRefLSeqPtr;
         std::ofstream mOfs;
         hrp::SlideFrictionControl* sfc;
-        Vector3d lastP;
         std::vector<int> failIdxVec;
 
     public:
