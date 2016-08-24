@@ -15,7 +15,6 @@ class SlideFrictionControl : public ModelPredictiveController<SlideFrictionContr
 
 public:
     double m;
-    int unitInputDim;// 接触点ごとの入力次元
     double errorCMWeight,errorMomentumWeight,errorAngularMomentumWeight;
     double inputForceWeight,inputMomentWeight;
 
@@ -28,8 +27,6 @@ public:
 class SlideFrictionControlParam : public ModelPredictiveControllerParam<SlideFrictionControl,SlideFrictionControlParam>
 {
 private:
-    int unitInputDim;
-
     void calcMatrix(void (ContactConstraintParam::*func)(void));
     void calcVector(void (ContactConstraintParam::*func)(void));
 
@@ -48,7 +45,6 @@ public:
         if(sfcParam != NULL) *this = *sfcParam;
         controller_ = sfc;
         stateDim = controller()->stateDim;
-        unitInputDim = controller()->unitInputDim;
     }
 
     SlideFrictionControlParam(int index, SlideFrictionControl* sfc, SlideFrictionControlParam* sfcParam)

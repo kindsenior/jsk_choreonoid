@@ -11,17 +11,25 @@ using namespace boost;
 // calcInequalMatrix
 void SimpleContactConstraintParam::calcInequalMatrix()
 {
-    inequalMat = dmatrix::Zero(numInequals,unitInputDim);
+    inequalMat = dmatrix::Zero(numInequals,inputDim);
     for(std::vector<Vector3>::iterator iter = edgeVec.begin(); iter != edgeVec.end(); ++iter){
         int idx = std::distance(edgeVec.begin(), iter);
-        inequalMat.block(idx,0, 1,6) << 0,0,(*iter)[2], (*iter)[1],-(*iter)[0],0;
+        dmatrix tmpMat(1,inputForceDim);// 1x6
+        tmpMat << 0,0,(*iter)[2], (*iter)[1],-(*iter)[0],0;
+        inequalMat.block(idx,0, 1,inputDim) << tmpMat*inputForceConvertMat;
     }
 }
 
 void StaticContactConstraintParam::calcInequalMatrix()
 {
     SimpleContactConstraintParam::calcInequalMatrix();
-    inequalMat.block(edgeVec.size(),0, 4,3) << -1,0,muTrans, 0,-1,muTrans, 1,0,muTrans, 0,1,muTrans;
+    dmatrix tmpMat(4,inputForceDim);
+    tmpMat <<
+        -1,0,muTrans, 0,0,0,
+        0,-1,muTrans, 0,0,0,
+        1,0,muTrans,  0,0,0,
+        0,1,muTrans,  0,0,0;
+    inequalMat.block(edgeVec.size(),0, 4,inputDim) = tmpMat*inputForceConvertMat;
 }
 
 void SlideContactConstraintParam::calcInequalMatrix()
@@ -52,12 +60,19 @@ void SlideContactConstraintParam::calcInequalMaximumVector()
 // clacMinimumVector
 void SimpleContactConstraintParam::calcMinimumVector()
 {
-    minVec = dvector::Constant(unitInputDim,-INFINITY);
+    minVec = dvector::Constant(inputDim,-INFINITY);
     minVec(2) = 0;
+}
+
+void DistributedForceContactConstraintParam::calcMinimumVector()
+{
+    // std::cout << "calcMinimumVector(" << linkName << ")" << std::endl;
+    minVec = dvector::Constant(inputDim,-INFINITY);
+    minVec.tail(distributedNum) = dvector::Zero(distributedNum);// fx,fy,tauz, fz0,fz1,...
 }
 
 // calcMaximumVector
 void SimpleContactConstraintParam::calcMaximumVector()
 {
-    maxVec = dvector::Constant(unitInputDim,INFINITY);
+    maxVec = dvector::Constant(inputDim,INFINITY);
 }

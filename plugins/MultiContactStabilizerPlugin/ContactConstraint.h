@@ -15,10 +15,10 @@ namespace hrp {
 class ContactConstraintParam
 {
 protected:
-    int unitInputDim;
+    int inputForceDim;
 
 public:
-    int contactState;
+    int inputDim;
     int numEquals;
     int numInequals;
     std::string linkName;
@@ -32,6 +32,9 @@ public:
     dvector inequalMaxVec;
     dvector minVec;
     dvector maxVec;
+
+    dmatrix inputForceConvertMat;
+    dmatrix inputWeightConvertMat;
 
     virtual void calcEqualMatrix(){equalMat.resize(0,0);};
     virtual void calcEqualVector(){equalVec.resize(0);};
@@ -49,9 +52,18 @@ public:
 
 class SimpleContactConstraintParam : public ContactConstraintParam
 {
-public:
-    std::vector<Vector3> edgeVec;
+protected:
+    void initialize()
+    {
+        inputForceDim = 6;// 6軸力
+        inputDim = inputForceDim;// 6軸力
+        numEquals = 0;
+        numInequals = edgeVec.size();
+        inputForceConvertMat = dmatrix::Identity(inputForceDim,inputDim);
+        inputWeightConvertMat = dmatrix::Identity(inputForceDim,inputDim);
+    }
 
+public:
     virtual void calcInequalMatrix();
     virtual void calcInequalMinimumVector();
     virtual void calcInequalMaximumVector();
@@ -61,10 +73,7 @@ public:
     SimpleContactConstraintParam(const std::string linkName_, const std::vector<Vector3>& edgeVec_)
         : ContactConstraintParam(linkName_)
     {
-        unitInputDim = 6;
-        numEquals = 0;
-        edgeVec = edgeVec_;
-        numInequals = edgeVec.size();
+        initialize();
     };
 };
 
@@ -85,6 +94,17 @@ public:
 
 class SlideContactConstraintParam : public SimpleContactConstraintParam
 {
+protected:
+    void initialize()
+    {
+        inputForceDim = 6;// 6軸力
+        inputDim = inputForceDim;// 6軸力
+        numEquals = 0;
+        numInequals = edgeVec.size();
+        inputForceConvertMat = dmatrix::Identity(inputForceDim,inputDim);
+        inputWeightConvertMat = dmatrix::Identity(inputForceDim,inputDim);
+    }
+
 public:
     double muTrans, muRot;
     Vector3 direction;

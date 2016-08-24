@@ -9,8 +9,7 @@ using namespace std;
 SlideFrictionControl::SlideFrictionControl()
     : ModelPredictiveController<SlideFrictionControl, SlideFrictionControlParam>()
 {
-    unitInputDim = 6;// 接触点ごとの入力次元
-    stateDim = 7;//changed
+    stateDim = 7;//changed add Lz
 }
 
 void SlideFrictionControl::setupQP()
@@ -66,26 +65,30 @@ void SlideFrictionControlParam::calcInputMatrix()
 {
     double dt = controller()->dt;
     inputMat = dmatrix::Zero(stateDim,inputDim);
+    int inputForceDim = 6;
+
+    int colIdx = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        int idx = std::distance(ccParamVec.begin(), iter);
         Matrix33 R = (*iter)->R;
         Vector3 p = (*iter)->p;
 
-        dmatrix R2 = dmatrix::Zero(unitInputDim,unitInputDim);
+        dmatrix R2 = dmatrix::Zero(inputForceDim,inputForceDim);
         R2.block(0,0,3,3) = R;
         R2.block(3,3,3,3) = R;
-        dmatrix unitInputMat = dmatrix(stateDim,unitInputDim);// B_k^i
+        dmatrix unitInputMat = dmatrix(stateDim,inputForceDim);// B_k^i
         double T2_2 = dt*dt/2;
         double beta = dt*(p(2)-CM(2));
-        unitInputMat <<
+        dmatrix tmpMat(stateDim,inputForceDim);// statedim x inputForceDim
+        tmpMat <<
             T2_2,0, 0,       0, 0,0,
             dt,  0, 0,       0, 0,0,
             0,T2_2, 0,       0, 0,0,
             0,dt,   0,       0, 0,0,
             0,-beta,dt*p(1), dt,0,0,
             beta,0,-dt*p(0), 0,dt,0,
-            0,0,0,           0,0,dt;//changed
-        inputMat.block(0,unitInputDim*idx, stateDim,unitInputDim) = unitInputMat*R2;// product input conversion matrix (distribution->6dof force)
+            0,0,0,           0,0,dt;//changed add Lz
+        inputMat.block(0,colIdx, stateDim,(*iter)->inputDim) = tmpMat*R2*(*iter)->inputForceConvertMat;// product input conversion matrix (distribution->6dof force)
+        colIdx += (*iter)->inputDim;
     }
 }
 
@@ -113,8 +116,8 @@ void SlideFrictionControlParam::calcEqualConstraints()
     equalVec(rowIdx) = F(2);
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         Matrix33 R = (*iter)->R;
-        equalMat.block(rowIdx,colIdx, 1,3) = R.block(2,0,1,3);//fz product input convertion matrix (fx0,fy0,fz0?)
-        colIdx += unitInputDim;
+        equalMat.block(rowIdx,colIdx, 1,(*iter)->inputDim) = R.block(2,0,1,3) * (*iter)->inputForceConvertMat.block(0,0, 3,(*iter)->inputDim);//fz product input convertion matrix (fx,fy,fzi)
+        colIdx += (*iter)->inputDim;
     }
     ++rowIdx;
 
@@ -155,7 +158,7 @@ void SlideFrictionControlParam::calcRefStateVector()
 {
     const double m = controller()->m;
     dvector tmpVec(stateDim);
-    tmpVec << m*CM(0),P(0), m*CM(1),P(1), L(0),L(1);
+    tmpVec << m*CM(0),P(0), m*CM(1),P(1), L(0),L(1),L(2);//Lz
     setRefStateVector(tmpVec);
 }
 
@@ -163,27 +166,32 @@ void SlideFrictionControlParam::calcErrorWeightVector()
 {
     errorWeightVec = dvector(stateDim);
     double errorCMWeight = controller()->errorCMWeight, errorMomentumWeight = controller()->errorMomentumWeight, errorAngularMomentumWeight = controller()->errorAngularMomentumWeight;
-    errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight;
+    errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight,errorAngularMomentumWeight;// Lz
 }
 
 void SlideFrictionControlParam::calcInputWeightVector()
 {
     inputWeightVec = dvector(inputDim);
     double inputForceWeight = controller()->inputForceWeight, inputMomentWeight = controller()->inputMomentWeight;
+    int colIdx = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        int idx = std::distance(ccParamVec.begin(), iter);
-        inputWeightVec.block(unitInputDim*idx,0, unitInputDim,1) << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;
+        dvector tmpVec(6);
+        tmpVec << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;// fx,fy,fz, nx,ny,nz
+        // inputWeightVec.block(colIdx,0, (*iter)->inputDim,1) << cnoid::PseudoInverse((*iter)->inputForceConvertMat)*tmpVec;// implement or find psuedo inverse
+        inputWeightVec.block(colIdx,0, (*iter)->inputDim,1) << cnoid::PseudoInverse((*iter)->inputWeightConvertMat)*tmpVec;// implement or find psuedo inverse
+        colIdx += (*iter)->inputDim;
     }
 }
 
 void SlideFrictionControlParam::convertToMpcParam()
 {
-    inputDim = unitInputDim*ccParamVec.size();// 6*M_k
+    inputDim = 0;
     numEquals = 1;//Fzの合計
     numInequals = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         numEquals += (*iter)->numEquals;
         numInequals += (*iter)->numInequals;
+        inputDim += (*iter)->inputDim;
     }
 
     calcEqualConstraints();
