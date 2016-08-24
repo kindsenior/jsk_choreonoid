@@ -177,7 +177,6 @@ void SlideFrictionControlParam::calcInputWeightVector()
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         dvector tmpVec(6);
         tmpVec << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;// fx,fy,fz, nx,ny,nz
-        // inputWeightVec.block(colIdx,0, (*iter)->inputDim,1) << cnoid::PseudoInverse((*iter)->inputForceConvertMat)*tmpVec;// implement or find psuedo inverse
         inputWeightVec.block(colIdx,0, (*iter)->inputDim,1) << cnoid::PseudoInverse((*iter)->inputWeightConvertMat)*tmpVec;// implement or find psuedo inverse
         colIdx += (*iter)->inputDim;
     }
