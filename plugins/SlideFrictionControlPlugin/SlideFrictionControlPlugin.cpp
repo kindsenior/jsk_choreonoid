@@ -73,11 +73,11 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     const int frameRate = motion->frameRate();
     const int numFrames = motion->numFrames();
     const double dt = 1.0/motion->frameRate();
-    Vector3d lastP, tmpL;
+    Vector3d lastMomentum, tmpL;
     updateBodyState(body, motion, 0);
     body->calcForwardKinematics(true, true);
     body->calcCenterOfMass();
-    body->calcTotalMomentum(lastP,tmpL);
+    body->calcTotalMomentum(lastMomentum,tmpL);
 
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
     int index = 0;
@@ -94,7 +94,7 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
 
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
             // 動作軌道に依存するパラメータの設定
-            generateSlideFrictionControlParam(sfcParam, lastP, body, ccParamVec, dt);
+            generateSlideFrictionControlParam(sfcParam, lastMomentum, body, ccParamVec, dt);
 
             sfc->preMpcParamDeque.push_back((SlideFrictionControlParam*) sfcParam);
             ++index;
@@ -126,7 +126,7 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
     }
 }
 
-void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d& lastP,  BodyPtr body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
+void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d& lastMomentum, BodyPtr body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
 {
 
     static Vector3 g;
@@ -141,7 +141,7 @@ void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcPara
     sfcParam->P = P;
     // sfcParam->L = L;
     sfcParam->L << 0,0,0;
-    sfcParam->F = (P - lastP)/dt + body->mass()*g;
+    sfcParam->F = (P - lastMomentum)/dt + body->mass()*g;
 
     // 接触点座標系の更新 等式と不等式数の合計
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
@@ -150,7 +150,7 @@ void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcPara
     }
     sfcParam->ccParamVec = ccParamVec;
 
-    lastP = P;
+    lastMomentum = P;
 }
 
 void SlideFrictionControlPlugin::execControl()
