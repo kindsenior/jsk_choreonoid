@@ -175,4 +175,63 @@ public:
     }
 };
 
+class DistributedForceContactConstraintParam : public SimpleContactConstraintParam
+{
+protected:
+    Vector2 startVertex;
+    Vector2 diagonalVec;
+    int nonDistributedDim;
+    int distributedNum;
+
+public:
+    std::vector<Vector3> forcePointVec;// in local coordinate
+
+    virtual void calcMinimumVector();
+
+    DistributedForceContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, int rows, int cols)
+        : ContactConstraintParam(linkName_, vertexVec_),
+          SimpleContactConstraintParam(linkName_, vertexVec_)
+    {
+        inputForceDim = 6;// 6軸
+        distributedNum = (rows+1)*(cols+1);// distributed fz
+        nonDistributedDim = inputForceDim - 3; // 3 (fx,fy,tauz)
+        inputDim = nonDistributedDim + distributedNum;// input dimension
+
+        // forcePointVec
+        startVertex = vertexVec.front();
+        diagonalVec = Vector2::Zero();
+        for(std::vector<Vector2>::iterator iter = vertexVec.begin(); iter != vertexVec.end(); ++iter){
+            if((*iter - startVertex).norm() > diagonalVec.norm()) diagonalVec = *iter - startVertex;
+        }
+        double xStep = diagonalVec[0]/rows, yStep = diagonalVec[1]/cols;
+        for(int i=0; i<rows+1; ++i){
+            for(int j=0; j<cols+1; ++j){
+                Vector3 forcePoint;
+                forcePoint << startVertex[0]+xStep*i, startVertex[1]+yStep*j, 0;
+                forcePointVec.push_back(forcePoint);
+            }
+        }
+
+        // inputForceConvertMat
+        inputForceConvertMat = dmatrix::Zero(inputForceDim, inputDim);
+        inputForceConvertMat.block(0,0, inputForceDim,nonDistributedDim) <<
+            1,0,0,// fx
+            0,1,0,// fy
+            0,0,0,// fz   distributed
+            0,0,0,// taux distributed
+            0,0,0,// tauy distributed
+            0,0,1;// tauz
+        inputForceConvertMat.block(2,nonDistributedDim, 1,distributedNum) = dmatrix::Ones(1,distributedNum);
+        int idx = 0;
+        for(std::vector<Vector3>::iterator iter = forcePointVec.begin(); iter != forcePointVec.end(); ++iter){
+            inputForceConvertMat.block(3,nonDistributedDim+idx, 2,1) << (*iter)[1], -(*iter)[0];
+            ++idx;
+        }
+
+        // inputWeightConvertMat
+        inputWeightConvertMat = inputForceConvertMat;
+        inputWeightConvertMat.block(3,0, 2,inputDim) = dmatrix::Zero(2,inputDim);
+    };
+};
+
 }
