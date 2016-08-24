@@ -24,7 +24,6 @@ void SlideFrictionControl::setupQP()
     // blockMat.transpose()*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat, blockMat.transpose()*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refXVec),// 1_6 2_7
     // blockMatInv*(psiMat.transpose()*errorWeightMat*psiMat + inputWeightMat)*blockMat2, blockMatInv*psiMat.transpose()*errorWeightMat*(phiMat*x0 - refXVec),
 
-
     qpInterface.equalMat = equalMat; qpInterface.equalVec = equalVec;
     qpInterface.inequalMat = inequalMat; qpInterface.inequalMinVec = inequalMinVec; qpInterface.inequalMaxVec = inequalMaxVec;
     qpInterface.minVec = minVec; qpInterface.maxVec = maxVec;
