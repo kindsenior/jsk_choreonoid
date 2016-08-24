@@ -108,17 +108,12 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
         int linkIdx = (*linkIter)->index();
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
         if(contactState < 2){// 接触フラグが0か1 要改良
-            std::vector<hrp::Vector3> edgeVec;
-            hrp::Vector3 edge;// 要改良 直線の係数a,b,cを代入
-            edge << -1, 0, 0.1;
-            edgeVec.push_back(edge);
-            edge << 1, 0, 0.1;
-            edgeVec.push_back(edge);
-            edge << 0, -1, 0.05;
-            edgeVec.push_back(edge);
-            edge << 0, 1, 0.05;
-            edgeVec.push_back(edge);
-
+            std::vector<hrp::Vector2> vertexVec;
+            hrp::Vector2 vertex;// 頂点の2次元座標を代入
+            vertex << 0.1,0.05; vertexVec.push_back(vertex);
+            vertex << 0.1,-0.05; vertexVec.push_back(vertex);
+            vertex << -0.1,0.05; vertexVec.push_back(vertex);
+            vertex << -0.1,-0.05; vertexVec.push_back(vertex);
             ContactConstraintParam* ccParam;
             if(contactState == 0){// static contact
                 // ccParam = (SimpleContactConstraintParam*) new SimpleContactConstraintParam((*linkIter)->name(), edgeVec);
