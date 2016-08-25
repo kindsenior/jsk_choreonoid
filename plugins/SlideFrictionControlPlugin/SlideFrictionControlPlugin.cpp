@@ -114,14 +114,15 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
             vertex << 0.1,-0.05; vertexVec.push_back(vertex);
             vertex << -0.1,0.05; vertexVec.push_back(vertex);
             vertex << -0.1,-0.05; vertexVec.push_back(vertex);
-            ContactConstraintParam* ccParam;
             if(contactState == 0){// static contact
-                // ccParam = (SimpleContactConstraintParam*) new SimpleContactConstraintParam((*linkIter)->name(), edgeVec);
-                ccParam = (StaticContactConstraintParam*) new StaticContactConstraintParam((*linkIter)->name(), edgeVec, 0.5);// 摩擦係数 要改良
+                // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), edgeVec));
+                // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
+                // ccParamVec.push_back(new DistributedForceContactConstraintParam((*linkIter)->name(), vertexVec, 2,2));
+                ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));// 摩擦係数 要改良
             }else if(contactState == 1){// slide contact
-                ccParam = (SlideContactConstraintParam*) new SlideContactConstraintParam((*linkIter)->name(), edgeVec, 0.5, getPrevDirection(poseIter, poseSeqPtr, linkIdx));
+                // ccParamVec.push_back(new SlideContactConstraintParam((*linkIter)->name(), vertexVec, 0.5, getPrevDirection(poseIter, poseSeqPtr, linkIdx)));
+                ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));
             }
-            ccParamVec.push_back(ccParam);
         }
     }
 }
@@ -149,8 +150,24 @@ void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcPara
         (*iter)->R = body->link((*iter)->linkName)->R();
         (*iter)->v = body->link((*iter)->linkName)->v();
         (*iter)->w = body->link((*iter)->linkName)->w();
+
+        if(typeid(**iter) == typeid(SimpleContactConstraintParam)){
+            sfcParam->ccParamVec.push_back(new SimpleContactConstraintParam(dynamic_cast<SimpleContactConstraintParam*>(*iter)));
+        }else if(typeid(**iter) == typeid(StaticContactConstraintParam)){
+            sfcParam->ccParamVec.push_back(new StaticContactConstraintParam(dynamic_cast<StaticContactConstraintParam*>(*iter)));
+        }else if(typeid(**iter) == typeid(SlideContactConstraintParam)){
+            sfcParam->ccParamVec.push_back(new SlideContactConstraintParam(dynamic_cast<SlideContactConstraintParam*>(*iter)));
+        }else if(typeid(**iter) == typeid(DistributedForceContactConstraintParam)){
+            sfcParam->ccParamVec.push_back(new DistributedForceContactConstraintParam(dynamic_cast<DistributedForceContactConstraintParam*>(*iter)));
+        }else if(typeid(**iter) == typeid(DistributedForceStaticContactConstraintParam)){
+            sfcParam->ccParamVec.push_back(new DistributedForceStaticContactConstraintParam(dynamic_cast<DistributedForceStaticContactConstraintParam*>(*iter)));
+        }else if(typeid(**iter) == typeid(DistributedForceSlideContactConstraintParam)){
+            sfcParam->ccParamVec.push_back(new DistributedForceSlideContactConstraintParam(dynamic_cast<DistributedForceSlideContactConstraintParam*>(*iter)));
+        }else{
+            cout << "Warning! ContactConstraintParam's pointer Copy Constructor called" << endl;
+            sfcParam->ccParamVec.push_back(new ContactConstraintParam(dynamic_cast<ContactConstraintParam*>(*iter)));
+        }
     }
-    sfcParam->ccParamVec = ccParamVec;
 
     lastMomentum = P;
 }

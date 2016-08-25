@@ -73,6 +73,12 @@ public:
     virtual void calcMinimumVector(){minVec.resize(0);};
     virtual void calcMaximumVector(){maxVec.resize(0);};
 
+    // copy constructor of pointer
+    explicit ContactConstraintParam(const ContactConstraintParam* ccParam)
+    {
+        *this = *ccParam;
+    }
+
     ContactConstraintParam(const std::string linkName_, const std::vector<Vector3> edgeVec_)
     {
         linkName = linkName_;
@@ -107,6 +113,12 @@ public:
     virtual void calcMinimumVector();
     virtual void calcMaximumVector();
 
+    explicit SimpleContactConstraintParam(const SimpleContactConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec)
+    {
+        *this = *ccParam;
+    }
+
     SimpleContactConstraintParam(const std::string linkName_, const std::vector<Vector3> edgeVec_)
         : ContactConstraintParam(linkName_, edgeVec_)
     {
@@ -134,6 +146,13 @@ public:
 
     void calcInequalMatrix();
 
+    explicit StaticContactConstraintParam(const StaticContactConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
+          SimpleContactConstraintParam(ccParam->linkName, ccParam->vertexVec)
+    {
+        *this = *ccParam;
+    }
+
     StaticContactConstraintParam(const std::string linkName_, const std::vector<Vector3> edgeVec_, const double mu_)
         : ContactConstraintParam(linkName_, edgeVec_),
           SimpleContactConstraintParam(linkName_, edgeVec_)
@@ -157,6 +176,13 @@ public:
 
     void calcInequalMatrix();
     void calcInequalMaximumVector();
+
+    explicit SlideContactConstraintParam(const SlideContactConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
+          SimpleContactConstraintParam(ccParam->linkName, ccParam->vertexVec)
+    {
+        *this = *ccParam;
+    }
 
     SlideContactConstraintParam(const std::string linkName_, const std::vector<Vector3> edgeVec_, const double mu_, const Vector3& direction_)
         : ContactConstraintParam(linkName_, edgeVec_),
@@ -188,6 +214,13 @@ public:
     std::vector<Vector3> forcePointVec;// in local coordinate
 
     virtual void calcMinimumVector();
+
+    explicit DistributedForceContactConstraintParam(const DistributedForceContactConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
+          SimpleContactConstraintParam(ccParam->linkName, ccParam->vertexVec)
+    {
+        *this = *ccParam;
+    }
 
     DistributedForceContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, int rows, int cols)
         : ContactConstraintParam(linkName_, vertexVec_),
@@ -241,6 +274,14 @@ class DistributedForceStaticContactConstraintParam : public StaticContactConstra
                                                      public DistributedForceContactConstraintParam
 {
 public:
+    explicit DistributedForceStaticContactConstraintParam(const DistributedForceStaticContactConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
+          StaticContactConstraintParam(ccParam->linkName, ccParam->vertexVec, ccParam->muTrans),
+          DistributedForceContactConstraintParam(ccParam->linkName, ccParam->vertexVec, ccParam->rows_, ccParam->cols_)
+    {
+        *this = *ccParam;
+    }
+
     DistributedForceStaticContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, const int rows, const int cols, const double mu_)
         : ContactConstraintParam(linkName_, vertexVec_),
           StaticContactConstraintParam(linkName_, vertexVec_, mu_),
