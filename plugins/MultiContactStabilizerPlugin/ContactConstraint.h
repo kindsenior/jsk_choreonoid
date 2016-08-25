@@ -256,4 +256,28 @@ public:
     void calcMaximumVector(){StaticContactConstraintParam::calcMaximumVector();}
 };
 
+class DistributedForceSlideContactConstraintParam : public DistributedForceContactConstraintParam
+{
+public:
+    double muTrans;
+
+    explicit DistributedForceSlideContactConstraintParam(const DistributedForceSlideContactConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
+          DistributedForceContactConstraintParam(ccParam->linkName, ccParam->vertexVec, ccParam->rows_, ccParam->cols_)
+    {
+        *this = *ccParam;
+    }
+
+    DistributedForceSlideContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, const int rows, const int cols, const double mu_)
+        : ContactConstraintParam(linkName_, vertexVec_),// virtual inheritance
+          DistributedForceContactConstraintParam(linkName_, vertexVec_, rows, cols)
+    {
+        numInequals = 3 + edgeVec.size();// overwrite SC <- SCC <- DFCCP
+        muTrans = mu_;
+    }
+
+    void calcInequalMatrix();
+    void calcInequalMaximumVector();
+};
+
 }

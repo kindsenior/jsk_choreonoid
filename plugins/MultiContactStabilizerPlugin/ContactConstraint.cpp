@@ -38,6 +38,24 @@ void SlideContactConstraintParam::calcInequalMatrix()
     inequalMat.block(edgeVec.size(),0, 2,3) << 1,0,muTrans*math::sign(direction(0)), 0,1,muTrans*math::sign(direction(1));
 }
 
+void DistributedForceSlideContactConstraintParam::calcInequalMatrix()
+{
+    SimpleContactConstraintParam::calcInequalMatrix();
+    inequalMat.block(edgeVec.size(),0, nonDistributedDim,nonDistributedDim) = dmatrix::Identity(nonDistributedDim,nonDistributedDim);
+
+    int rowIdx = edgeVec.size();
+    int colIdx = nonDistributedDim;
+    for(std::vector<Vector3>::iterator rIter = forcePointVec.begin(); rIter != forcePointVec.end(); ++rIter){
+        Vector3 ri = *rIter;
+        Vector3 di = R.transpose()*(-v) + (R.transpose()*(-w)).cross((*rIter));// in local coordinate
+        di.normalize();
+
+        inequalMat.block(rowIdx,colIdx, 2,1) = -muTrans*di.head(2);// -mu*dxy
+        inequalMat(rowIdx+2,colIdx) = -muTrans*(ri(0)*di(1) - ri(1)*di(0));
+        ++colIdx;
+    }
+}
+
 // calcInequalMinimumVector
 void SimpleContactConstraintParam::calcInequalMinimumVector()
 {
@@ -55,6 +73,12 @@ void SlideContactConstraintParam::calcInequalMaximumVector()
     SimpleContactConstraintParam::calcInequalMaximumVector();
     inequalMaxVec(edgeVec.size()) = 0;
     inequalMaxVec(edgeVec.size()+1) = 0;
+}
+
+void DistributedForceSlideContactConstraintParam::calcInequalMaximumVector()
+{
+    SimpleContactConstraintParam::calcInequalMaximumVector();
+    inequalMaxVec.tail(3) = dvector::Zero(3);// translation x, translation y, rotation z
 }
 
 // clacMinimumVector
