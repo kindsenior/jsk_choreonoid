@@ -146,7 +146,9 @@ void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcPara
     // 接触点座標系の更新 等式と不等式数の合計
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         (*iter)->p = body->link((*iter)->linkName)->p();
-        (*iter)->R =  body->link((*iter)->linkName)->R();
+        (*iter)->R = body->link((*iter)->linkName)->R();
+        (*iter)->v = body->link((*iter)->linkName)->v();
+        (*iter)->w = body->link((*iter)->linkName)->w();
     }
     sfcParam->ccParamVec = ccParamVec;
 

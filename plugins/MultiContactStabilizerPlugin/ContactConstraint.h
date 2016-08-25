@@ -49,7 +49,7 @@ public:
     int numEquals;
     int numInequals;
     std::string linkName;
-    Vector3 p;
+    Vector3 p,v,w;
     Matrix33 R;
     std::vector<Vector3> edgeVec;
     std::vector<Vector2> vertexVec;
