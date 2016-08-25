@@ -182,6 +182,7 @@ protected:
     Vector2 diagonalVec;
     int nonDistributedDim;
     int distributedNum;
+    int rows_,cols_;
 
 public:
     std::vector<Vector3> forcePointVec;// in local coordinate
@@ -196,6 +197,8 @@ public:
         distributedNum = (rows+1)*(cols+1);// distributed fz
         nonDistributedDim = inputForceDim - 3; // 3 (fx,fy,tauz)
         inputDim = nonDistributedDim + distributedNum;// input dimension
+        rows_ = rows;
+        cols_ = cols;
 
         // forcePointVec
         startVertex = vertexVec.front();
