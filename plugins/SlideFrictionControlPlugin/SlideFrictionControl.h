@@ -4,6 +4,7 @@
 #pragma once
 
 #include <MultiContactStabilizerPlugin/ModelPredictiveController.h>
+#include <UtilPlugin/UtilPlugin.h>
 
 namespace hrp {
 
