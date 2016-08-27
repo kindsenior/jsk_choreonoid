@@ -91,3 +91,6 @@ foreach(_plugin_dir ${_plugin_dirs})
 	add_subdirectory(${_plugin_dir})
 endforeach()
 
+
+# for python module
+catkin_python_setup()
