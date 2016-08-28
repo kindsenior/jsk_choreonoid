@@ -60,6 +60,11 @@ void cnoid::calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet
             if(linkInfoIter->second.isTouching() && !linkInfoIter->second.isSlave()) contactLinkCandidateSet.insert(body->link(linkInfoIter->first));
         }
     }
+    cout << endl << "Contact Link Candidates:";
+    for(std::set<Link*>::iterator iter = contactLinkCandidateSet.begin(); iter != contactLinkCandidateSet.end(); ++iter){
+        cout << " " << (*iter)->name();
+    }
+    cout << endl << endl;
 }
 
 // 2つのPose間の接触状態を2進数で表す

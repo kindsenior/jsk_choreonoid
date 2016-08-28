@@ -122,6 +122,7 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
 
 void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
+    cout << "generateContactConstraintParamVec2( ~" << poseIter->time() << "[sec] )" << endl;
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
@@ -137,12 +138,15 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
                 // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceContactConstraintParam((*linkIter)->name(), vertexVec, 2,2));
                 ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));// 摩擦係数 要改良
+                cout << " " << (*linkIter)->name() << ": Static" << endl;
             }else if(contactState == 1){// slide contact
                 // ccParamVec.push_back(new SlideContactConstraintParam((*linkIter)->name(), vertexVec, 0.5, getPrevDirection(poseIter, poseSeqPtr, linkIdx)));
                 ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));
+                cout << " " << (*linkIter)->name() << ": Slide" << endl;
             }
         }
     }
+    cout << endl << endl;
 }
 
 void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d& lastMomentum, BodyPtr body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
