@@ -214,7 +214,8 @@ public:
     bool isInitial;
     std::deque<ParamClass*> preMpcParamDeque;
     std::deque<ParamClass*> mpcParamDeque;
-    dvector x0;
+    dvector x0,u0;
+    ParamClass* prevMpcParam;
     ControllerClass* parent;
 
     ModelPredictiveController()
@@ -245,6 +246,7 @@ public:
             st = et;
 
             updateX0Vector();
+            prevMpcParam = mpcParamDeque.front();
             mpcParamDeque.pop_front();
         }
 
@@ -328,7 +330,8 @@ public:
         ParamClass* mpcParam = mpcParamDeque[0];
         // U->u0
         // x0 = A0*x0 + B'0*u0
-        dmatrix x1 = mpcParam->systemMat*x0 + mpcParam->inputMat*U.block(0,0, mpcParam->inputMat.cols(),1);
+        u0 = U.block(0,0, mpcParam->inputMat.cols(),1);
+        dmatrix x1 = mpcParam->systemMat*x0 + mpcParam->inputMat*u0;
 
         if(parent != NULL){
             ControllerClass* root = rootController();
