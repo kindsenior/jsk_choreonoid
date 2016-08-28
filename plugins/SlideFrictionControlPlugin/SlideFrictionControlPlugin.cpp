@@ -149,7 +149,7 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
     cout << endl << endl;
 }
 
-void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d& lastMomentum, BodyPtr body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
+void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d& lastMomentum, BodyPtr& body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
 {
 
     static Vector3 g;

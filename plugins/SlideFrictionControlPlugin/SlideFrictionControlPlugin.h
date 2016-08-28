@@ -28,8 +28,8 @@
 namespace cnoid{
     void generatePreModelPredictiveControlParamDeque(hrp::SlideFrictionControl* sfc, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet);
     void generateContactConstraintParamVec2(std::vector<hrp::ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);
-    void generateSlideFrictionControlParam(hrp::SlideFrictionControlParam* sfcParam, Vector3d& lastMomentum, BodyPtr body, std::vector<hrp::ContactConstraintParam*>& ccParamVec, double dt);
-    void sweepControl(std::ofstream& ofs, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr);
+    void generateSlideFrictionControlParam(hrp::SlideFrictionControlParam* sfcParam, Vector3d& lastMomentum, BodyPtr& body, std::vector<hrp::ContactConstraintParam*>& ccParamVec, double dt);
+    void sweepControl(std::ofstream& ofs, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
 
     class SlideFrictionControlBar;
 
