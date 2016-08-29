@@ -15,19 +15,42 @@ bool SlideFrictionControlPlugin::initialize()
     return true;
 }
 
-void cnoid::sweepControl(ofstream& ofs, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
+void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
 {
+    stringstream fnamess; fnamess.str("");
+    fnamess << poseSeqPath.stem().string() << "_SFC_refPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    ofstream refPLOfs;
+    refPLOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+
     const double dt = sfc->dt;
     const int numFrames = bodyMotionItemPtr->motion()->numFrames()*sfc->rootController()->dt/sfc->dt;
 
     float avgTime = 0;
     std::vector<int> failIdxVec;
 
-    ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
+    refPLOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
 
     Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
     Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
+
+    fnamess.str("");
+    fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    ofstream contactOfs;
+    contactOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    contactOfs << "time lpx lpy lpz lvx lvy lvz lwx lwy lwz rpx rpy rpz rvx rvy rvz rwx rwy rwz" << endl;
+
+    fnamess.str("");
+    fnamess << poseSeqPath.stem().string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    ofstream wrenchOfs;
+    wrenchOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    wrenchOfs << "time lfx lfy lfz lnx lny lnz rfx rfy rfz rnx rny rnz" << endl;
+
+    fnamess.str("");
+    fnamess << poseSeqPath.stem().string() << "_SFC_inputPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    ofstream inputPLOfs;
+    inputPLOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    inputPLOfs << "time IPx Px IPy Py Lx Ly Lz Fz" << endl;
 
     for(int i=0; i < numFrames + sfc->numWindows(); ++i){
         // if(i > sfc->numWindows() + 1) goto BREAK;
@@ -44,30 +67,40 @@ void cnoid::sweepControl(ofstream& ofs, SlideFrictionControl* sfc, BodyPtr& body
             Vector3d CM,P,L;
             CM << x0[0],x0[2],0;
             P << x0[1],x0[3],0;
-            L << x0[4],x0[5],0;
+            L << x0[4],x0[5],x0[6];
             CM /= body->mass();
             refCMSeqPtr->at(i - sfc->numWindows()) = CM;
             refPSeqPtr->at(i - sfc->numWindows()) = P;
             refLSeqPtr->at(i - sfc->numWindows()) = L;
-            ofs << (i - sfc->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
+            refPLOfs << (i - sfc->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
 
             SlideFrictionControlParam sfcParam = *(sfc->prevMpcParam);
+            inputPLOfs << (i - sfc->numWindows())*dt << " " << sfcParam.refStateVec.transpose() << " " << sfcParam.F(2) << endl;
+
+            contactOfs << (i - sfc->numWindows())*dt;
+            wrenchOfs << (i - sfc->numWindows())*dt;
             std::vector<ContactConstraintParam*> ccParamVec = sfcParam.ccParamVec;
             VectorXd u0 = sfc->u0;
             for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
+                int colIdx = 0;
                 for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
                     ContactConstraintParam* ccParam = *iter;
-                    int colIdx = 0;
                     int inputDim = ccParam->inputDim;
                     if((*linkIter)->name() == ccParam->linkName){
+                        contactOfs << " "<< ccParam->p.transpose() << " " << ccParam->v.transpose() << " " << ccParam->w.transpose();
                         VectorXd u = ccParam->inputForceConvertMat*u0.segment(colIdx,inputDim);
+                        wrenchOfs << " " << u.transpose();
                         goto END;
                     }
                     colIdx += inputDim;
                 }
+                contactOfs << " 0 0 0  0 0 0  0 0 0";
+                wrenchOfs << " 0 0 0  0 0 0";
             END:
                 ;
             }
+            contactOfs << endl;
+            wrenchOfs << endl;
         }
     }
  // BREAK:
@@ -76,7 +109,10 @@ void cnoid::sweepControl(ofstream& ofs, SlideFrictionControl* sfc, BodyPtr& body
     setSubItem("refP", refPSeqPtr, bodyMotionItemPtr);
     setSubItem("refL", refLSeqPtr, bodyMotionItemPtr);
 
-    ofs.close();
+    refPLOfs.close();
+    contactOfs.close();
+    wrenchOfs.close();
+    inputPLOfs.close();
 
     for(std::vector<int>::iterator iter = failIdxVec.begin(); iter != failIdxVec.end(); ++iter) cout << "Failed in " << *iter << ":(" << (*iter)*dt << " sec)" << endl;
     if(failIdxVec.empty()) cout << "All QP succeeded" << endl;
@@ -235,14 +271,7 @@ void SlideFrictionControlPlugin::execControl()
 
     generatePreModelPredictiveControlParamDeque(sfc, body, poseSeqPtr, motion, contactLinkCandidateSet);
 
-    fnamess.str("");
-    fnamess << mPoseSeqPath.stem().string() << "_SFC_refPL";
-    fnamess << mBar->dialog->layout()->getParamString();
-    fnamess << "_" << frameRate << "fps.dat";
-    mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
-    mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
-
-    sweepControl(mOfs, sfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
+    sweepControl(mPoseSeqPath, mBar->dialog->layout()->getParamString(), sfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
 
     cout << "Finished SlideFrictionControl" << endl;
 }
