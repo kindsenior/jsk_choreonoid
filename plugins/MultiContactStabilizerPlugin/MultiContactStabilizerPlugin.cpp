@@ -15,8 +15,13 @@ bool MultiContactStabilizerPlugin::initialize()
     return true;
 }
 
-void cnoid::sweepControl(ofstream& ofs, MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr)
+void cnoid::sweepControl(boost::filesystem::path poseSeqPath, std::string paramStr, MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr)
 {
+    stringstream fnamess; fnamess.str("");
+    fnamess << poseSeqPath.stem().string() << "_MCS_refPL" << paramStr << "_" << (int) 1/mcs->rootController()->dt << "fps.dat";
+    ofstream ofs;
+    ofs.open( ((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
+
     const double dt = mcs->dt;
     const int numFrames = bodyMotionItemPtr->motion()->numFrames()*mcs->rootController()->dt/mcs->dt;
 
@@ -197,14 +202,7 @@ void MultiContactStabilizerPlugin::execControl()
 
     generatePreModelPredictiveControlParamDeque(mcs, body, poseSeqPtr, motion, contactLinkCandidateSet);
 
-    fnamess.str("");
-    fnamess << mPoseSeqPath.stem().string() << "_MCS_refPL";
-    fnamess << mBar->dialog->layout()->getParamString();
-    fnamess << "_" << frameRate << "fps.dat";
-    mOfs.open( ((filesystem::path) mPoseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
-    mOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
-
-    sweepControl(mOfs, mcs, body, mBodyMotionItemPtr);
+    sweepControl(mPoseSeqPath, mBar->dialog->layout()->getParamString(), mcs, body, mBodyMotionItemPtr);
 
     cout << "Finished MultiContactStabilizer" << endl;
 }
