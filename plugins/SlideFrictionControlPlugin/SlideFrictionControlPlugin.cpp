@@ -170,7 +170,7 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
             vertex << -0.1,0.05; vertexVec.push_back(vertex);
             vertex << -0.1,-0.05; vertexVec.push_back(vertex);
             if(contactState == 0){// static contact
-                // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), edgeVec));
+                // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
                 // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceContactConstraintParam((*linkIter)->name(), vertexVec, 2,2));
                 ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));// 摩擦係数 要改良

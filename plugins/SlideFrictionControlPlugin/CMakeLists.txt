@@ -23,7 +23,7 @@ if(NOT ONLYTEST)
 
 	add_library(${TARGET} SHARED SlideFrictionControlPlugin SlideFrictionControl SlideFrictionControlBar)
 
-	set(libs CnoidUtilPlugin qpOASES ${openhrp3_link_shared_files})
+	set(libs CnoidUtilPlugin qpOASES CnoidMultiContactStabilizerPlugin ${openhrp3_link_shared_files})
 	target_link_libraries(${TARGET} ${libs})
 endif(NOT ONLYTEST)
 

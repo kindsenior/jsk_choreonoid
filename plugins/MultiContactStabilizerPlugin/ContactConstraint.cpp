@@ -90,7 +90,6 @@ void SimpleContactConstraintParam::calcMinimumVector()
 
 void DistributedForceContactConstraintParam::calcMinimumVector()
 {
-    // std::cout << "calcMinimumVector(" << linkName << ")" << std::endl;
     minVec = dvector::Constant(inputDim,-INFINITY);
     minVec.tail(distributedNum) = dvector::Zero(distributedNum);// fx,fy,tauz, fz0,fz1,...
 }
