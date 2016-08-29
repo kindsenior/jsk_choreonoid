@@ -408,10 +408,14 @@ toolbars:
       errorMomentumWeightCheck: true
       errorAngularMomentumWeight: 200
       errorAngularMomentumWeightCheck: true
+      errorYawAngularMomentumWeight: 1
+      errorYawAngularMomentumWeightCheck: true
       inputForceWeight: 10
       inputForceWeightCheck: true
       inputMomentWeight: 20
       inputMomentWeightCheck: true
+      inputYawMomentWeight: 1
+      inputYawMomentWeightCheck: true
       blockingList: 1,1,1,1,1,1,1
       blockingListCheck: true
       dt: 0.1
