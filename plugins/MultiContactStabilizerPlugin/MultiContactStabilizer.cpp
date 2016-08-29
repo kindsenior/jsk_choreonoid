@@ -165,13 +165,18 @@ void MultiContactStabilizerParam::calcErrorWeightVector()
     errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight;
 }
 
-void MultiContactStabilizerParam::calcInputWeightVector()
+void MultiContactStabilizerParam::calcInputWeightMatrix()
 {
-    inputWeightVec = dvector(inputDim);
+    int rowIdx = 0, colIdx = 0;
+    inputWeightMat = dmatrix::Zero(inputDim,inputDim);
     double inputForceWeight = controller()->inputForceWeight, inputMomentWeight = controller()->inputMomentWeight;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        int idx = std::distance(ccParamVec.begin(), iter);
-        inputWeightVec.block(unitInputDim*idx,0, unitInputDim,1) << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;
+        int inputDim = (*iter)->inputDim;
+        dvector tmpVec(6);
+        tmpVec << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;
+        inputWeightMat.block(rowIdx,colIdx, inputDim,inputDim) = (*iter)->inputForceConvertMat.transpose()*tmpVec.asDiagonal()*(*iter)->inputForceConvertMat;
+        rowIdx += inputDim;
+        colIdx += inputDim;
     }
 }
 
@@ -195,5 +200,5 @@ void MultiContactStabilizerParam::convertToMpcParam()
     calcRefStateVector();
 
     calcErrorWeightVector();
-    calcInputWeightVector();
+    calcInputWeightMatrix();
 }

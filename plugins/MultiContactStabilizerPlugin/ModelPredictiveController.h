@@ -178,11 +178,8 @@ private:
     {
         inputWeightMat = dmatrix::Zero(psiCols,psiCols);
         int rowIdx = 0;
-        for(typename std::deque<ParamClass*>::iterator iter = mpcParamDeque.begin(); iter != mpcParamDeque.end(); ++iter){
-            int rows = (*iter)->inputWeightVec.rows();
-            inputWeightMat.block(rowIdx,rowIdx, rows,rows) = (*iter)->inputWeightVec.asDiagonal();
-            rowIdx += rows;
-        }
+        int colIdx = 0;
+        hrp::dumpMatrix(inputWeightMat, &ParamClass::inputWeightMat, mpcParamDeque, rowIdx, colIdx, blockFlagVec);
     }
 
     void calcBlockMatrix()
@@ -404,7 +401,7 @@ public:
     dvector maxVec;
     dvector refStateVec;
     dvector errorWeightVec;
-    dvector inputWeightVec;
+    dmatrix inputWeightMat;
     // dmatrix outputMat;
 
     ModelPredictiveControllerParam()

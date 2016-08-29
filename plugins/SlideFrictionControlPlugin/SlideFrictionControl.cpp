@@ -170,16 +170,18 @@ void SlideFrictionControlParam::calcErrorWeightVector()
     errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight,errorYawAngularMomentumWeight;// Lz
 }
 
-void SlideFrictionControlParam::calcInputWeightVector()
+void SlideFrictionControlParam::calcInputWeightMatrix()
 {
-    inputWeightVec = dvector(inputDim);
+    int rowIdx = 0, colIdx = 0;
+    inputWeightMat = dmatrix::Zero(inputDim,inputDim);
     double inputForceWeight = controller()->inputForceWeight, inputMomentWeight = controller()->inputMomentWeight, inputYawMomentWeight = controller()->inputYawMomentWeight;
-    int colIdx = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+        int inputDim = (*iter)->inputDim;
         dvector tmpVec(6);
         tmpVec << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputYawMomentWeight;// fx,fy,fz, nx,ny,nz
         inputWeightMat.block(rowIdx,colIdx, inputDim,inputDim) = (*iter)->inputForceConvertMat.transpose()*tmpVec.asDiagonal()*(*iter)->inputForceConvertMat;
-        colIdx += (*iter)->inputDim;
+        rowIdx += inputDim;
+        colIdx += inputDim;
     }
 }
 
@@ -204,5 +206,5 @@ void SlideFrictionControlParam::convertToMpcParam()
     calcRefStateVector();
 
     calcErrorWeightVector();
-    calcInputWeightVector();
+    calcInputWeightMatrix();
 }

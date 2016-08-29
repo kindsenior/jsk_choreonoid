@@ -72,7 +72,7 @@ public:
     void calcBoundVectors();
     void calcRefStateVector();
     void calcErrorWeightVector();
-    void calcInputWeightVector();
+    void calcInputWeightMatrix();
     void convertToMpcParam();
 };
 
