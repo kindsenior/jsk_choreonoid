@@ -18,10 +18,14 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     paramNodes_->addParamNode(errorMomentumWeightSpin);
     errorAngularMomentumWeightSpin = new SpinParamWidget();
     paramNodes_->addParamNode(errorAngularMomentumWeightSpin);
+    errorYawAngularMomentumWeightSpin = new SpinParamWidget();
+    paramNodes_->addParamNode(errorYawAngularMomentumWeightSpin);
     inputForceWeightSpin = new SpinParamWidget();
     paramNodes_->addParamNode(inputForceWeightSpin);
     inputMomentWeightSpin = new SpinParamWidget();
     paramNodes_->addParamNode(inputMomentWeightSpin);
+    inputYawMomentWeightSpin = new SpinParamWidget();
+    paramNodes_->addParamNode(inputYawMomentWeightSpin);
     blockSpinVec = new SpinVectorParamWidget();
     paramNodes_->addParamNode(blockSpinVec);
     dtSpin = new SpinParamWidget();
@@ -61,6 +65,14 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     errorAngularMomentumWeightSpin->addToLayout(hbox);
     hbox->addStretch();
 
+    hbox->addSpacing(8);
+    errorYawAngularMomentumWeightSpin->setText("YawAngularMomentum:");
+    errorYawAngularMomentumWeightSpin->setSaveName("Lz");
+    errorYawAngularMomentumWeightSpin->setArchiveName("errorYawAngularMomentumWeight");
+    errorYawAngularMomentumWeightSpin->setValue(1);
+    errorYawAngularMomentumWeightSpin->addToLayout(hbox);
+    hbox->addStretch();
+
     hbox = newRow();
     inputForceWeightSpin->setText("Force:");
     inputForceWeightSpin->setArchiveName("inputForceWeight");
@@ -74,6 +86,14 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     inputMomentWeightSpin->setArchiveName("inputMomentWeight");
     inputMomentWeightSpin->setValue(10);
     inputMomentWeightSpin->addToLayout(hbox);
+    hbox->addStretch();
+
+    hbox->addSpacing(8);
+    inputYawMomentWeightSpin->setText("Yaw Moment:");
+    inputYawMomentWeightSpin->setSaveName("nz");
+    inputYawMomentWeightSpin->setArchiveName("inputYawMomentWeight");
+    inputYawMomentWeightSpin->setValue(1);
+    inputYawMomentWeightSpin->addToLayout(hbox);
     hbox->addStretch();
 
     hbox = newRow();

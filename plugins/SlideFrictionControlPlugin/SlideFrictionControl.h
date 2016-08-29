@@ -16,8 +16,8 @@ class SlideFrictionControl : public ModelPredictiveController<SlideFrictionContr
 
 public:
     double m;
-    double errorCMWeight,errorMomentumWeight,errorAngularMomentumWeight;
-    double inputForceWeight,inputMomentWeight;
+    double errorCMWeight,errorMomentumWeight,errorAngularMomentumWeight,errorYawAngularMomentumWeight;
+    double inputForceWeight,inputMomentWeight,inputYawMomentWeight;
 
     SlideFrictionControl();
 

@@ -165,19 +165,20 @@ void SlideFrictionControlParam::calcRefStateVector()
 void SlideFrictionControlParam::calcErrorWeightVector()
 {
     errorWeightVec = dvector(stateDim);
-    double errorCMWeight = controller()->errorCMWeight, errorMomentumWeight = controller()->errorMomentumWeight, errorAngularMomentumWeight = controller()->errorAngularMomentumWeight;
-    errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight,errorAngularMomentumWeight;// Lz
+    double errorCMWeight = controller()->errorCMWeight, errorMomentumWeight = controller()->errorMomentumWeight,
+        errorAngularMomentumWeight = controller()->errorAngularMomentumWeight, errorYawAngularMomentumWeight = controller()->errorYawAngularMomentumWeight;
+    errorWeightVec << errorCMWeight,errorMomentumWeight, errorCMWeight,errorMomentumWeight, errorAngularMomentumWeight,errorAngularMomentumWeight,errorYawAngularMomentumWeight;// Lz
 }
 
 void SlideFrictionControlParam::calcInputWeightVector()
 {
     inputWeightVec = dvector(inputDim);
-    double inputForceWeight = controller()->inputForceWeight, inputMomentWeight = controller()->inputMomentWeight;
+    double inputForceWeight = controller()->inputForceWeight, inputMomentWeight = controller()->inputMomentWeight, inputYawMomentWeight = controller()->inputYawMomentWeight;
     int colIdx = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         dvector tmpVec(6);
-        tmpVec << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputMomentWeight;// fx,fy,fz, nx,ny,nz
-        inputWeightVec.block(colIdx,0, (*iter)->inputDim,1) << cnoid::PseudoInverse((*iter)->inputWeightConvertMat)*tmpVec;// implement or find psuedo inverse
+        tmpVec << inputForceWeight,inputForceWeight,inputForceWeight, inputMomentWeight,inputMomentWeight,inputYawMomentWeight;// fx,fy,fz, nx,ny,nz
+        inputWeightMat.block(rowIdx,colIdx, inputDim,inputDim) = (*iter)->inputForceConvertMat.transpose()*tmpVec.asDiagonal()*(*iter)->inputForceConvertMat;
         colIdx += (*iter)->inputDim;
     }
 }

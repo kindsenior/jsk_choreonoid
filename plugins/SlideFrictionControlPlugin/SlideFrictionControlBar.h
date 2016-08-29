@@ -29,8 +29,10 @@ public:
     SpinParamWidget* errorCMWeightSpin;
     SpinParamWidget* errorMomentumWeightSpin;
     SpinParamWidget* errorAngularMomentumWeightSpin;
+    SpinParamWidget* errorYawAngularMomentumWeightSpin;
     SpinParamWidget* inputForceWeightSpin;
     SpinParamWidget* inputMomentWeightSpin;
+    SpinParamWidget* inputYawMomentWeightSpin;
     SpinVectorParamWidget* blockSpinVec;
 
     SlideFrictionControlSetupLayout();
