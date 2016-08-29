@@ -79,8 +79,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_RED_rotate-left-slide.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 6
+              name: "left-crab"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_left-crab.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 6
+          id: 7
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -103,7 +112,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 7
+          id: 8
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -133,7 +142,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 8
+              id: 9
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -152,7 +161,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 9
+              id: 10
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -171,7 +180,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 10
+              id: 11
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -207,8 +216,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 5 ]
-      checked: [ 1, 2, 6, 7, 8, 9, 10 ]
+      selected: [ 6 ]
+      checked: [ 1, 2, 7, 8, 9, 10, 11 ]
       expanded: [ 1, 2 ]
   - 
     id: 3
@@ -312,7 +321,7 @@ views:
           id: 2
           selectedLinks: [ 38 ]
         - 
-          id: 6
+          id: 7
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -321,7 +330,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 5
+      currentPoseSeqItem: 6
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
