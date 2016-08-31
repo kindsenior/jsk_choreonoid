@@ -278,12 +278,36 @@ void cnoid::generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseS
     cout << "Generated motion" << endl;
 }
 
-void cnoid::updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame)
+void cnoid::updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame, const std::set<Link*>& linkSet)
 {
     int prevFrame = max(currentFrame-1, 0);
     int nextFrame = min(currentFrame+1, motion->numFrames()-1);
 
     const double dt = 1.0/motion->frameRate();
+
+    // 特定リンクのvとwの更新
+    if(linkSet.size() != 0){
+        motion->frame(prevFrame) >> *body;
+        body->calcForwardKinematics();
+        std::map<std::string, SE3> SE3Map;
+        for(std::set<Link*>::iterator iter = linkSet.begin(); iter != linkSet.end(); ++iter){
+            string linkName = (*iter)->name();
+            SE3 se3;
+            se3.translation() = body->link(linkName)->p();
+            se3.rotation() = body->link(linkName)->R();
+            SE3Map[linkName] = se3;
+        }
+        motion->frame(currentFrame) >> *body;
+        body->calcForwardKinematics();
+        for(std::set<Link*>::iterator iter = linkSet.begin(); iter != linkSet.end(); ++iter){
+            string linkName = (*iter)->name();
+            SE3 se3 = SE3Map[linkName];
+            body->link(linkName)->v() = (body->link(linkName)->p() - se3.translation())/dt;
+            Matrix3d R = body->link(linkName)->R() * se3.rotation().toRotationMatrix().inverse();
+            AngleAxis aa = AngleAxis(R);
+            body->link(linkName)->w() = aa.axis() * aa.angle()/dt;
+        }
+    }
 
     motion->frame(currentFrame) >> *body;
 

@@ -74,7 +74,7 @@ bool getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
 
 void generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemptr, const BodyMotionItemPtr& bodyMotionItemPtr);
 
-void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame );
+void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame, const std::set<Link*>& linkSet=std::set<Link*>());
 
 void calcDifferential(const BodyMotionPtr& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq);
 
