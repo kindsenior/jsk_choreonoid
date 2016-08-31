@@ -35,7 +35,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
 
     fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream contactOfs;
     contactOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
     contactOfs << "time lpx lpy lpz lvx lvy lvz lwx lwy lwz rpx rpy rpz rvx rvy rvz rwx rwy rwz" << endl;
@@ -47,10 +47,10 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     wrenchOfs << "time lfx lfy lfz lnx lny lnz rfx rfy rfz rnx rny rnz" << endl;
 
     fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_inputPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << poseSeqPath.stem().string() << "_SFC_inputPL_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream inputPLOfs;
     inputPLOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
-    inputPLOfs << "time IPx Px IPy Py Lx Ly Lz Fz" << endl;
+    inputPLOfs << "time CMx CMy CMz Px Py Pz Lx Ly Lz Fx Fy Fz" << endl;
 
     for(int i=0; i < numFrames + sfc->numWindows(); ++i){
         // if(i > sfc->numWindows() + 1) goto BREAK;
@@ -75,7 +75,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             refPLOfs << (i - sfc->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
 
             SlideFrictionControlParam sfcParam = *(sfc->prevMpcParam);
-            inputPLOfs << (i - sfc->numWindows())*dt << " " << sfcParam.refStateVec.transpose() << " " << sfcParam.F(2) << endl;
+            inputPLOfs << (i - sfc->numWindows())*dt << " " << sfcParam.CM.transpose() << " "<< sfcParam.P.transpose() << " " << sfcParam.L.transpose() << " " << sfcParam.F.transpose() << endl;
 
             contactOfs << (i - sfc->numWindows())*dt;
             wrenchOfs << (i - sfc->numWindows())*dt;
