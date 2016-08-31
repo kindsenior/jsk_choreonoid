@@ -42,7 +42,7 @@ CascadedControlSetupLayout::CascadedControlSetupLayout()
 CascadedControlSetupDialog::CascadedControlSetupDialog()
     : ParamSetupDialog()
 {
-    setWindowTitle("Multi Contact Stabilizer Setup");
+    setWindowTitle("Cascaded Control Setup");
 
     QVBoxLayout* vbox = new QVBoxLayout();
 

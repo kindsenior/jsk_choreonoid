@@ -115,7 +115,7 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
 SlideFrictionControlSetupDialog::SlideFrictionControlSetupDialog()
     : ParamSetupDialog()
 {
-    setWindowTitle("Multi Contact Stabilizer Setup");
+    setWindowTitle("Slide Friction Control Setup");
 
     QVBoxLayout* vbox = new QVBoxLayout();
 
