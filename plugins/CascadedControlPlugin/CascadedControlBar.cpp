@@ -11,15 +11,26 @@ CascadedControlSetupLayout::CascadedControlSetupLayout()
     paramNodes_ = new ParamVector();
     paramNodes_->setArchiveName("CC");
 
+    // // in order for saving param to file name
+    // MultiContactStabilizerSetupLayout* parentMcsLayout = new MultiContactStabilizerSetupLayout();
+    // paramNodes_->addParamNode(parentMcsLayout->paramNodes());
+    // MultiContactStabilizerSetupLayout* childMcsLayout = new MultiContactStabilizerSetupLayout();
+    // paramNodes_->addParamNode(childMcsLayout->paramNodes());
+
+    // // in order of param setup dialog
+    // this->addLayout(parentMcsLayout);
+    // this->addLayout(childMcsLayout);
+
+
     // in order for saving param to file name
-    MultiContactStabilizerSetupLayout* parentMcsLayout = new MultiContactStabilizerSetupLayout();
-    paramNodes_->addParamNode(parentMcsLayout->paramNodes());
-    MultiContactStabilizerSetupLayout* childMcsLayout = new MultiContactStabilizerSetupLayout();
-    paramNodes_->addParamNode(childMcsLayout->paramNodes());
+    SlideFrictionControlSetupLayout* parentSfcLayout = new SlideFrictionControlSetupLayout();
+    paramNodes_->addParamNode(parentSfcLayout->paramNodes());
+    SlideFrictionControlSetupLayout* childSfcLayout = new SlideFrictionControlSetupLayout();
+    paramNodes_->addParamNode(childSfcLayout->paramNodes());
 
     // in order of param setup dialog
-    this->addLayout(parentMcsLayout);
-    this->addLayout(childMcsLayout);
+    this->addLayout(parentSfcLayout);
+    this->addLayout(childSfcLayout);
 
     QHBoxLayout* hbox = newRow();
     saveParameterInFileNameCheck_.setText("Save parameters in file name");

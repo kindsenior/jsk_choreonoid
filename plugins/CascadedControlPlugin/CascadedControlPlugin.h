@@ -23,6 +23,7 @@
 #include <UtilPlugin/UtilPlugin.h>
 #include <MultiContactStabilizerPlugin/MultiContactStabilizerPlugin.h>
 #include <MultiContactStabilizerPlugin/MultiContactStabilizer.h>
+#include <SlideFrictionControlPlugin/SlideFrictionControlPlugin.h>
 
 #include "CascadedControlBar.h"
 
