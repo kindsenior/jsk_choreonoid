@@ -28,6 +28,8 @@
 #include "CascadedControlBar.h"
 
 namespace cnoid{
+    void interpolateZMP(BodyMotionItemPtr& bodyMotionItemPtr, double T);
+
     class CascadedControlBar;
 
     class CascadedControlPlugin : public Plugin

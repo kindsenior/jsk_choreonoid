@@ -15,6 +15,22 @@ bool CascadedControlPlugin::initialize()
     return true;
 }
 
+void cnoid::interpolateZMP(BodyMotionItemPtr& bodyMotionItemPtr, double T)
+{
+    BodyMotionPtr motion = bodyMotionItemPtr->motion();
+    const double dt = 1.0/motion->frameRate();
+    const int cycle = T/dt;
+    const int numFrames = motion->numFrames();
+    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+    for(int i=0; i<numFrames-cycle; i+=cycle){
+        Vector3d front = refZmpSeqPtr->at(i);
+        Vector3d diff = refZmpSeqPtr->at(i+cycle) - front;
+        for(int j=0; j<cycle; ++j){
+            refZmpSeqPtr->at(i+j) = front + ((double)j/cycle)*diff;
+        }
+    }
+}
+
 void CascadedControlPlugin::execControl()
 {
     stringstream ss,fnamess;
@@ -113,6 +129,7 @@ void CascadedControlPlugin::execControl()
     childSfc->pushAllPreMPCParamFromRoot();
 
     sweepControl(mPoseSeqPath, childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// childモーション走査
+    interpolateZMP(mBodyMotionItemPtr, childSfc->dt);
     // sweepControl(mPoseSeqPath, parentSfcLayout->getParamString(), parentSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// parentモーション走査
 
     cout << "Finished CascadedControl" << endl;

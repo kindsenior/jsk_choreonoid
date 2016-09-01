@@ -23,6 +23,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     refPLOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
 
     const double dt = sfc->dt;
+    const int cycle = sfc->dt*bodyMotionItemPtr->motion()->frameRate();
     const int numFrames = bodyMotionItemPtr->motion()->numFrames()*sfc->rootController()->dt/sfc->dt;
 
     float avgTime = 0;
@@ -33,6 +34,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
     Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
+    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
 
     fnamess.str("");
     fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
@@ -69,9 +71,10 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             P << x0[1],x0[3],0;
             L << x0[4],x0[5],x0[6];
             CM /= body->mass();
-            refCMSeqPtr->at(i - sfc->numWindows()) = CM;
-            refPSeqPtr->at(i - sfc->numWindows()) = P;
-            refLSeqPtr->at(i - sfc->numWindows()) = L;
+            int motionIdx = (i - sfc->numWindows())*cycle;
+            refCMSeqPtr->at(motionIdx) = CM;
+            refPSeqPtr->at(motionIdx) = P;
+            refLSeqPtr->at(motionIdx) = L;
             refPLOfs << (i - sfc->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
 
             SlideFrictionControlParam sfcParam = *(sfc->prevMpcParam);
@@ -81,6 +84,8 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             wrenchOfs << (i - sfc->numWindows())*dt;
             std::vector<ContactConstraintParam*> ccParamVec = sfcParam.ccParamVec;
             VectorXd u0 = sfc->u0;
+            double Fz = 0;
+            Vector3d zmp = Vector3d::Zero();
             for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
                 int colIdx = 0;
                 for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
@@ -90,6 +95,13 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                         contactOfs << " "<< ccParam->p.transpose() << " " << ccParam->v.transpose() << " " << ccParam->w.transpose();
                         VectorXd u = ccParam->inputForceConvertMat*u0.segment(colIdx,inputDim);
                         wrenchOfs << " " << u.transpose();
+
+                        //calc ZMP 足は床上である前提
+                        Vector3d f = ccParam->R*u.head(3);
+                        Vector3d n = ccParam->R*u.tail(3);
+                        Fz += f.z();
+                        zmp.x() += -n.y()+ccParam->p.x()*f.z();
+                        zmp.y() +=  n.x()+ccParam->p.y()*f.z();
                         goto END;
                     }
                     colIdx += inputDim;
@@ -99,6 +111,8 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             END:
                 ;
             }
+            zmp /= Fz;
+            refZmpSeqPtr->at(motionIdx) = zmp;
             contactOfs << endl;
             wrenchOfs << endl;
         }
@@ -108,6 +122,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     setSubItem("refCM", refCMSeqPtr, bodyMotionItemPtr);
     setSubItem("refP", refPSeqPtr, bodyMotionItemPtr);
     setSubItem("refL", refLSeqPtr, bodyMotionItemPtr);
+    setSubItem("ZMP", refZmpSeqPtr, bodyMotionItemPtr);
 
     refPLOfs.close();
     contactOfs.close();
