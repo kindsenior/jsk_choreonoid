@@ -104,7 +104,7 @@ void PreviewControlPlugin::execControl()
         stringstream ss;
         ss << poseSeqPath.stem().string() << "_PC";
         if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) ss << mBar->dialog->getParamString();
-        ss << "_" << motion->frameRate() << ".dat";
+        ss << "_" << motion->frameRate() << "fps.dat";
         ofstream ofs(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
         Vector3d lastPosVec = body->rootLink()->p();
         Vector3d lastVelVec = VectorXd::Zero(3);
@@ -131,7 +131,7 @@ void PreviewControlPlugin::execControl()
     cout << "control mode: " << modeStr << endl;
     string dfMode = mBar->dialog->controlModeCombo->itemText(DynamicsFilter).toStdString();
     string tpMode = mBar->dialog->controlModeCombo->itemText(TrajectoryPlanning).toStdString();
-    for(int loopNum = 0; loopNum < 5; ++loopNum){
+    for(int loopNum = 0; loopNum < 3; ++loopNum){
         cout << "loop: " << loopNum << endl;
 
         zmpSeqPtr.reset( new Vector3Seq() );
@@ -167,32 +167,38 @@ void PreviewControlPlugin::execControl()
             }
         }
         cout << "Finished generating ref zmp list" << endl;
-    
-        Vector3SeqPtr diffCMSeqPtr;
-        diffCMSeqPtr.reset( new Vector3Seq() );
-        diffCMSeqPtr->setNumFrames(motion->numFrames(), true);
 
-        Vector3SeqPtr cartZMPSeqPtr;
-        cartZMPSeqPtr.reset(new Vector3Seq());
-        cartZMPSeqPtr->setNumFrames(motion->numFrames(), true);
+        Vector3SeqPtr inputZMPSeqPtr;
+        inputZMPSeqPtr.reset( new Vector3Seq() );
+        inputZMPSeqPtr->setNumFrames(motion->numFrames(), true);
 
-        // preview_dynamics_filter<preview_control> df(dt, 0.8, ref_zmp_list.front());
-        rats2::preview_dynamics_filter<rats2::extended_preview_control> df(dt, 0.8, ref_zmp_list.front());
-        double cart_zmp[3], refzmp[3];
+        Vector3SeqPtr outputCMSeqPtr;
+        outputCMSeqPtr.reset( new Vector3Seq() );
+        outputCMSeqPtr->setNumFrames(motion->numFrames(), true);
+
+        Vector3SeqPtr outputZMPSeqPtr;
+        outputZMPSeqPtr.reset(new Vector3Seq());
+        outputZMPSeqPtr->setNumFrames(motion->numFrames(), true);
+
+        motion->frame(0) >> *body;
+        body->calcForwardKinematics();
+        Vector3d CM = body->calcCenterOfMass();
+        rats2::preview_dynamics_filter<rats2::extended_preview_control> df(dt, CM.z(), ref_zmp_list.front());
+        double output_zmp[3], input_zmp[3];
         bool r = true;
         size_t index = 0;
         while (r) {
             hrp::Vector3 p, x;// p: current_refzmp   x: refcog
-            // r = df.update(p, x, ref_zmp_list.front(), ref_frame_list.front(), !ref_zmp_list.empty());
-            r = df.update(p, x, ref_zmp_list.front(), !ref_zmp_list.empty());
+            std::vector<hrp::Vector3> qdata;
+            r = df.update(p, x, qdata, ref_zmp_list.front(), qdata, !ref_zmp_list.empty());
             if (r) {
-                df.get_cart_zmp(cart_zmp);
-                df.get_current_refzmp(refzmp);
+                df.get_cart_zmp(output_zmp);
+                df.get_current_refzmp(input_zmp);
 
-                x.z() = 0;
-                diffCMSeqPtr->at(index) = x;
+                outputCMSeqPtr->at(index) = x;
 
-                cartZMPSeqPtr->at(index) << cart_zmp[0], cart_zmp[1], cart_zmp[2];
+                inputZMPSeqPtr->at(index) << input_zmp[0], input_zmp[1], input_zmp[2];
+                outputZMPSeqPtr->at(index) << output_zmp[0], output_zmp[1], output_zmp[2];
 
                 ++index;
             } else if ( !ref_zmp_list.empty() ) r = true;
@@ -203,20 +209,24 @@ void PreviewControlPlugin::execControl()
         cout << "Finished calculating ref diff centroid" << endl;
 
         for(int i = 0; i < motion->numFrames(); ++i){
-            Vector3d lFootPos,rFootPos, lHipPos, rHipPos, dCM;
+            Vector3d lFootPos,rFootPos, lHipPos, rHipPos, refCM;
             Matrix3 lFootR,rFootR;
             motion->frame(i) >> *body;
             body->calcForwardKinematics();// 状態更新
-            dCM = diffCMSeqPtr->at(i) - body->calcCenterOfMass();
-            dCM.z() = 0;
 
             lFootPos = lFootLink->p(); lFootR = lFootLink->R();// 足先位置取得
             rFootPos = rFootLink->p(); rFootR = rFootLink->R();
 
             if(modeStr == dfMode){
-                body->rootLink()->p() += 0.7*diffCMSeqPtr->at(i);// 腰位置修正 ゲインを掛けるだけでは微妙
+                Vector3d diffCM = outputCMSeqPtr->at(i);
+                diffCM.z() = 0;
+                body->rootLink()->p() += 0.5*diffCM;// 腰位置修正 ゲインを掛けるだけでは微妙
             }else if(modeStr == tpMode){
-                body->rootLink()->p() += dCM;
+                Vector3d CM =  outputCMSeqPtr->at(i);
+                Vector3d CM2RootLink =  body->rootLink()->p() - body->calcCenterOfMass();
+                CM2RootLink.z() = 0;
+                CM.z() = body->rootLink()->p().z();
+                body->rootLink()->p() = CM + CM2RootLink;
             }
             body->calcForwardKinematics();// 状態更新
             lHipPos = jpl->joint(0)->p(); rHipPos = jpr->joint(0)->p();
@@ -243,13 +253,13 @@ void PreviewControlPlugin::execControl()
             ofs.open(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
 
             calcZMP( body, motion, zmpSeqPtr );
-            ofs << "time  cartZMPx cartZMPy cartZMPz refCMx refCMy refCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
+            ofs << "time  inputZMPx inputZMPy inputZMPz outputZMPx outputZMPy outputZMPz outputCMx outputCMy outputCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
             for(int i = 0; i < motion->numFrames(); ++i){
                 motion->frame(i) >> *body;
                 body->calcForwardKinematics();
                 body->calcCenterOfMass();
                 ofs << i*dt
-                    << " " << cartZMPSeqPtr->at(i).transpose() << " " << diffCMSeqPtr->at(i).transpose()
+                    << " " << inputZMPSeqPtr->at(i).transpose() << " " << outputZMPSeqPtr->at(i).transpose() << " " << outputCMSeqPtr->at(i).transpose()
                     << " " << zmpSeqPtr->at(i).transpose() << " " << body->centerOfMass().transpose() << " " << body->rootLink()->p().transpose() << endl;
             }
             ofs.close();
