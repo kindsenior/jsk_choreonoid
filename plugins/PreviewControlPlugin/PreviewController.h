@@ -5,10 +5,12 @@
 #include <queue>
 #include <deque>
 #include <hrpUtil/Eigen3d.h>
-#include <cnoid/Vector3Seq>
+#include "hrpsys/util/Hrpsys.h"
 
 namespace rats2
 {
+  static const double DEFAULT_GRAVITATIONAL_ACCELERATION = 9.80665; // [m/s^2]
+
   template <std::size_t dim>
   struct riccati_equation
   {
@@ -30,12 +32,12 @@ namespace rats2
     virtual ~riccati_equation() {};
     bool solve() {
       Eigen::Matrix<double, dim, dim> prev_P;
-      for (int i = 0; i < 2000; i++) {
+      for (int i = 0; i < 10000; i++) {
         R_btPb_inv = (1.0 / (R + (b.transpose() * P * b)(0,0)));
         Eigen::Matrix<double, dim, dim> tmp_pa(P * A);
         K = R_btPb_inv * b.transpose() * tmp_pa;
         prev_P = A.transpose() * tmp_pa + c.transpose() * Q * c - A.transpose() * P * b * K;
-        if ((abs((P - prev_P).array()) < 5.0e-5).all()) {
+        if ((abs((P - prev_P).array()) < 5.0e-10).all()) {
           A_minus_bKt = (A - b * K).transpose();
           return true;
         }
@@ -49,8 +51,6 @@ namespace rats2
   class preview_control_base
   {
   protected:
-    // static const double g = 9.80665; /* [m/s^2] */
-    static constexpr double g = 9.80665; // for c++11
     riccati_equation<dim> riccati;
     Eigen::Matrix<double, 3, 3> tcA;
     Eigen::Matrix<double, 3, 1> tcb;
@@ -59,6 +59,8 @@ namespace rats2
     Eigen::Matrix<double, 1, 2> u_k;
     hrp::dvector f;
     std::deque<Eigen::Matrix<double, 2, 1> > p;
+    std::deque<double> pz;
+    std::deque< std::vector<hrp::Vector3> > qdata;
     double zmp_z, cog_z;
     size_t delay, ending_count;
     virtual void calc_f() = 0;
@@ -79,8 +81,8 @@ namespace rats2
   public:
     /* dt = [s], zc = [mm], d = [s] */
     preview_control_base(const double dt, const double zc,
-                         const hrp::Vector3& init_xk, const double d = 1.6)
-      : riccati(), x_k(Eigen::Matrix<double, 3, 2>::Zero()), u_k(Eigen::Matrix<double, 1, 2>::Zero()), p(),
+                         const hrp::Vector3& init_xk, const double _gravitational_acceleration, const double d = 1.6)
+      : riccati(), x_k(Eigen::Matrix<double, 3, 2>::Zero()), u_k(Eigen::Matrix<double, 1, 2>::Zero()), p(), pz(), qdata(),
         zmp_z(0), cog_z(zc), delay(static_cast<size_t>(round(d / dt))), ending_count(1+delay)
     {
       tcA << 1, dt, 0.5 * dt * dt,
@@ -89,25 +91,27 @@ namespace rats2
       tcb << 1 / 6.0 * dt * dt * dt,
         0.5 * dt * dt,
         dt;
-      tcc << 1.0, 0.0, -zc / g;
+      tcc << 1.0, 0.0, -zc / _gravitational_acceleration;
       x_k(0,0) = init_xk(0);
       x_k(0,1) = init_xk(1);
     };
     virtual ~preview_control_base()
     {
       p.clear();
+      pz.clear();
+      qdata.clear();
     };
-    virtual void update_x_k(const hrp::Vector3& pr);
+    virtual void update_x_k(const hrp::Vector3& pr, const std::vector<hrp::Vector3>& qdata);
     virtual void update_x_k()
     {
       hrp::Vector3 pr;
       pr(0) = p.back()(0);
       pr(1) = p.back()(1);
-      pr(2) = zmp_z;
-      update_x_k(pr);
+      pr(2) = pz.back();
+      update_x_k(pr, qdata.back());
       ending_count--;
     };
-    void update_zc(double zc);
+    // void update_zc(double zc);
     size_t get_delay () { return delay; };
     void get_refcog (double* ret)
     {
@@ -115,25 +119,51 @@ namespace rats2
       ret[1] = x_k(0,1);
       ret[2] = cog_z;
     };
+    void get_refcog_vel (double* ret)
+    {
+      ret[0] = x_k(1,0);
+      ret[1] = x_k(1,1);
+      ret[2] = 0;
+    };
+    void get_refcog_acc (double* ret)
+    {
+      ret[0] = x_k(2,0);
+      ret[1] = x_k(2,1);
+      ret[2] = 0;
+    };
     void get_cart_zmp (double* ret)
     {
       Eigen::Matrix<double, 1, 2> _p(tcc * x_k);
       ret[0] = _p(0, 0);
       ret[1] = _p(0, 1);
-      ret[2] = zmp_z;
+      ret[2] = pz.front();
     };
     void get_current_refzmp (double* ret)
     {
       ret[0] = p.front()(0);
       ret[1] = p.front()(1);
-      ret[2] = zmp_z;
+      ret[2] = pz.front();
+    };
+    void get_current_qdata (std::vector<hrp::Vector3>& _qdata)
+    {
+        _qdata = qdata.front();
     };
     bool is_doing () { return p.size() >= 1 + delay; };
     bool is_end () { return ending_count <= 0 ; };
     void remove_preview_queue(const size_t remain_length)
     {
       size_t num = p.size() - remain_length;
-      for (size_t i = 0; i < num; i++) p.pop_back();
+      for (size_t i = 0; i < num; i++) {
+        p.pop_back();
+        pz.pop_back();
+        qdata.pop_back();
+      }
+    };
+    void remove_preview_queue() // Remove all queue
+    {
+        p.clear();
+        pz.clear();
+        qdata.clear();
     };
     void print_all_queue ()
     {
@@ -153,9 +183,9 @@ namespace rats2
     void calc_x_k();
   public:
     preview_control(const double dt, const double zc,
-                    const hrp::Vector3& init_xk, const double q = 1.0,
+                    const hrp::Vector3& init_xk, const double _gravitational_acceleration = DEFAULT_GRAVITATIONAL_ACCELERATION, const double q = 1.0,
                     const double r = 1.0e-6, const double d = 1.6)
-      : preview_control_base<3>(dt, zc, init_xk, d)
+        : preview_control_base<3>(dt, zc, init_xk, _gravitational_acceleration, d)
     {
       init_riccati(tcA, tcb, tcc, q, r);
     };
@@ -171,9 +201,9 @@ namespace rats2
     void calc_x_k();
   public:
     extended_preview_control(const double dt, const double zc,
-                             const hrp::Vector3& init_xk, const double q = 1.0,
+                             const hrp::Vector3& init_xk, const double _gravitational_acceleration = DEFAULT_GRAVITATIONAL_ACCELERATION, const double q = 1.0,
                              const double r = 1.0e-6, const double d = 1.6)
-      : preview_control_base<4>(dt, zc, init_xk, d), x_k_e(Eigen::Matrix<double, 4, 2>::Zero())
+      : preview_control_base<4>(dt, zc, init_xk, _gravitational_acceleration, d), x_k_e(Eigen::Matrix<double, 4, 2>::Zero())
     {
       Eigen::Matrix<double, 4, 4> A;
       Eigen::Matrix<double, 4, 1> b;
@@ -203,14 +233,14 @@ namespace rats2
     bool finishedp;
   public:
     preview_dynamics_filter() {};
-    preview_dynamics_filter(const double dt, const double zc, const hrp::Vector3& init_xk, const double q = 1.0, const double r = 1.0e-6, const double d = 1.6)
-      : preview_controller(dt, zc, init_xk, q, r, d), finishedp(false) {};
-    ~preview_dynamics_filter() {};  
-    bool update(hrp::Vector3& p_ret, hrp::Vector3& x_ret, const hrp::Vector3& pr, const bool updatep)
+    preview_dynamics_filter(const double dt, const double zc, const hrp::Vector3& init_xk, const double _gravitational_acceleration = DEFAULT_GRAVITATIONAL_ACCELERATION, const double q = 1.0, const double r = 1.0e-6, const double d = 1.6)
+        : preview_controller(dt, zc, init_xk, _gravitational_acceleration, q, r, d), finishedp(false) {};
+    ~preview_dynamics_filter() {};
+    bool update(hrp::Vector3& p_ret, hrp::Vector3& x_ret, std::vector<hrp::Vector3>& qdata_ret, const hrp::Vector3& pr, const std::vector<hrp::Vector3>& qdata, const bool updatep)
     {
       bool flg;
       if (updatep) {
-        preview_controller.update_x_k(pr);
+        preview_controller.update_x_k(pr, qdata);
         flg = preview_controller.is_doing();
       } else {
         if ( !preview_controller.is_end() )
@@ -221,6 +251,7 @@ namespace rats2
       if (flg) {
         preview_controller.get_current_refzmp(p_ret.data());
         preview_controller.get_refcog(x_ret.data());
+        preview_controller.get_current_qdata(qdata_ret);
       }
       return flg;
     };
@@ -228,13 +259,21 @@ namespace rats2
     {
       preview_controller.remove_preview_queue(remain_length);
     };
+    void remove_preview_queue()
+    {
+      preview_controller.remove_preview_queue();
+    };
     void print_all_queue ()
     {
       preview_controller.print_all_queue();
     }
 
     void get_cart_zmp (double* ret) { preview_controller.get_cart_zmp(ret);}
+    void get_refcog_vel (double* ret) { preview_controller.get_refcog_vel(ret);}
+    void get_refcog_acc (double* ret) { preview_controller.get_refcog_acc(ret);}
     void get_current_refzmp (double* ret) { preview_controller.get_current_refzmp(ret);}
+    //void get_current_qdata (double* ret) { preview_controller.get_current_qdata(ret);}
+    size_t get_delay () { return preview_controller.get_delay(); };
   };
 }
 #endif /*PREVIEW_H_*/

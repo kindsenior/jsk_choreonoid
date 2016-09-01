@@ -5,27 +5,34 @@ using namespace hrp;
 using namespace rats2;
 
 template <std::size_t dim>
-void preview_control_base<dim>::update_x_k(const hrp::Vector3& pr)
+void preview_control_base<dim>::update_x_k(const hrp::Vector3& pr, const std::vector<hrp::Vector3>& _qdata)
 {
   zmp_z = pr(2);
   Eigen::Matrix<double, 2, 1> tmpv;
   tmpv(0,0) = pr(0);
   tmpv(1,0) = pr(1);
   p.push_back(tmpv);
-  if ( p.size() > 1 + delay ) p.pop_front();
+  pz.push_back(pr(2));
+  qdata.push_back(_qdata);
+  if ( p.size() > 1 + delay ) {
+    p.pop_front();
+    pz.pop_front();
+    qdata.pop_front();
+  }
   if ( is_doing() ) calc_x_k();
 }
 
-template <std::size_t dim>
-void preview_control_base<dim>::update_zc(double zc)
-{
-  riccati.c(0, 2) = - zc / g; 
-  riccati.solve();
-}
+// template <std::size_t dim>
+// void preview_control_base<dim>::update_zc(double zc)
+// {
+//   riccati.c(0, 2) = - zc / gravitational_acceleration; 
+//   riccati.solve();
+// }
 
 void preview_control::calc_f()
 {
   f.resize(delay+1);
+  f(0)=0;
   Eigen::Matrix<double, 1, 1> fa;
   hrp::Matrix33 gsi(hrp::Matrix33::Identity());
   for (size_t i = 0; i < delay; i++) {
@@ -52,6 +59,7 @@ void preview_control::calc_x_k()
 void extended_preview_control::calc_f()
 {
   f.resize(delay + 1);
+  f(0)=0;
   Eigen::Matrix<double, 1, 1> fa;
   Eigen::Matrix<double, 4, 4> gsi(Eigen::Matrix<double, 4, 4>::Identity());
   Eigen::Matrix<double, 4, 1> qt(riccati.Q * riccati.c.transpose());
