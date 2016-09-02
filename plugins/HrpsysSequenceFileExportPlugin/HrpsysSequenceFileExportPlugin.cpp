@@ -27,29 +27,27 @@ void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport()
   boost::filesystem::path poseSeqPath(poseSeqPathString);
   cout << " parent_path:" << poseSeqPath.parent_path().string() << " basename:" << getBasename(poseSeqPath) << endl;
 
-  stringstream ss;
-  ss << poseSeqPath.parent_path().string() << "/" << poseSeqItem->name() << ".optionaldata";
-  FILE* fp = fopen(ss.str().c_str(),"w"); if(fp == NULL){ cout << "\x1b[31m" << "optionaldata file("<< ss.str() << ") open error" << "\x1b[m" << endl; return; }
+  double dt = ((double) 1)/motion->frameRate();
+  int numFrames = motion->numFrames();
 
-  double frameRate = motion->frameRate();
+  std::vector<string> extentionVec{"wrenches","optionalData"};
+  for(auto ext : extentionVec){
+      stringstream fnamess;
+      fnamess << poseSeqItem->name() << "." << ext;
+      ofstream ofs;
+      ofs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+      MultiValueSeqPtr multiValueSeqPtr = bodyMotionItem->findSubItem<MultiValueSeqItem>(ext)->seq();
 
-  for(PoseSeq::iterator prevPoseIter = poseSeq->begin(), poseIter = poseSeq->begin(); poseIter != poseSeq->end(); prevPoseIter = poseIter){
-      incContactPose( poseIter, poseSeq, body );
-      cout << "phase:" << prevPoseIter->time() << "[sec]->" << poseIter->time() << "[sec]" << endl;
-
-      std::vector<int> contactStates;
-      for(int i=0; i < lgh->numFeet(); ++i){
-          contactStates.push_back( getPrevContactState( poseIter, poseSeq, lgh->footLink(i)->index() ) );
+      for(int i=0; i<numFrames; ++i){
+          ofs << i*dt;
+          MultiValueSeq::Frame frame = multiValueSeqPtr->frame(i);
+          for(int j=0; j<frame.size(); ++j){
+              ofs << " " << frame[j];
+          }
+          ofs << endl;
       }
-
-      // 同じ時刻のキーポーズが連続するとダメ
-      for(int i = (int)(prevPoseIter->time()*frameRate); i < poseIter->time()*frameRate; ++i){
-          fprintf(fp,"%lf %d %d 0 0   5 5 5 5\n", (double)i/frameRate, contactStates[0] > 0 ? 0 : 1, contactStates[1] > 0 ? 0 : 1);// hrpsys-baseの実装に合わせて静止接触だけ1
-      }
-      cout << endl << endl;
+      ofs.close();
   }
-
-  fclose(fp);
 
   cout << "\x1b[31m" << "Finished HrpsysSequenceFileExport" << "\x1b[m" << endl << endl;
 }
