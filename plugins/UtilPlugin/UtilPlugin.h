@@ -85,6 +85,7 @@ Matrix3d D(Vector3d r);
 void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
 
 void setSubItem(std::string seqName, const Vector3SeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem);
+void setSubItem(std::string seqName, const MultiValueSeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem);
 
 template <typename t_matrix>
 t_matrix PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6);

@@ -415,6 +415,18 @@ void cnoid::setSubItem(std::string seqName, const Vector3SeqPtr& seqPtr, BodyMot
     }
 }
 
+void cnoid::setSubItem(std::string seqName, const MultiValueSeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem)
+{
+    MultiValueSeqItemPtr seqItemPtr = pBodyMotionItem->findSubItem<MultiValueSeqItem>(seqName);
+    if(!seqItemPtr){
+        seqItemPtr = new MultiValueSeqItem(seqPtr);
+        seqItemPtr->setName(seqName);
+        pBodyMotionItem->addSubItem(seqItemPtr);
+    }else{
+        seqItemPtr->seq() = seqPtr;
+    }
+}
+
 template <typename t_matrix>
 t_matrix cnoid::PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6)
 {
