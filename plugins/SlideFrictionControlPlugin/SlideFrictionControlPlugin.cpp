@@ -310,6 +310,11 @@ void SlideFrictionControlPlugin::execControl()
     mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
     cout << "PoseSeqPath: " << mPoseSeqPath << endl;
 
+    std::vector<Link*> endEffectorLinkVec;
+    if(!getEndEffectorLinkVector(endEffectorLinkVec, body)) return;
+
+    generateOptionalData(body, poseSeqItemPtr, endEffectorLinkVec);
+
     // BodyMotion作成
     generateBodyMotionFromBar(body, poseSeqItemPtr, mBodyMotionItemPtr);
 
