@@ -243,6 +243,7 @@ void UtilPlugin::getFootLink(Link** plFootLink, Link** prFootLink, const BodyPtr
   if(legged->isValid()){
     *prFootLink = body->link(legged->footLink(0)->index());
     *plFootLink = body->link(legged->footLink(1)->index());
+    cout << "Foot Links: " << (*plFootLink)->name() << " " << (*prFootLink)->name() << endl;
   }else{
     cout << "Please load model from yaml file" << endl;
   }

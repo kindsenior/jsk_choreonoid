@@ -61,7 +61,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     for(int i=0; i < numFrames + sfc->numWindows(); ++i){
         // if(i > sfc->numWindows() + 1) goto BREAK;
 
-        cout << endl << "##############################" << endl << "processCycle() turn:" << i << endl;
+        cout << endl << "##############################" << endl << "processCycle() turn:" << i  << "(" << (i-sfc->numWindows())*dt << " sec)"<< endl;
         float processedTime;
         if(sfc->processCycle(processedTime)) failIdxVec.push_back(i - sfc->numWindows());
         avgTime += processedTime;
