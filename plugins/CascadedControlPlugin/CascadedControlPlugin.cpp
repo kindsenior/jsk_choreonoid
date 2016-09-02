@@ -15,28 +15,11 @@ bool CascadedControlPlugin::initialize()
     return true;
 }
 
-MultiValueSeq::Frame operator+(const MultiValueSeq::Frame& frame0, const MultiValueSeq::Frame& frame1)
-{
-    MultiValueSeq::Frame frame = frame0;
-    for(int i=0; i<frame.size(); ++i){
-        frame[i] += frame1[i];
-    }
-    return frame;
-}
-
 MultiValueSeq::Frame operator-(const MultiValueSeq::Frame& frame0, const MultiValueSeq::Frame& frame1)
 {
     MultiValueSeq::Frame frame = frame0;
     for(int i=0; i<frame.size(); ++i){
         frame[i] -= frame1[i];
-    }
-    return frame;
-}
-MultiValueSeq::Frame operator*(const double d, const MultiValueSeq::Frame& frame0)
-{
-    MultiValueSeq::Frame frame = frame0;
-    for(int i=0; i<frame.size(); ++i){
-        frame[i] *= d;
     }
     return frame;
 }
@@ -47,8 +30,8 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     const double dt = 1.0/motion->frameRate();
     const int cycle = T/dt;
     const int numFrames = motion->numFrames();
-    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
-		MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
+    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq();
+    MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq();
     for(int i=0; i<numFrames-cycle; i+=cycle){
         Vector3d front = refZmpSeqPtr->at(i);
         Vector3d diff = refZmpSeqPtr->at(i+cycle) - front;
@@ -57,7 +40,9 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
         for(int j=0; j<cycle; ++j){
             double r = ((double)j/cycle);
             refZmpSeqPtr->at(i+j) = front + r*diff;
-            refWrenchesSeqPtr->frame(i+j) = frontWrenches  + r*diffWrenches;
+            for(int k=0; k<frontWrenches.size(); ++k){
+                refWrenchesSeqPtr->frame(i+j)[k] = frontWrenches[k] + r*diffWrenches[k];
+            }
         }
     }
 }
