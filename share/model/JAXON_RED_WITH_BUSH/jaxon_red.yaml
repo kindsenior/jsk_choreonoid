@@ -84,6 +84,12 @@ selfCollisionDetection:
   excludeTreeDepth: 3
   excludeLinks: [ ]
 
+endEffectors:
+  - RLEG_JOINT5
+  - LLEG_JOINT5
+  - RARM_JOINT7
+  - RARM_JOINT7
+
 poseConversionInfo:
   - targetBodies: [ HRP4C ]
     jointMap: [ 
