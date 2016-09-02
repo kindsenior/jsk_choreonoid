@@ -35,6 +35,10 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
     Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+    MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
+    refWrenchesSeqPtr->setNumParts(6*4,true);
+
+    std::vector<std::vector<string>> limbKeysVec{{"rleg"},{"lleg"},{"rarm"},{"larm"}};
 
     fnamess.str("");
     fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
@@ -86,6 +90,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             VectorXd u0 = sfc->u0;
             double Fz = 0;
             Vector3d zmp = Vector3d::Zero();
+            std::map<string, VectorXd> wrenchMap;
             for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
                 int colIdx = 0;
                 for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
@@ -102,12 +107,19 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                         Fz += f.z();
                         zmp.x() += -n.y()+ccParam->p.x()*f.z();
                         zmp.y() +=  n.x()+ccParam->p.y()*f.z();
+
+                        //wrench
+                        VectorXd wrench(6);
+                        wrench.head(3) << f;
+                        wrench.tail(3) << n;
+                        wrenchMap[(*linkIter)->name()] = wrench;
                         goto END;
                     }
                     colIdx += inputDim;
                 }
                 contactOfs << " 0 0 0  0 0 0  0 0 0";
                 wrenchOfs << " 0 0 0  0 0 0";
+                wrenchMap[(*linkIter)->name()] = VectorXd::Zero(6);
             END:
                 ;
             }
@@ -115,6 +127,36 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             refZmpSeqPtr->at(motionIdx) = zmp;
             contactOfs << endl;
             wrenchOfs << endl;
+
+            // refWrenchsSeq
+            {
+                cout << "wrenches in " << (i - sfc->numWindows())*dt << " sec :";
+                MultiValueSeq::Frame wrenches = refWrenchesSeqPtr->frame(motionIdx);
+                int idx = 0;
+                for(auto limbKeys : limbKeysVec){
+                    VectorXd wrenchVec = VectorXd::Zero(6);
+                    for(auto wrench : wrenchMap){
+                        bool isFound = true;
+                        string linkName = wrench.first;
+                        std::transform(linkName.begin(), linkName.end(), linkName.begin(), ::tolower);// convert to lower case
+                        for(auto key : limbKeys){// check all keys
+                            if(linkName.find(key) == std::string::npos){
+                                isFound = false;
+                                break;// break keys loop
+                            }
+                        }// isFound is true when all keys found
+                        if(isFound){
+                            wrenchVec = wrench.second;
+                            cout << "  " << linkName << " " << wrench.second.transpose();
+                            break;// break wrenchMap loop
+                        }
+                    }
+                    for(int i=0; i<6; ++i) wrenches[idx+i] = wrenchVec[i];
+                    idx += 6;
+                }
+                refWrenchesSeqPtr->frame(motionIdx) = wrenches;
+                cout << endl;
+            }
         }
     }
  // BREAK:
@@ -123,6 +165,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     setSubItem("refP", refPSeqPtr, bodyMotionItemPtr);
     setSubItem("refL", refLSeqPtr, bodyMotionItemPtr);
     setSubItem("ZMP", refZmpSeqPtr, bodyMotionItemPtr);
+    setSubItem("wrenches", refWrenchesSeqPtr, bodyMotionItemPtr);
 
     refPLOfs.close();
     contactOfs.close();
