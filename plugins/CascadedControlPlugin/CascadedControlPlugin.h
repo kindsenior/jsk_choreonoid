@@ -28,7 +28,7 @@
 #include "CascadedControlBar.h"
 
 namespace cnoid{
-    void interpolateZMP(BodyMotionItemPtr& bodyMotionItemPtr, double T);
+    void interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T);
 
     class CascadedControlBar;
 

@@ -15,18 +15,49 @@ bool CascadedControlPlugin::initialize()
     return true;
 }
 
-void cnoid::interpolateZMP(BodyMotionItemPtr& bodyMotionItemPtr, double T)
+MultiValueSeq::Frame operator+(const MultiValueSeq::Frame& frame0, const MultiValueSeq::Frame& frame1)
+{
+    MultiValueSeq::Frame frame = frame0;
+    for(int i=0; i<frame.size(); ++i){
+        frame[i] += frame1[i];
+    }
+    return frame;
+}
+
+MultiValueSeq::Frame operator-(const MultiValueSeq::Frame& frame0, const MultiValueSeq::Frame& frame1)
+{
+    MultiValueSeq::Frame frame = frame0;
+    for(int i=0; i<frame.size(); ++i){
+        frame[i] -= frame1[i];
+    }
+    return frame;
+}
+MultiValueSeq::Frame operator*(const double d, const MultiValueSeq::Frame& frame0)
+{
+    MultiValueSeq::Frame frame = frame0;
+    for(int i=0; i<frame.size(); ++i){
+        frame[i] *= d;
+    }
+    return frame;
+}
+
+void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
 {
     BodyMotionPtr motion = bodyMotionItemPtr->motion();
     const double dt = 1.0/motion->frameRate();
     const int cycle = T/dt;
     const int numFrames = motion->numFrames();
     Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+		MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
     for(int i=0; i<numFrames-cycle; i+=cycle){
         Vector3d front = refZmpSeqPtr->at(i);
         Vector3d diff = refZmpSeqPtr->at(i+cycle) - front;
+        MultiValueSeq::Frame frontWrenches = refWrenchesSeqPtr->frame(i);
+        MultiValueSeq::Frame diffWrenches = refWrenchesSeqPtr->frame(i+cycle) - frontWrenches;
         for(int j=0; j<cycle; ++j){
-            refZmpSeqPtr->at(i+j) = front + ((double)j/cycle)*diff;
+            double r = ((double)j/cycle);
+            refZmpSeqPtr->at(i+j) = front + r*diff;
+            refWrenchesSeqPtr->frame(i+j) = frontWrenches  + r*diffWrenches;
         }
     }
 }
@@ -129,7 +160,7 @@ void CascadedControlPlugin::execControl()
     childSfc->pushAllPreMPCParamFromRoot();
 
     sweepControl(mPoseSeqPath, childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// childモーション走査
-    interpolateZMP(mBodyMotionItemPtr, childSfc->dt);
+    interpolateExtraSeq(mBodyMotionItemPtr, childSfc->dt);
     // sweepControl(mPoseSeqPath, parentSfcLayout->getParamString(), parentSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// parentモーション走査
 
     cout << "Finished CascadedControl" << endl;
