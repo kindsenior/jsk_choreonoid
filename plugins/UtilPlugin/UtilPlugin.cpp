@@ -279,6 +279,49 @@ void cnoid::generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseS
     cout << "Generated motion" << endl;
 }
 
+void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const std::vector<Link*>& linkVec)
+{
+    PoseSeqPtr poseSeqPtr = poseSeqItemPtr->poseSeq();
+    BodyMotionItemPtr bodyMotionItemPtr = poseSeqItemPtr->bodyMotionItem();
+    BodyMotionPtr motion = bodyMotionItemPtr->motion();
+
+    int linkNum = linkVec.size();
+    int frameRate = motion->frameRate();
+    MultiValueSeqPtr optionalDataSeqPtr = motion->getOrCreateExtraSeq<MultiValueSeq>("optionalData");
+    optionalDataSeqPtr->setNumParts(linkNum*2,true);
+    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
+        if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
+        std::vector<int> contactStateVec;
+        for(auto link : linkVec){
+            contactStateVec.push_back(getPrevContactState(frontPoseIter, poseSeqPtr, link->index()) < 2);// 0:静止接触 1:滑り接触
+        }
+        for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            MultiValueSeq::Frame frame = optionalDataSeqPtr->frame(i);
+            for(int j=0; j<linkNum; ++j){
+                frame[j] = contactStateVec[j];
+                frame[j+linkNum] = 5;
+            }
+        }
+    }
+
+    setSubItem("optionalData", optionalDataSeqPtr, bodyMotionItemPtr);
+}
+
+bool cnoid::getEndEffectorLinkVector(std::vector<Link*>& endEfectorLinkVec, BodyPtr& body)
+{
+    cout << "generateEndEffectorLinkVector( " << body->name() << ")" << endl;
+    const Listing& endEffectorNodes = *body->info()->findListing("endEffectors");
+    if(endEffectorNodes.isValid() && endEffectorNodes.size() != 0){
+        for(int i=0; i<endEffectorNodes.size(); ++i){
+            endEfectorLinkVec.push_back(body->link(endEffectorNodes[i].toString()));
+        }
+        return true;
+    }else{
+        cout << "Please set endEffectorNodes in yaml file" << endl;
+        return false;
+    }
+}
+
 void cnoid::updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame, const std::set<Link*>& linkSet)
 {
     int prevFrame = max(currentFrame-1, 0);

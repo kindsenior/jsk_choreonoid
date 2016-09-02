@@ -23,6 +23,7 @@
 #include <cnoid/src/Body/Jacobian.h>
 #include <cnoid/Vector3SeqItem>
 #include <cnoid/FileUtil>
+#include <cnoid/ValueTree>
 
 namespace cnoid{
 
@@ -73,6 +74,10 @@ bool getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
                            BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion);
 
 void generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemptr, const BodyMotionItemPtr& bodyMotionItemPtr);
+
+void generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const std::vector<Link*>& linkVec);
+
+bool getEndEffectorLinkVector(std::vector<Link*>& endEfectorLinkVector, BodyPtr& body);
 
 void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame, const std::set<Link*>& linkSet=std::set<Link*>());
 
