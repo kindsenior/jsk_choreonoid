@@ -19,7 +19,7 @@ MultiValueSeq::Frame operator-(const MultiValueSeq::Frame& frame0, const MultiVa
 {
     MultiValueSeq::Frame frame = frame0;
     for(int i=0; i<frame.size(); ++i){
-        frame[i] -= frame1[i];
+        frame[i] = frame0[i] - frame1[i];
     }
     return frame;
 }
@@ -36,12 +36,12 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
         Vector3d front = refZmpSeqPtr->at(i);
         Vector3d diff = refZmpSeqPtr->at(i+cycle) - front;
         MultiValueSeq::Frame frontWrenches = refWrenchesSeqPtr->frame(i);
-        MultiValueSeq::Frame diffWrenches = refWrenchesSeqPtr->frame(i+cycle) - frontWrenches;
+        MultiValueSeq::Frame nextWrenches = refWrenchesSeqPtr->frame(i+cycle);
         for(int j=0; j<cycle; ++j){
             double r = ((double)j/cycle);
             refZmpSeqPtr->at(i+j) = front + r*diff;
             for(int k=0; k<frontWrenches.size(); ++k){
-                refWrenchesSeqPtr->frame(i+j)[k] = frontWrenches[k] + r*diffWrenches[k];
+                refWrenchesSeqPtr->frame(i+j)[k] = (1-r)*frontWrenches[k] + r*nextWrenches[k];
             }
         }
     }
