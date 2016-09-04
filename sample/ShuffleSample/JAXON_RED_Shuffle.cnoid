@@ -352,7 +352,7 @@ toolbars:
   "TimeBar": 
     minTime: 0
     maxTime: 12000
-    frameRate: 10
+    frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
     currentTime: 0
