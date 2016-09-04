@@ -447,7 +447,7 @@ toolbars:
       dt: 0.1
       dtCheck: true
   "PreviewControl": 
-    controlMode: DynamicsFilter
+    controlMode: TrajectoryPlanning
     controlModeCheck: true
     saveParameterInFileName: true
   "CascadedControlBar": 
