@@ -80,6 +80,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
 
     body->rootLink()->dv() = VectorXd::Zero(3);
     Vector3 lastdv = VectorXd::Zero(3);
+    Vector3d prevZmp;
     for(int currentFrame = 0; currentFrame < motion->numFrames(); ++currentFrame){
         // 腰座標更新
         motion->frame(currentFrame) >> *body;
@@ -146,6 +147,8 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         // cout << "dw_:   " << dw_.transpose() << endl;
         // }
 
+        Vector3d zmp;
+
         // リンク速度・加速度計算
         body->calcForwardKinematics(true,true);
         // body->calcCM();
@@ -161,9 +164,13 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         Vector3d out_f = f.head<3>();
         Vector3d out_tau = f.tail<3>();
         
-        zmpSeqPtr->at(currentFrame).x() = - out_tau.y() / out_f.z();
-        zmpSeqPtr->at(currentFrame).y() =   out_tau.x() / out_f.z();
-        zmpSeqPtr->at(currentFrame).z() = 0;
+        zmp = Vector3d(-out_tau.y()/out_f.z(), out_tau.x()/out_f.z(), 0);
+        if(currentFrame > 0 && (zmp - prevZmp).norm() > 0.2){// thresh is 0.2[m]
+            cout << currentFrame << "(" << currentFrame*dt << " sec): zmp diff " << (zmp - prevZmp).norm() << "[m] is larger than thresh"<< endl;
+            zmp = prevZmp;// thresh 0.5[m]
+        }
+        zmpSeqPtr->at(currentFrame) = zmp;
+        prevZmp = zmp;
 
 
         // // 西脇方式
