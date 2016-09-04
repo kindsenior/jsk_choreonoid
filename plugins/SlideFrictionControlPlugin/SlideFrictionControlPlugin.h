@@ -30,6 +30,7 @@ namespace cnoid{
     void generateContactConstraintParamVec2(std::vector<hrp::ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr);
     void generateSlideFrictionControlParam(hrp::SlideFrictionControlParam* sfcParam, Vector3d& lastCM, Vector3d& lastMomentum, BodyPtr& body, std::vector<hrp::ContactConstraintParam*>& ccParamVec, double dt);
     void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
+    void loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
 
     class SlideFrictionControlBar;
 

@@ -15,6 +15,93 @@ bool SlideFrictionControlPlugin::initialize()
     return true;
 }
 
+void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
+{
+    cout << "loadExtraSeq()" << endl;
+
+    stringstream fnamess;
+    fnamess << poseSeqPath.stem().string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    ifstream wrenchIfs;
+    wrenchIfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::in);
+    cout << " file: " << fnamess.str() << endl;
+
+    fnamess.str("");
+    fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    ifstream contactIfs;
+    contactIfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+
+    BodyMotionPtr motion = bodyMotionItemPtr->motion();
+    const double dt = ((double)1)/motion->frameRate();
+
+    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+    MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
+    refWrenchesSeqPtr->setNumParts(6*4,true);
+
+    std::vector<std::vector<string>> limbKeysVec{{"rleg"},{"lleg"},{"rarm"},{"larm"}};
+
+    const int cycle = sfc->dt*bodyMotionItemPtr->motion()->frameRate();
+    string wrenchStr, contactStr;
+    getline(wrenchIfs,wrenchStr);
+    getline(contactIfs,contactStr);// first row is columnhead
+    for(int i=0; getline(wrenchIfs,wrenchStr),getline(contactIfs,contactStr); ++i){
+        motion->frame(i*cycle) >> *body;
+        body->calcForwardKinematics();
+
+        double Fz = 0;
+        Vector3d zmp = Vector3d::Zero();
+        std::map<string, VectorXd> wrenchMap;
+        stringstream wrenchSs(wrenchStr), contactSs(contactStr);
+        VectorXd wrench(6);
+        Vector3d p;
+        double tmp;
+        wrenchSs >> tmp;// time column
+        contactSs >> tmp;
+        for(auto contactLink : contactLinkCandidateSet){
+            for(int j=0; j<6; ++j) wrenchSs >> wrench(j);
+            for(int j=0; j<3; ++j) contactSs >> p(j);
+            for(int j=0; j<6; ++j) contactSs >> tmp;// vx -> wz
+            wrench.head(3) = body->link(contactLink->name())->R()*wrench.head(3);
+            wrench.tail(3) = body->link(contactLink->name())->R()*wrench.tail(3);
+            wrenchMap[contactLink->name()] = wrench;
+            Vector3d f = wrench.head(3);
+            Vector3d n = wrench.tail(3);
+            Fz += f.z();
+            zmp.x() += -n.y()+p.x()*f.z();// 遊脚の場合は発散する
+            zmp.y() +=  n.x()+p.y()*f.z();
+        }
+        zmp /= Fz;
+        refZmpSeqPtr->at(i*cycle) = zmp;
+
+        // refWrenchsSeq
+        {
+            MultiValueSeq::Frame wrenches = refWrenchesSeqPtr->frame(i*cycle);
+            int idx = 0;
+            for(auto limbKeys : limbKeysVec){
+                VectorXd wrenchVec = VectorXd::Zero(6);
+                for(auto wrench : wrenchMap){
+                    bool isFound = true;
+                    string linkName = wrench.first;
+                    std::transform(linkName.begin(), linkName.end(), linkName.begin(), ::tolower);// convert to lower case
+                    for(auto key : limbKeys){// check all keys
+                        if(linkName.find(key) == std::string::npos){
+                            isFound = false;
+                            break;// break keys loop
+                        }
+                    }// isFound is true when all keys found
+                    if(isFound){
+                        wrenchVec = wrench.second;
+                        break;// break wrenchMap loop
+                    }
+                }
+                for(int j=0; j<6; ++j) wrenches[idx+j] = wrenchVec[j];
+                idx += 6;
+            }
+            refWrenchesSeqPtr->frame(i*cycle) = wrenches;
+        }
+    }
+    setSubItem("wrenches", refWrenchesSeqPtr, bodyMotionItemPtr);
+}
+
 void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
 {
     stringstream fnamess; fnamess.str("");
