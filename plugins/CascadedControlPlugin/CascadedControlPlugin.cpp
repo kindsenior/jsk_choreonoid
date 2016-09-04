@@ -26,6 +26,7 @@ MultiValueSeq::Frame operator-(const MultiValueSeq::Frame& frame0, const MultiVa
 
 void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
 {
+    cout << "interpolateExtraSeq()" << endl;
     BodyMotionPtr motion = bodyMotionItemPtr->motion();
     const double dt = 1.0/motion->frameRate();
     const int cycle = T/dt;
