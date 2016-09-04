@@ -47,7 +47,7 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     }
 }
 
-void CascadedControlPlugin::execControl()
+void CascadedControlPlugin::execControl(bool loadFlg)
 {
     stringstream ss,fnamess;
     MessageView::instance()->putln("CascadedControl called !");
@@ -141,15 +141,20 @@ void CascadedControlPlugin::execControl()
     childSfc->inputMomentWeight = childSfcLayout->inputMomentWeightSpin->value();
     childSfc->inputYawMomentWeight = childSfcLayout->inputYawMomentWeightSpin->value();
 
-    generatePreModelPredictiveControlParamDeque(parentSfc, body, poseSeqPtr, motion, contactLinkCandidateSet);
-    {// add last param for interpolation
-        SlideFrictionControlParam* lastSfcParam = (SlideFrictionControlParam*) parentSfc->preMpcParamDeque.back();
-        SlideFrictionControlParam* tmpParam = new SlideFrictionControlParam(lastSfcParam->index()+1, parentSfc, lastSfcParam);
-        parentSfc->preMpcParamDeque.push_back(tmpParam);
-    }
-    childSfc->pushAllPreMPCParamFromRoot();
+    if(loadFlg){
+        loadExtraSeq(mPoseSeqPath ,childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
+    }else{
 
-    sweepControl(mPoseSeqPath, childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// childモーション走査
+        generatePreModelPredictiveControlParamDeque(parentSfc, body, poseSeqPtr, motion, contactLinkCandidateSet);
+        {// add last param for interpolation
+            SlideFrictionControlParam* lastSfcParam = (SlideFrictionControlParam*) parentSfc->preMpcParamDeque.back();
+            SlideFrictionControlParam* tmpParam = new SlideFrictionControlParam(lastSfcParam->index()+1, parentSfc, lastSfcParam);
+            parentSfc->preMpcParamDeque.push_back(tmpParam);
+        }
+        childSfc->pushAllPreMPCParamFromRoot();
+
+        sweepControl(mPoseSeqPath, childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// childモーション走査
+    }
     interpolateExtraSeq(mBodyMotionItemPtr, childSfc->dt);
     // sweepControl(mPoseSeqPath, parentSfcLayout->getParamString(), parentSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// parentモーション走査
 

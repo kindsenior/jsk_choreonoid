@@ -70,7 +70,8 @@ void CascadedControlBar::initialize(CascadedControlPlugin* plugin)
     dialog = (CascadedControlSetupDialog*) new CascadedControlSetupDialog();
     SetupToolBar::initialize(dialog);
 
-    addButton("CC")->sigClicked().connect(boost::bind(&CascadedControlPlugin::execControl, plugin));
+    addButton("CC")->sigClicked().connect(boost::bind(&CascadedControlPlugin::execControl, plugin, false));
+    addButton("load")->sigClicked().connect(boost::bind(&CascadedControlPlugin::execControl, plugin, true));
     addButton(QIcon(":/Base/icons/setup.png"))->sigClicked().connect(boost::bind(&CascadedControlSetupDialog::show, dialog));
 
     setVisibleByDefault(true);// 効かない?

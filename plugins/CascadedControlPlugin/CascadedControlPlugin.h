@@ -62,7 +62,7 @@ namespace cnoid{
         }
 
         virtual bool initialize();
-        void execControl();
+        void execControl(bool loadFlg);
     };
 
 }
