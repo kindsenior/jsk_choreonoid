@@ -301,7 +301,7 @@ views:
     mounted: true
     state: 
       showAllJoints: true
-      jointId: false
+      jointId: true
       name: true
       numColumns: 1
       spinBox: true
@@ -319,7 +319,7 @@ views:
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 38 ]
+          selectedLinks: [ 0 ]
         - 
           id: 7
           selectedLinks: [ 0 ]
@@ -504,7 +504,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 6
+        bodyItem: 7
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
