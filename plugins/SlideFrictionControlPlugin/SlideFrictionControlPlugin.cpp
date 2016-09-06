@@ -310,11 +310,15 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
         if(contactState < 2){// 接触フラグが0か1 要改良
             std::vector<hrp::Vector2> vertexVec;
-            hrp::Vector2 vertex;// 頂点の2次元座標を代入
-            vertex << 0.1,0.05; vertexVec.push_back(vertex);
-            vertex << 0.1,-0.05; vertexVec.push_back(vertex);
-            vertex << -0.1,0.05; vertexVec.push_back(vertex);
-            vertex << -0.1,-0.05; vertexVec.push_back(vertex);
+            hrp::Vector2 vertex;// 頂点の2次元座標を代入 (要 足の形状取得)
+            // vertex << 0.1,0.05; vertexVec.push_back(vertex);
+            // vertex << 0.1,-0.05; vertexVec.push_back(vertex);
+            // vertex << -0.1,0.05; vertexVec.push_back(vertex);
+            // vertex << -0.1,-0.05; vertexVec.push_back(vertex);
+            vertex << 0.15,0.08; vertexVec.push_back(vertex);
+            vertex << 0.15,-0.08; vertexVec.push_back(vertex);
+            vertex << -0.1,0.08; vertexVec.push_back(vertex);
+            vertex << -0.1,-0.08; vertexVec.push_back(vertex);
             if(contactState == 0){// static contact
                 // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
                 // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
