@@ -165,7 +165,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         Vector3d out_tau = f.tail<3>();
         
         zmp = Vector3d(-out_tau.y()/out_f.z(), out_tau.x()/out_f.z(), 0);
-        if(currentFrame > 0 && (zmp - prevZmp).norm() > 0.2){// thresh is 0.2[m]
+        if(currentFrame > 0 && (zmp - prevZmp).norm() > 0.02){// thresh is 0.02[m]
             cout << currentFrame << "(" << currentFrame*dt << " sec): zmp diff " << (zmp - prevZmp).norm() << "[m] is larger than thresh"<< endl;
             zmp = prevZmp;// thresh 0.5[m]
         }
