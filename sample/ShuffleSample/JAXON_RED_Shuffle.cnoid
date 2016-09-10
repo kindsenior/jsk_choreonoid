@@ -88,8 +88,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_RED_left-crab.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 7
+              name: "rotate-left-slide-wide"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_rotate-left-slide-wide.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 7
+          id: 8
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -112,7 +121,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 8
+          id: 9
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -142,7 +151,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 9
+              id: 10
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -161,7 +170,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 10
+              id: 11
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -180,7 +189,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 11
+              id: 12
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -216,8 +225,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 6 ]
-      checked: [ 1, 2, 7, 8, 9, 10, 11 ]
+      selected: [ 7 ]
+      checked: [ 1, 2, 8, 9, 10, 11, 12 ]
       expanded: [ 1, 2 ]
   - 
     id: 3
@@ -321,7 +330,7 @@ views:
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 7
+          id: 8
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -330,7 +339,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 6
+      currentPoseSeqItem: 7
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -504,7 +513,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 7
+        bodyItem: 8
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
