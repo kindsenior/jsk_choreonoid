@@ -288,6 +288,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
 
 void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sfc, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet)
 {
+    cout << "generatePreModelPredictiveControlParamDeque()" << endl;
     const int frameRate = motion->frameRate();
     const int numFrames = motion->numFrames();
     const double dt = 1.0/motion->frameRate();
