@@ -427,6 +427,8 @@ void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcPara
                     = new DistributedForceStaticContactConstraintParam(ccParam->linkName, ccParam->vertexVec, ccParam->rows(),ccParam->cols(), ccParam->muTrans);
                 staticCcParam->p = (*iter)->p;
                 staticCcParam->R = (*iter)->R;
+                staticCcParam->v = (*iter)->v;
+                staticCcParam->w = (*iter)->w;
                 sfcParam->ccParamVec.push_back(staticCcParam);
             }else{
                 sfcParam->ccParamVec.push_back(ccParam);
