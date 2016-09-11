@@ -292,7 +292,7 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     const int numFrames = motion->numFrames();
     const double dt = 1.0/motion->frameRate();
     Vector3d lastMomentum, tmpL;
-    updateBodyState(body, motion, 0);
+    updateBodyState(body, motion, 0, contactLinkCandidateSet);
     body->calcForwardKinematics();// use end effector's velocity
     Vector3d lastCM = body->calcCenterOfMass();
     // body->calcTotalMomentum(lastMomentum,tmpL);
@@ -300,6 +300,8 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
 
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
     int index = 0;
+    std::vector<ContactConstraintParam*> prevCcParamVec;
+    generateContactConstraintParamVec2(prevCcParamVec, contactLinkCandidateSet, ++poseSeqPtr->begin(), poseSeqPtr);
     for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
 
@@ -308,22 +310,30 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
         generateContactConstraintParamVec2(ccParamVec, contactLinkCandidateSet, frontPoseIter, poseSeqPtr);
 
         for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+        // for(int i=backPoseIter->time()*frameRate+1; i <= frontPoseIter->time()*frameRate; ++i){
             updateBodyState(body, motion, min(i,numFrames-1), contactLinkCandidateSet);
             body->calcForwardKinematics();// use end effector's velocity
 
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
             // 動作軌道に依存するパラメータの設定
-            generateSlideFrictionControlParam(sfcParam, lastCM, lastMomentum, body, ccParamVec, dt);
+            if(i == backPoseIter->time()*frameRate){
+                generateSlideFrictionControlParam(sfcParam, lastCM, lastMomentum, body, ccParamVec, prevCcParamVec, dt);
+            }else{
+                std::vector<ContactConstraintParam*> dummyCcparamVec;
+                generateSlideFrictionControlParam(sfcParam, lastCM, lastMomentum, body, ccParamVec, dummyCcparamVec, dt);
+            }
 
             sfc->preMpcParamDeque.push_back((SlideFrictionControlParam*) sfcParam);
             ++index;
         }
+        prevCcParamVec = ccParamVec;
     }
 }
 
 void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
     cout << "generateContactConstraintParamVec2( ~" << poseIter->time() << "[sec] )" << endl;
+    ccParamVec.clear();
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
@@ -354,7 +364,7 @@ void cnoid::generateContactConstraintParamVec2(std::vector<ContactConstraintPara
     cout << endl << endl;
 }
 
-void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam,Vector3d& lastCM, Vector3d& lastMomentum, BodyPtr& body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
+void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam,Vector3d& lastCM, Vector3d& lastMomentum, BodyPtr& body, std::vector<ContactConstraintParam*>& ccParamVec, std::vector<ContactConstraintParam*>& prevCcParamVec, double dt)
 {
 
     static Vector3 g;
@@ -377,6 +387,20 @@ void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcPara
 
     // 接触点座標系の更新 等式と不等式数の合計
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+        bool isPrevstatic = false;
+        if(prevCcParamVec.size() != 0){
+            for(auto ccParam : prevCcParamVec){
+                if((*iter)->linkName == ccParam->linkName){
+                    if(typeid(*ccParam) == typeid(SimpleContactConstraintParam)
+                       || typeid(*ccParam) == typeid(StaticContactConstraintParam)
+                       || typeid(*ccParam) == typeid(DistributedForceContactConstraintParam)
+                       || typeid(*ccParam) == typeid(DistributedForceStaticContactConstraintParam)){
+                        isPrevstatic = true;
+                        break;
+                    }
+                }
+            }
+        }
         (*iter)->p = body->link((*iter)->linkName)->p();
         (*iter)->R = body->link((*iter)->linkName)->R();
         // (*iter)->v = body->link((*iter)->linkName)->v();
@@ -395,7 +419,17 @@ void cnoid::generateSlideFrictionControlParam(SlideFrictionControlParam* sfcPara
         }else if(typeid(**iter) == typeid(DistributedForceStaticContactConstraintParam)){
             sfcParam->ccParamVec.push_back(new DistributedForceStaticContactConstraintParam(dynamic_cast<DistributedForceStaticContactConstraintParam*>(*iter)));
         }else if(typeid(**iter) == typeid(DistributedForceSlideContactConstraintParam)){
-            sfcParam->ccParamVec.push_back(new DistributedForceSlideContactConstraintParam(dynamic_cast<DistributedForceSlideContactConstraintParam*>(*iter)));
+            DistributedForceSlideContactConstraintParam* ccParam = new DistributedForceSlideContactConstraintParam(dynamic_cast<DistributedForceSlideContactConstraintParam*>(*iter));
+            if(isPrevstatic){
+                cout << "slideDF -> staticDF" << endl;
+                DistributedForceStaticContactConstraintParam* staticCcParam
+                    = new DistributedForceStaticContactConstraintParam(ccParam->linkName, ccParam->vertexVec, ccParam->rows(),ccParam->cols(), ccParam->muTrans);
+                staticCcParam->p = (*iter)->p;
+                staticCcParam->R = (*iter)->R;
+                sfcParam->ccParamVec.push_back(staticCcParam);
+            }else{
+                sfcParam->ccParamVec.push_back(ccParam);
+            }
         }else{
             cout << "Warning! ContactConstraintParam's pointer Copy Constructor called" << endl;
             sfcParam->ccParamVec.push_back(new ContactConstraintParam(dynamic_cast<ContactConstraintParam*>(*iter)));
