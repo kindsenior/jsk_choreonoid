@@ -32,15 +32,27 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     const int cycle = T/dt;
     const int numFrames = motion->numFrames();
     Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq();
+    Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refCM")->seq();
+    Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refP")->seq();
+    Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refL")->seq();
     MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq();
     for(int i=0; i<numFrames-cycle; i+=cycle){
-        Vector3d front = refZmpSeqPtr->at(i);
-        Vector3d diff = refZmpSeqPtr->at(i+cycle) - front;
+        Vector3d frontZmp = refZmpSeqPtr->at(i);
+        Vector3d diffZmp = refZmpSeqPtr->at(i+cycle) - frontZmp;
+        Vector3d frontCM = refCMSeqPtr->at(i);
+        Vector3d diffCM = refCMSeqPtr->at(i+cycle) - frontCM;
+        Vector3d frontP = refPSeqPtr->at(i);
+        Vector3d diffP = refPSeqPtr->at(i+cycle) - frontP;
+        Vector3d frontL = refLSeqPtr->at(i);
+        Vector3d diffL = refLSeqPtr->at(i+cycle) - frontL;
         MultiValueSeq::Frame frontWrenches = refWrenchesSeqPtr->frame(i);
         MultiValueSeq::Frame nextWrenches = refWrenchesSeqPtr->frame(i+cycle);
         for(int j=0; j<cycle; ++j){
             double r = ((double)j/cycle);
-            refZmpSeqPtr->at(i+j) = front + r*diff;
+            refZmpSeqPtr->at(i+j) = frontZmp + r*diffZmp;
+            refCMSeqPtr->at(i+j) = frontCM + r*diffCM;
+            refPSeqPtr->at(i+j) = frontP + r*diffP;
+            refLSeqPtr->at(i+j) = frontL + r*diffL;
             for(int k=0; k<frontWrenches.size(); ++k){
                 refWrenchesSeqPtr->frame(i+j)[k] = (1-r)*frontWrenches[k] + r*nextWrenches[k];
             }
