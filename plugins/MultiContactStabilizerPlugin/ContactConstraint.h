@@ -213,6 +213,9 @@ protected:
 public:
     std::vector<Vector3> forcePointVec;// in local coordinate
 
+    int rows(){return rows_;}
+    int cols(){return cols_;}
+
     virtual void calcMinimumVector();
 
     explicit DistributedForceContactConstraintParam(const DistributedForceContactConstraintParam* ccParam)
