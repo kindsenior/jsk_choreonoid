@@ -20,6 +20,11 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     cout << "loadExtraSeq()" << endl;
 
     stringstream fnamess;
+    fnamess << poseSeqPath.stem().string() << "_SFC_refPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    ifstream refPLIfs;
+    refPLIfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::in);
+
+    fnamess.str("");
     fnamess << poseSeqPath.stem().string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ifstream wrenchIfs;
     wrenchIfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::in);
@@ -33,6 +38,9 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     BodyMotionPtr motion = bodyMotionItemPtr->motion();
     const double dt = ((double)1)/motion->frameRate();
 
+    Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
+    Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
+    Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
     Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
     MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
     refWrenchesSeqPtr->setNumParts(6*4,true);
@@ -40,22 +48,27 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     std::vector<std::vector<string>> limbKeysVec{{"rleg"},{"lleg"},{"rarm"},{"larm"}};
 
     const int cycle = sfc->dt*bodyMotionItemPtr->motion()->frameRate();
-    string wrenchStr, contactStr;
+    string PLStr, wrenchStr, contactStr;
+    getline(refPLIfs,PLStr);
     getline(wrenchIfs,wrenchStr);
     getline(contactIfs,contactStr);// first row is columnhead
-    for(int i=0; getline(wrenchIfs,wrenchStr),getline(contactIfs,contactStr); ++i){
+    for(int i=0; getline(refPLIfs,PLStr),getline(wrenchIfs,wrenchStr),getline(contactIfs,contactStr); ++i){
         motion->frame(i*cycle) >> *body;
         body->calcForwardKinematics();
 
         double Fz = 0;
         Vector3d zmp = Vector3d::Zero();
         std::map<string, VectorXd> wrenchMap;
-        stringstream wrenchSs(wrenchStr), contactSs(contactStr);
+        stringstream PLSs(PLStr), wrenchSs(wrenchStr), contactSs(contactStr);
         VectorXd wrench(6);
-        Vector3d p;
+        Vector3d p,P,L,CM;
         double tmp;
-        wrenchSs >> tmp;// time column
+        PLSs >> tmp;// time column
+        wrenchSs >> tmp;
         contactSs >> tmp;
+        for(int j=0; j<3; ++j) PLSs >> CM(j);
+        for(int j=0; j<3; ++j) PLSs >> P(j);
+        for(int j=0; j<3; ++j) PLSs >> L(j);
         for(auto contactLink : contactLinkCandidateSet){
             for(int j=0; j<6; ++j) wrenchSs >> wrench(j);
             for(int j=0; j<3; ++j) contactSs >> p(j);
@@ -69,6 +82,9 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
             zmp.x() += -n.y()+p.x()*f.z();// 遊脚の場合は発散する
             zmp.y() +=  n.x()+p.y()*f.z();
         }
+        refCMSeqPtr->at(i*cycle) = CM;
+        refPSeqPtr->at(i*cycle) = P;
+        refLSeqPtr->at(i*cycle) = L;
         zmp /= Fz;
         refZmpSeqPtr->at(i*cycle) = zmp;
 
@@ -99,6 +115,9 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
             refWrenchesSeqPtr->frame(i*cycle) = wrenches;
         }
     }
+    setSubItem("refCM", refCMSeqPtr, bodyMotionItemPtr);
+    setSubItem("refP", refPSeqPtr, bodyMotionItemPtr);
+    setSubItem("refL", refLSeqPtr, bodyMotionItemPtr);
     setSubItem("wrenches", refWrenchesSeqPtr, bodyMotionItemPtr);
 }
 
