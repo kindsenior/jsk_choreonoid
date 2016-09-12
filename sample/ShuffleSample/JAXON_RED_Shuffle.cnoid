@@ -366,7 +366,7 @@ views:
       bodyItems: 
         - 
           id: 2
-          expandedParts: [ "ARMS", "LEGS", "LOWER-BODY", "UPPER-BODY", "Whole Body" ]
+          expandedParts: [ "ARMS", "LEGS", "LOWER-BODY", "Whole Body" ]
       timeLength: 11
       showLipSync: false
       gridInterval: 1
