@@ -45,7 +45,7 @@ using namespace std;
 class RhythmBalancerPlugin : public Plugin
 {
 public:
-    SignalProxy<void()>::connection_type connections;
+    Connection connections;
     
     RhythmBalancerPlugin() : Plugin("RhythmBalancer")
     {
