@@ -191,8 +191,8 @@ public:
         // sigTest.connect(bind(&RhythmBalancerPlugin::test, this));
         // sigTest();
 
-        // スレッド
-        boost::thread thr(&RhythmBalancerPlugin::test, this);
+        // スレッドでcollision取得->pointで表示
+        // boost::thread thr(&RhythmBalancerPlugin::test, this);
 
         // WorldItemへのアクセス
         {
