@@ -31,6 +31,7 @@
 #include <cnoid/Button>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QEventLoop>
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <set>
@@ -105,6 +106,7 @@ public:
         }// end prit
 
         MessageView::instance()->putln("sweep called !");
+        QEventLoop eventLoop;
         // 各PoseSeqへアクセス
         ItemList<PoseSeqItem> poseSeqItems = ItemTreeView::mainInstance()->selectedItems<Item>();
         for(size_t i=0; i < poseSeqItems.size(); ++i){
@@ -115,6 +117,7 @@ public:
             // BodyMotionの各Frameへのアクセス
             BodyMotionItem* bodyMotionItem = poseSeqItems[i]->bodyMotionItem();
             BodyMotionPtr motion = bodyMotionItem->motion();
+            const double dt = 1.0/motion->frameRate();
 
             for(int j=0;j < motion->numFrames(); ++j){// zmpSeq.numFrames()でもOK
 
@@ -135,6 +138,23 @@ public:
                 // // ss << (*p)[0] << " " << (*p)[1] << " " << (*p)[2] << endl;
                 // Vector3 zmp = bodyItem->zmp();
                 // ss << zmp.x() << " " << zmp.y() << " " << zmp.z() << endl;// 今一不明
+
+                // 姿勢更新
+                motion->frame(j) >> *body;
+                bodyItems[0]->notifyKinematicStateChange(true);
+
+                // collision取得
+                const std::vector<CollisionLinkPairPtr>& collisions = bodyItems[0]->collisions();
+                cout << dt*j << " sec:";
+                cout << collisions.size() << endl;
+                for(size_t i=0; i < collisions.size(); ++i){
+                  CollisionLinkPair& collisionPair = *collisions[i];
+                  cout << " " << collisionPair.link[0]->name() << " " << collisionPair.link[1]->name() << " " << collisionPair.isSelfCollision();
+                  for(std::vector<Collision>::iterator iter = collisionPair.collisions.begin(); iter != collisionPair.collisions.end(); ++iter){
+                    // cout << " " << iter->point.transpose() << " " << iter->normal.transpose() << endl;
+                  }
+                }cout << endl;
+                eventLoop.processEvents();
               }
             }
 
