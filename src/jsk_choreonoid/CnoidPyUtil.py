@@ -1,3 +1,20 @@
+import numpy as np
+from cnoid import Base, BodyPlugin
+from PyQt4 import QtGui
+import time
+
+def hoist(robotItem=Base.Item.find("JAXON_RED"), simulatorItem=Base.Item.find("AISTSimulator"), position = [0,0,0.98]):
+    '''
+    hoist robot and let him stand.
+    :param cnoid.Base.Item robotItem: bodyItem of robot
+    :param cnoid.BodyPlugin.AISTSimulatorItem simulatorItem: simulator item
+    '''
+    pos = np.eye(3,4)
+    pos[:,3] = np.array(position)
+    simulatorItem.setForcedPosition(robotItem, pos);
+    QtGui.QApplication.processEvents();
+    simulatorItem.clearForcedPositions()
+
 class SimTimeLoop(object):
     """
     This class is used when you wan to use loop program in choreonoid simulation mode.
