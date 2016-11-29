@@ -73,11 +73,13 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
             for(int j=0; j<6; ++j) wrenchSs >> wrench(j);
             for(int j=0; j<3; ++j) contactSs >> p(j);
             for(int j=0; j<6; ++j) contactSs >> tmp;// vx -> wz
-            wrench.head(3) = body->link(contactLink->name())->R()*wrench.head(3);
+            wrench.head(3) = body->link(contactLink->name())->R()*wrench.head(3);// world
             wrench.tail(3) = body->link(contactLink->name())->R()*wrench.tail(3);
             wrenchMap[contactLink->name()] = wrench;
-            Vector3d f = wrench.head(3);
+            Vector3d f = wrench.head(3);// wrench is world
             Vector3d n = wrench.tail(3);
+            // Vector3d f = body->link(contactLink->name())->R()*wrench.head(3);// wrench is local
+            // Vector3d n = body->link(contactLink->name())->R()*wrench.tail(3);
             Fz += f.z();
             zmp.x() += -n.y()+p.x()*f.z();// 遊脚の場合は発散する
             zmp.y() +=  n.x()+p.y()*f.z();
@@ -216,8 +218,10 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
 
                         //wrench
                         VectorXd wrench(6);
-                        wrench.head(3) << f;
+                        wrench.head(3) << f;// world
                         wrench.tail(3) << n;
+                        // wrench.head(3) = u.head(3);// local
+                        // wrench.tail(3) = u.tail(3);
                         wrenchMap[(*linkIter)->name()] = wrench;
                         goto END;
                     }
