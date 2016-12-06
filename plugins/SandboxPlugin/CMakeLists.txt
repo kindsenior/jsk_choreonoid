@@ -1,8 +1,8 @@
-message("This is RhythmBalancerPlugin")
+message("This is SandboxPlugin")
 
-set(TARGET CnoidRhythmBalancerPlugin)
+set(TARGET CnoidSandboxPlugin)
 
-add_library(${TARGET} SHARED RhythmBalancerPlugin)
+add_library(${TARGET} SHARED SandboxPlugin)
 
 target_link_libraries(${TARGET} CnoidUtilPlugin boost_thread)
 

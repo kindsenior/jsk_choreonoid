@@ -43,26 +43,26 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
-class RhythmBalancerPlugin : public Plugin
+class SandboxPlugin : public Plugin
 {
 public:
     Connection connections;
     
-    RhythmBalancerPlugin() : Plugin("RhythmBalancer")
+    SandboxPlugin() : Plugin("Sandbox")
     {
         require("Body");
     }
     
     virtual bool initialize()
     {
-        ToolBar* bar = new ToolBar("RhythmBalancer");
+        ToolBar* bar = new ToolBar("Sandbox");
 
         BodyMotionGenerationBar* bmgb = BodyMotionGenerationBar::instance();// インスタンス生成
 
         bar->addButton("sweep")
-            ->sigClicked().connect(bind(&RhythmBalancerPlugin::onButtonClicked, this, false));
+            ->sigClicked().connect(bind(&SandboxPlugin::onButtonClicked, this, false));
         bar->addButton("print")
-            ->sigClicked().connect(bind(&RhythmBalancerPlugin::onButtonClicked, this, true));
+            ->sigClicked().connect(bind(&SandboxPlugin::onButtonClicked, this, true));
 
         addToolBar(bar);
 
@@ -188,11 +188,11 @@ public:
 
         // シグナル
         // Signal<void()> sigTest;
-        // sigTest.connect(bind(&RhythmBalancerPlugin::test, this));
+        // sigTest.connect(bind(&SandboxPlugin::test, this));
         // sigTest();
 
         // スレッドでcollision取得->pointで表示
-        // boost::thread thr(&RhythmBalancerPlugin::test, this);
+        // boost::thread thr(&SandboxPlugin::test, this);
 
         // WorldItemへのアクセス
         {
@@ -234,7 +234,7 @@ public:
             ItemTreeView::mainInstance()->checkItem(pointSetItemPtr);// check + updateCollisions() -> segmentation fault
         }
 
-        connections = bodyItemPtr->sigCollisionsUpdated().connect(boost::bind(&RhythmBalancerPlugin::test2, this, bodyItemPtr, robot, motion, pointSetItemPtr));
+        connections = bodyItemPtr->sigCollisionsUpdated().connect(boost::bind(&SandboxPlugin::test2, this, bodyItemPtr, robot, motion, pointSetItemPtr));
         test2(bodyItemPtr, robot, motion, pointSetItemPtr);
     }
 
@@ -272,4 +272,4 @@ public:
 
 };
 
-CNOID_IMPLEMENT_PLUGIN_ENTRY(RhythmBalancerPlugin)
+CNOID_IMPLEMENT_PLUGIN_ENTRY(SandboxPlugin)
