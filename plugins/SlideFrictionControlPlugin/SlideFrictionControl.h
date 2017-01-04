@@ -5,6 +5,7 @@
 
 #include <UtilPlugin/UtilPlugin.h>
 #include <MultiContactStabilizerPlugin/ModelPredictiveController.h>
+#include <UtilPlugin/UtilPlugin.h>
 
 namespace hrp {
 
