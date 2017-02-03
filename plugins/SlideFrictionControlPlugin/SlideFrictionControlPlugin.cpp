@@ -282,7 +282,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     wrenchOfs.close();
     inputPLOfs.close();
 
-    for(std::vector<int>::iterator iter = failIdxVec.begin(); iter != failIdxVec.end(); ++iter) cout << "Failed in " << *iter << ":(" << (*iter)*dt << " sec)" << endl;
+    for(std::vector<int>::iterator iter = failIdxVec.begin(); iter != failIdxVec.end(); ++iter) cout << "\x1b[31m" << "Failed in " << *iter << ":(" << (*iter)*dt << " sec)" << "\x1b[m" << endl;
     if(failIdxVec.empty()) cout << "All QP succeeded" << endl;
     failIdxVec.clear();
 
