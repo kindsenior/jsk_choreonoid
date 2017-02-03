@@ -5,6 +5,8 @@
 
 #include <cnoid/Archive>
 
+#include <iomanip>
+
 namespace cnoid {
 
 class ParamNode
@@ -126,7 +128,7 @@ public:
     virtual void addParamNode(ParamNode* paramNode)
     {
         std::stringstream ss;
-        ss << size() << paramNode->archiveName();
+        ss << std::setfill('0') << std::setw(4) << size() << paramNode->archiveName();
         (*this)[ss.str()] = paramNode;
     };
 };
