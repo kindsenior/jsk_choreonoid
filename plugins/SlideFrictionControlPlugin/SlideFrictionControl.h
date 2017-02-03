@@ -18,6 +18,7 @@ public:
     double m;
     double errorCMWeight,errorMomentumWeight,errorAngularMomentumWeight,errorYawAngularMomentumWeight;
     double inputForceWeight,inputMomentWeight,inputYawMomentWeight;
+    int numXDivisions, numYDivisions;
 
     SlideFrictionControl();
 

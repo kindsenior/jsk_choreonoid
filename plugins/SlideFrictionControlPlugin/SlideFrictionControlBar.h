@@ -34,6 +34,8 @@ public:
     SpinParamWidget* inputMomentWeightSpin;
     SpinParamWidget* inputYawMomentWeightSpin;
     SpinVectorParamWidget* blockSpinVec;
+    SpinParamWidget* xDivisionNumSpin;
+    SpinParamWidget* yDivisionNumSpin;
 
     SlideFrictionControlSetupLayout();
 };

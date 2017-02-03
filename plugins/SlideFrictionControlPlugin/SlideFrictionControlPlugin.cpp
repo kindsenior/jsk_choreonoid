@@ -490,6 +490,8 @@ void SlideFrictionControlPlugin::execControl()
     sfc->inputForceWeight = (mBar->dialog->layout())->inputForceWeightSpin->value();
     sfc->inputMomentWeight = (mBar->dialog->layout())->inputMomentWeightSpin->value();
     sfc->inputYawMomentWeight = (mBar->dialog->layout())->inputYawMomentWeightSpin->value();
+    sfc->numXDivisions = (mBar->dialog->layout())->xDivisionNumSpin->value();
+    sfc->numYDivisions = (mBar->dialog->layout())->yDivisionNumSpin->value();
 
     generatePreModelPredictiveControlParamDeque(sfc, body, poseSeqPtr, motion, contactLinkCandidateSet);
 

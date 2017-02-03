@@ -139,6 +139,8 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     parentSfc->inputForceWeight = parentSfcLayout->inputForceWeightSpin->value();
     parentSfc->inputMomentWeight = parentSfcLayout->inputMomentWeightSpin->value();
     parentSfc->inputYawMomentWeight = parentSfcLayout->inputYawMomentWeightSpin->value();
+    parentSfc->numXDivisions = parentSfcLayout->xDivisionNumSpin->value();
+    parentSfc->numYDivisions = parentSfcLayout->yDivisionNumSpin->value();
 
     SlideFrictionControl* childSfc = new SlideFrictionControl();
     childSfc->parent = parentSfc;
@@ -153,6 +155,8 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     childSfc->inputForceWeight = childSfcLayout->inputForceWeightSpin->value();
     childSfc->inputMomentWeight = childSfcLayout->inputMomentWeightSpin->value();
     childSfc->inputYawMomentWeight = childSfcLayout->inputYawMomentWeightSpin->value();
+    childSfc->numXDivisions = childSfcLayout->xDivisionNumSpin->value();
+    childSfc->numYDivisions = childSfcLayout->yDivisionNumSpin->value();
 
     if(loadFlg){
         loadExtraSeq(mPoseSeqPath ,childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);

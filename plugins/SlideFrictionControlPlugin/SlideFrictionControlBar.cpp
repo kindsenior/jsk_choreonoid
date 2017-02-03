@@ -28,6 +28,10 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     paramNodes_->addParamNode(inputYawMomentWeightSpin);
     blockSpinVec = new SpinVectorParamWidget();
     paramNodes_->addParamNode(blockSpinVec);
+    xDivisionNumSpin = new SpinParamWidget();
+    paramNodes_->addParamNode(xDivisionNumSpin);
+    yDivisionNumSpin = new SpinParamWidget();
+    paramNodes_->addParamNode(yDivisionNumSpin);
     dtSpin = new SpinParamWidget();
     paramNodes_->addParamNode(dtSpin);
 
@@ -103,6 +107,23 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     std::vector<int> vec{1,1,1,1,1,1,1,1,1,1,1,1,1};
     blockSpinVec->setValue(vec);
     blockSpinVec->addToLayout(hbox);
+    hbox->addStretch();
+
+    hbox = newRow();
+    xDivisionNumSpin->setText("x Division Number:");
+    xDivisionNumSpin->setSaveName("x");
+    xDivisionNumSpin->setArchiveName("xDivisionNum");
+    xDivisionNumSpin->setValue(2);
+    xDivisionNumSpin->setDecimals(0);
+    xDivisionNumSpin->addToLayout(hbox);
+
+    hbox->addSpacing(8);
+    yDivisionNumSpin->setText("y Division Number:");
+    yDivisionNumSpin->setSaveName("y");
+    yDivisionNumSpin->setArchiveName("yDivisionNum");
+    yDivisionNumSpin->setValue(2);
+    yDivisionNumSpin->setDecimals(0);
+    yDivisionNumSpin->addToLayout(hbox);
     hbox->addStretch();
 
     hbox = newRow();
