@@ -73,41 +73,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath, std::string paramS
     cout << "average time: " << avgTime/numFrames << "[msec]" << endl;
 }
 
-void cnoid::generatePreModelPredictiveControlParamDeque(MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet)
-{
-    const int frameRate = motion->frameRate();
-    const int numFrames = motion->numFrames();
-    const double dt = 1.0/motion->frameRate();
-    Vector3d lastP, tmpL;
-    updateBodyState(body, motion, 0);
-    body->calcForwardKinematics(true, true);
-    body->calcCenterOfMass();
-    body->calcTotalMomentum(lastP,tmpL);
+namespace{
 
-    // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
-    int index = 0;
-    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
-        if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
-
-        // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
-        std::vector<ContactConstraintParam*> ccParamVec;
-        generateContactConstraintParamVec(ccParamVec, contactLinkCandidateSet, frontPoseIter, poseSeqPtr);
-
-        for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-            updateBodyState(body, motion, min(i,numFrames-1));
-            body->calcForwardKinematics(true, true);
-
-            MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(index, mcs);
-            // 動作軌道に依存するパラメータの設定
-            generateMultiContactStabilizerParam(mcsParam, lastP, body, ccParamVec, dt);
-
-            mcs->preMpcParamDeque.push_back((MultiContactStabilizerParam*) mcsParam);
-            ++index;
-        }
-    }
-}
-
-void cnoid::generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
+void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
@@ -136,7 +104,7 @@ void cnoid::generateContactConstraintParamVec(std::vector<ContactConstraintParam
     }
 }
 
-void cnoid::generateMultiContactStabilizerParam(MultiContactStabilizerParam* mcsParam, Vector3d& lastP,  BodyPtr body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
+void generateMultiContactStabilizerParam(MultiContactStabilizerParam* mcsParam, Vector3d& lastP,  BodyPtr body, std::vector<ContactConstraintParam*>& ccParamVec, double dt)
 {
 
     static Vector3 g;
@@ -161,6 +129,42 @@ void cnoid::generateMultiContactStabilizerParam(MultiContactStabilizerParam* mcs
     mcsParam->ccParamVec = ccParamVec;
 
     lastP = P;
+}
+
+}
+
+void cnoid::generatePreModelPredictiveControlParamDeque(MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet)
+{
+    const int frameRate = motion->frameRate();
+    const int numFrames = motion->numFrames();
+    const double dt = 1.0/motion->frameRate();
+    Vector3d lastP, tmpL;
+    updateBodyState(body, motion, 0);
+    body->calcForwardKinematics(true, true);
+    body->calcCenterOfMass();
+    body->calcTotalMomentum(lastP,tmpL);
+
+    // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
+    int index = 0;
+    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
+        if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
+
+        // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
+        std::vector<ContactConstraintParam*> ccParamVec;
+        ::generateContactConstraintParamVec(ccParamVec, contactLinkCandidateSet, frontPoseIter, poseSeqPtr);
+
+        for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            updateBodyState(body, motion, min(i,numFrames-1));
+            body->calcForwardKinematics(true, true);
+
+            MultiContactStabilizerParam* mcsParam = new MultiContactStabilizerParam(index, mcs);
+            // 動作軌道に依存するパラメータの設定
+            ::generateMultiContactStabilizerParam(mcsParam, lastP, body, ccParamVec, dt);
+
+            mcs->preMpcParamDeque.push_back((MultiContactStabilizerParam*) mcsParam);
+            ++index;
+        }
+    }
 }
 
 void MultiContactStabilizerPlugin::execControl()
