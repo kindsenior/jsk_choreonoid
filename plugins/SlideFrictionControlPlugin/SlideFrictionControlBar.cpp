@@ -115,6 +115,8 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     xDivisionNumSpin->setArchiveName("xDivisionNum");
     xDivisionNumSpin->setValue(2);
     xDivisionNumSpin->setDecimals(0);
+    xDivisionNumSpin->setRange(1,100);
+    xDivisionNumSpin->setSingleStep(1);
     xDivisionNumSpin->addToLayout(hbox);
 
     hbox->addSpacing(8);
@@ -123,6 +125,8 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     yDivisionNumSpin->setArchiveName("yDivisionNum");
     yDivisionNumSpin->setValue(2);
     yDivisionNumSpin->setDecimals(0);
+    yDivisionNumSpin->setRange(1,100);
+    yDivisionNumSpin->setSingleStep(1);
     yDivisionNumSpin->addToLayout(hbox);
     hbox->addStretch();
 
