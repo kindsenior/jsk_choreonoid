@@ -291,7 +291,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
 }
 
 namespace {
-void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
+void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, const SlideFrictionControl* const sfc, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
     cout << "generateContactConstraintParamVec( ~" << poseIter->time() << "[sec] )" << endl;
     ccParamVec.clear();
@@ -313,11 +313,19 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
                 // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
                 // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceContactConstraintParam((*linkIter)->name(), vertexVec, 2,2));
-                ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));// 摩擦係数 要改良
+                ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.5));// 摩擦係数 要改良
+                // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 1,1, 0.5));// 摩擦係数 要改良
+                // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));// 摩擦係数 要改良
+                // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 3,3, 0.5));// 3x3y 摩擦係数 要改良
+                // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 4,2, 0.5));// 4x2y 摩擦係数 要改良
                 cout << " " << (*linkIter)->name() << ": Static" << endl;
             }else if(contactState == 1){// slide contact
                 // ccParamVec.push_back(new SlideContactConstraintParam((*linkIter)->name(), vertexVec, 0.5, getPrevDirection(poseIter, poseSeqPtr, linkIdx)));
-                ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));
+                ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.5));
+                // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 1,1, 0.5));
+                // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));
+                // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 3,3, 0.5));//3x3y
+                // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 4,2, 0.5));//4x2y
                 cout << " " << (*linkIter)->name() << ": Slide" << endl;
             }
         }
@@ -421,13 +429,13 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
     int index = 0;
     std::vector<ContactConstraintParam*> prevCcParamVec;
-    ::generateContactConstraintParamVec(prevCcParamVec, contactLinkCandidateSet, ++poseSeqPtr->begin(), poseSeqPtr);
+    ::generateContactConstraintParamVec(prevCcParamVec, sfc, contactLinkCandidateSet, ++poseSeqPtr->begin(), poseSeqPtr);
     for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
 
         // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
         std::vector<ContactConstraintParam*> ccParamVec;
-        ::generateContactConstraintParamVec(ccParamVec, contactLinkCandidateSet, frontPoseIter, poseSeqPtr);
+        ::generateContactConstraintParamVec(ccParamVec, sfc, contactLinkCandidateSet, frontPoseIter, poseSeqPtr);
 
         for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
         // for(int i=backPoseIter->time()*frameRate+1; i <= frontPoseIter->time()*frameRate; ++i){

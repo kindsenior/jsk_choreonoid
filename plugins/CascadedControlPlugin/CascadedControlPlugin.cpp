@@ -157,6 +157,10 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     childSfc->inputYawMomentWeight = childSfcLayout->inputYawMomentWeightSpin->value();
     childSfc->numXDivisions = childSfcLayout->xDivisionNumSpin->value();
     childSfc->numYDivisions = childSfcLayout->yDivisionNumSpin->value();
+    // overwrite parentSfc's numDivisions by childSfc's
+    // numDivisionsは本来sfcではなくsfcparamの設定変数なのでparent,childにかかわらず共通であるべき?
+    parentSfc->numXDivisions = childSfc->numXDivisions;
+    parentSfc->numYDivisions = childSfc->numYDivisions;
 
     if(loadFlg){
         loadExtraSeq(mPoseSeqPath ,childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
