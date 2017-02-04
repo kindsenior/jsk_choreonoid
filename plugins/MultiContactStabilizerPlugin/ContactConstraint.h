@@ -197,7 +197,8 @@ public:
         : ContactConstraintParam(linkName_, vertexVec_),
           SimpleContactConstraintParam(linkName_, vertexVec_)
     {
-        *this = SlideContactConstraintParam(linkName_, edgeVec, mu_, direction_);
+        *this = SlideContactConstraintParam(linkName_, edgeVec, mu_, direction_);// overwritten vertexVec by none
+        this->vertexVec = vertexVec_;// overwrite vertexVec
     }
 };
 
