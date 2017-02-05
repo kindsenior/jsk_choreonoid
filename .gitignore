@@ -32,3 +32,12 @@
 
 # choreonoid
 *.dat
+
+# hrpsys sequence file
+*.pos
+*.waist
+*.hip
+*.zmp
+*.optionalData
+*.gsens
+*.wrenches
