@@ -115,8 +115,62 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_RED_rotate-left-slide-wide-short.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 10
+              name: "left-turn-90deg"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_left-turn-90deg.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 11
+              name: "left-toe-turn-90deg"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_left-toe-turn-90deg.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 12
+              name: "lf-rb-forward"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-forward.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 13
+              name: "lf-rb-backward"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-backward.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 14
+              name: "lf-rb-turn"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-turn.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 15
+              name: "lf-rb-toe-turn"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-toe-turn.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 10
+          id: 16
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -139,7 +193,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 11
+          id: 17
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -169,7 +223,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 12
+              id: 18
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -188,7 +242,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 13
+              id: 19
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -207,7 +261,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 14
+              id: 20
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -243,9 +297,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 9 ]
-      checked: [ 1, 2, 10, 11, 12, 13, 14 ]
-      expanded: [ 1, 2 ]
+      selected: [ 15 ]
+      checked: [ 1, 2, 16, 17, 18, 19, 20 ]
+      expanded: [ 1, 2, 15 ]
   - 
     id: 3
     plugin: Base
@@ -346,9 +400,9 @@ views:
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 38 ]
+          selectedLinks: [ 0 ]
         - 
-          id: 10
+          id: 16
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -357,7 +411,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 9
+      currentPoseSeqItem: 15
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -531,7 +585,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 10
+        bodyItem: 16
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
