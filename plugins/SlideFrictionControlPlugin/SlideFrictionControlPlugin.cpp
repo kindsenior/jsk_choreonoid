@@ -430,7 +430,7 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     int index = 0;
     std::vector<ContactConstraintParam*> prevCcParamVec;
     ::generateContactConstraintParamVec(prevCcParamVec, sfc, contactLinkCandidateSet, ++poseSeqPtr->begin(), poseSeqPtr);
-    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
+    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
 
         // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
@@ -454,7 +454,9 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
             sfc->preMpcParamDeque.push_back((SlideFrictionControlParam*) sfcParam);
             ++index;
         }
+
         prevCcParamVec = ccParamVec;
+        backPoseIter = frontPoseIter;
     }
 }
 
