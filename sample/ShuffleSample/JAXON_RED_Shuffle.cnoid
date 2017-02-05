@@ -41,7 +41,7 @@ items:
               -0.418684,  0.003093,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.523599, -0.349066, 
               -0.087266, -1.396263,  0.000000,  0.000000, -0.349066,  0.000000,  0.523599,  0.349066,  0.087266, -1.396263, 
                0.000000,  0.000000, -0.349066,  0.000000,  0.000000,  0.000000,  0.000000 ]
-            zmp: [ -2.1944579e-11, 0, 0 ]
+            zmp: [ 4.20167e-07, 3.18699999e-07, 0 ]
             collisionDetection: true
             selfCollisionDetection: false
             isEditable: true
@@ -441,6 +441,18 @@ toolbars:
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
+  "KinematicsBar": 
+    mode: AUTO
+    enablePositionDragger: true
+    penetrationBlock: true
+    collisionLinkHighlight: false
+    snapDistance: 0.025
+    penetrationBlockDepth: 0.0005
+    lazyCollisionDetectionMode: true
+  "BodyBar": 
+    current: 2
+  "LeggedBodyBar": 
+    stanceWidth: 0.15
   "BodyMotionGenerationBar": 
     autoGenerationForNewBody: true
     balancer: false
@@ -474,18 +486,6 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
-  "KinematicsBar": 
-    mode: AUTO
-    enablePositionDragger: true
-    penetrationBlock: true
-    collisionLinkHighlight: false
-    snapDistance: 0.025
-    penetrationBlockDepth: 0.0005
-    lazyCollisionDetectionMode: true
-  "BodyBar": 
-    current: 2
-  "LeggedBodyBar": 
-    stanceWidth: 0.15
   "RMControlBar": 
     initialTrajectory: Load
     initialTrajectoryCheck: false
@@ -511,6 +511,10 @@ toolbars:
       blockingListCheck: true
       dt: 0.1
       dtCheck: true
+  "PreviewControl": 
+    controlMode: TrajectoryPlanning
+    controlModeCheck: true
+    saveParameterInFileName: true
   "MultiContactStabilizerBar": 
     saveParameterInFileName: false
     MCS: 
@@ -528,10 +532,6 @@ toolbars:
       blockingListCheck: true
       dt: 0.1
       dtCheck: true
-  "PreviewControl": 
-    controlMode: TrajectoryPlanning
-    controlModeCheck: true
-    saveParameterInFileName: true
   "CascadedControlBar": 
     saveParameterInFileName: false
     CC: 
