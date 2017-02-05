@@ -509,6 +509,10 @@ toolbars:
       inputYawMomentWeightCheck: true
       blockingList: 1,1,1,1,1,1,1
       blockingListCheck: true
+      xDivisionNum: 2
+      xDivisionNumCheck: true
+      yDivisionNum: 2
+      yDivisionNumCheck: true
       dt: 0.1
       dtCheck: true
   "PreviewControl": 
@@ -553,6 +557,10 @@ toolbars:
           inputYawMomentWeightCheck: true
           blockingList: 1,1,1,1,1
           blockingListCheck: true
+          xDivisionNum: 2
+          xDivisionNumCheck: true
+          yDivisionNum: 2
+          yDivisionNumCheck: true
           dt: 0.002
           dtCheck: true
       - 
@@ -573,6 +581,10 @@ toolbars:
           inputYawMomentWeightCheck: true
           blockingList: 1,1,1,1,1,1,1,1,1,1
           blockingListCheck: true
+          xDivisionNum: 2
+          xDivisionNumCheck: true
+          yDivisionNum: 2
+          yDivisionNumCheck: true
           dt: 0.05
           dtCheck: true
 Body: 
