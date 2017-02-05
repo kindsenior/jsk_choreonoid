@@ -305,10 +305,14 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
             // vertex << 0.1,-0.05; vertexVec.push_back(vertex);
             // vertex << -0.1,0.05; vertexVec.push_back(vertex);
             // vertex << -0.1,-0.05; vertexVec.push_back(vertex);
-            vertex << 0.15,0.08; vertexVec.push_back(vertex);
-            vertex << 0.15,-0.08; vertexVec.push_back(vertex);
-            vertex << -0.1,0.08; vertexVec.push_back(vertex);
-            vertex << -0.1,-0.08; vertexVec.push_back(vertex);
+            // vertex << 0.15,0.08; vertexVec.push_back(vertex);
+            // vertex << 0.15,-0.08; vertexVec.push_back(vertex);
+            // vertex << -0.1,0.08; vertexVec.push_back(vertex);
+            // vertex << -0.1,-0.08; vertexVec.push_back(vertex);
+            vertex << 0.13,0.065; vertexVec.push_back(vertex);
+            vertex << 0.13,-0.065; vertexVec.push_back(vertex);
+            vertex << -0.1,0.065; vertexVec.push_back(vertex);
+            vertex << -0.1,-0.065; vertexVec.push_back(vertex);
             if(contactState == 0){// static contact
                 // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
                 // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
