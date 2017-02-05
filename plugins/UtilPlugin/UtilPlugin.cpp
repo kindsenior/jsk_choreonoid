@@ -75,14 +75,14 @@ int cnoid::getContactState(const PosePtr pose1, const PosePtr pose2, const int l
     int state = 0;
 
     // 滑り判定(静止0 滑り1)
-    double delta = 0.005;// 要検討 5[mm]
-    // std::cout << pose1->ikLinkInfo(linkInfoIter->first)->p.transpose() << " " << pose2->ikLinkInfo(linkInfoIter->first)->p.transpose() << std::endl;
-    if((pose1->ikLinkInfo(linkId)->p - pose2->ikLinkInfo(linkId)->p).norm() > delta){
+    const double deltaPos = 0.005, deltaAngle = 0.001;// 要検討 5[mm] 0.001[rad]
+    const Pose::LinkInfo *linkInfo1 = pose1->ikLinkInfo(linkId), *linkInfo2 = pose2->ikLinkInfo(linkId);
+    if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
         state += 1;// 2^0
     }
 
     // 遊脚判定(接触0 非接触1)
-    if(!pose1->ikLinkInfo(linkId)->isTouching() || !pose2->ikLinkInfo(linkId)->isTouching()){
+    if(!linkInfo1->isTouching() || !linkInfo2->isTouching()){
         state += 2;// 2^1
     }
 
