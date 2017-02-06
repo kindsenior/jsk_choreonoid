@@ -169,8 +169,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-toe-turn.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 16
+              name: "left-leg-stand-rotate-left-slide"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_left-leg-stand-rotate-left-slide.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 16
+          id: 17
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -193,7 +202,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 17
+          id: 18
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -223,7 +232,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 18
+              id: 19
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -242,7 +251,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 19
+              id: 20
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -261,7 +270,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 20
+              id: 21
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -297,9 +306,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 15 ]
-      checked: [ 1, 2, 16, 17, 18, 19, 20 ]
-      expanded: [ 1, 2, 15 ]
+      selected: [ 16 ]
+      checked: [ 1, 2, 17, 18, 19, 20, 21 ]
+      expanded: [ 1, 2 ]
   - 
     id: 3
     plugin: Base
@@ -348,9 +357,9 @@ views:
           fieldOfView: 0.6978
           near: 0.01
           far: 100
-          eye: [ 2.11196406, 1.79771878, 1.39836702 ]
-          direction: [ -0.756253844, -0.636983806, -0.14943813 ]
-          up: [ -0.114296588, -0.0962706844, 0.988771078 ]
+          eye: [ 3.59966544, 0.863613838, 1.94515204 ]
+          direction: [ -0.944609092, -0.142763698, -0.295520201 ]
+          up: [ -0.292201828, -0.0441619861, 0.955336491 ]
         - 
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -389,7 +398,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 2
+      currentBodyItem: 17
   - 
     id: 8
     plugin: Body
@@ -397,13 +406,13 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 2
+      currentBodyItem: 17
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 0 ]
+          selectedLinks: [ 31 ]
         - 
-          id: 16
+          id: 17
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -412,7 +421,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 15
+      currentPoseSeqItem: 16
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -450,7 +459,7 @@ toolbars:
     penetrationBlockDepth: 0.0005
     lazyCollisionDetectionMode: true
   "BodyBar": 
-    current: 2
+    current: 17
   "LeggedBodyBar": 
     stanceWidth: 0.15
   "BodyMotionGenerationBar": 
@@ -598,7 +607,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 16
+        bodyItem: 17
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
