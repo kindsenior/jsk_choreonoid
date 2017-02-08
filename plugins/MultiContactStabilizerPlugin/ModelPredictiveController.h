@@ -204,6 +204,43 @@ private:
         }
     }
 
+    void updateX1Vector()
+    {
+        ParamClass* mpcParam = mpcParamDeque[0];
+        // U->u0
+        // x0 = A0*x0 + B'0*u0
+        u0 = U.block(0,0, mpcParam->inputMat.cols(),1);
+        x1 = mpcParam->systemMat*x0 + mpcParam->inputMat*u0;
+
+        if(parent != NULL){
+            ControllerClass* root = rootController();
+            int stepNum = parent->dt/root->dt;// root->dtで割り切れる?
+            // int nextPushIndex;
+            // if(!parent->preMpcParamDeque.empty()) nextPushIndex = parent->preMpcParamDeque.back()->index() + stepNum;
+            // else if(!parent->mpcParamDeque.empty()) nextPushIndex = parent->mpcParamDeque.back()->index() + stepNum;
+            // else nextPushIndex = 0;
+
+            int x0Index = mpcParamDeque[0]->index();
+            int x1Index = mpcParamDeque[1]->index();// 0除算の可能性 最後以降は補間しないから大丈夫?
+            std::cout << x0Index << ": " << x0.transpose() << std::endl;
+            std::cout << x1Index << ": " << x1.transpose() << std::endl;
+            std::cout << "root: " << root->dt << "  parent:" << parent->dt << std::endl;
+            typename std::deque<ParamClass*>::iterator rootPreDequeIter = root->preMpcParamDeque.begin();
+            ParamClass* targetMpcParam;
+            while((*rootPreDequeIter)->index() < x0Index) rootPreDequeIter += stepNum;
+            while((*rootPreDequeIter)->index() < x1Index){
+                if(root == parent){
+                    targetMpcParam = *rootPreDequeIter;
+                }else{
+                    parent->preMpcParamDeque.push_back(copyMpcParam(parent, *rootPreDequeIter));// pickup mpcParam from root mpc dtが変わるので行列は生成し直す
+                    targetMpcParam = parent->preMpcParamDeque.back();
+                }
+                targetMpcParam->setRefStateVector(x0 + (x1-x0)*((*rootPreDequeIter)->index() - x0Index)/(double)(x1Index - x0Index)); // interpolate refX,U
+                rootPreDequeIter += stepNum;
+            }
+        }
+    }
+
 public:
     double dt;
     int stateDim;
@@ -211,7 +248,7 @@ public:
     bool isInitial;
     std::deque<ParamClass*> preMpcParamDeque;
     std::deque<ParamClass*> mpcParamDeque;
-    dvector x0,u0;
+    dvector x0,x1,u0;
     ParamClass* prevMpcParam;
     ControllerClass* parent;
 
@@ -242,7 +279,7 @@ public:
             tmList[3] = (double) 1000*(et-st)/CLOCKS_PER_SEC;
             st = et;
 
-            updateX0Vector();
+            updateX1Vector();// x0,U -> x1
             prevMpcParam = mpcParamDeque.front();
             mpcParamDeque.pop_front();
         }
@@ -307,6 +344,8 @@ public:
             x0 = dvector(stateDim);
             x0 = mpcParamDeque[0]->refStateVec;
             isInitial = false;
+        }else{
+            x0 = x1;
         }
 
         calcPhiMatrix();
@@ -320,45 +359,6 @@ public:
         calcBlockMatrix();
         U = dvector::Zero(URows);
 
-    }
-
-    void updateX0Vector()
-    {
-        ParamClass* mpcParam = mpcParamDeque[0];
-        // U->u0
-        // x0 = A0*x0 + B'0*u0
-        u0 = U.block(0,0, mpcParam->inputMat.cols(),1);
-        dmatrix x1 = mpcParam->systemMat*x0 + mpcParam->inputMat*u0;
-
-        if(parent != NULL){
-            ControllerClass* root = rootController();
-            int stepNum = parent->dt/root->dt;// root->dtで割り切れる?
-            // int nextPushIndex;
-            // if(!parent->preMpcParamDeque.empty()) nextPushIndex = parent->preMpcParamDeque.back()->index() + stepNum;
-            // else if(!parent->mpcParamDeque.empty()) nextPushIndex = parent->mpcParamDeque.back()->index() + stepNum;
-            // else nextPushIndex = 0;
-
-            int x0Index = mpcParamDeque[0]->index();
-            int x1Index = mpcParamDeque[1]->index();// 0除算の可能性 最後以降は補間しないから大丈夫?
-            std::cout << x0Index << ": " << x0.transpose() << std::endl;
-            std::cout << x1Index << ": " << x1.transpose() << std::endl;
-            std::cout << "root: " << root->dt << "  parent:" << parent->dt << std::endl;
-            typename std::deque<ParamClass*>::iterator rootPreDequeIter = root->preMpcParamDeque.begin();
-            ParamClass* targetMpcParam;
-            while((*rootPreDequeIter)->index() < x0Index) rootPreDequeIter += stepNum;
-            while((*rootPreDequeIter)->index() < x1Index){
-                if(root == parent){
-                    targetMpcParam = *rootPreDequeIter;
-                }else{
-                    parent->preMpcParamDeque.push_back(copyMpcParam(parent, *rootPreDequeIter));// pickup mpcParam from root mpc dtが変わるので行列は生成し直す
-                    targetMpcParam = parent->preMpcParamDeque.back();
-                }
-                targetMpcParam->setRefStateVector(x0 + (x1-x0)*((*rootPreDequeIter)->index() - x0Index)/(double)(x1Index - x0Index)); // interpolate refX,U
-                rootPreDequeIter += stepNum;
-            }
-        }
-
-        x0 = x1;
     }
 
     virtual void setupQP() = 0;
