@@ -57,6 +57,12 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath, std::string paramS
             ofs << (i - mcs->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
         }
     }
+    // {// for final frame's SeqPtr
+    //     int finalMotionIdx = numFrames*cycle;
+    //     refCMSeqPtr->at(finalMotionIdx) = refCMSeqPtr->at(finalMotionIdx-cycle);
+    //     refPSeqPtr->at(finalMotionIdx) = refPSeqPtr->at(finalMotionIdx-cycle);
+    //     refLSeqPtr->at(finalMotionIdx) = refLSeqPtr->at(finalMotionIdx-cycle);
+    // }
  // BREAK:
 
     setSubItem("refCM", refCMSeqPtr, bodyMotionItemPtr);
