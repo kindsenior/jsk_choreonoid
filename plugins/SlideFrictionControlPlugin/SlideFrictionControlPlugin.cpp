@@ -204,7 +204,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                     if((*linkIter)->name() == ccParam->linkName){
                         contactOfs << " "<< ccParam->p.transpose() << " " << ccParam->v.transpose() << " " << ccParam->w.transpose();
                         VectorXd u = ccParam->inputForceConvertMat*u0.segment(colIdx,inputDim);
-                        wrenchOfs << " " << u.transpose();
+                        wrenchOfs << " " << u.transpose();// local
 
                         //calc ZMP 足は床上である前提
                         Vector3d f = ccParam->R*u.head(3);
@@ -235,7 +235,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             contactOfs << endl;
             wrenchOfs << endl;
 
-            // refWrenchsSeq
+            // refWrenchsSeq: limbKeysVec's limb order(for sequence file) is not same with contactLinkCandidateSet
             {
                 cout << "wrenches in " << (i - sfc->numWindows())*dt << " sec :";
                 MultiValueSeq::Frame wrenches = refWrenchesSeqPtr->frame(motionIdx);
@@ -326,7 +326,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
 namespace {
 void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, const SlideFrictionControl* const sfc, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
-    cout << "generateContactConstraintParamVec( ~" << poseIter->time() << "[sec] )" << endl;
+    cout << "\x1b[34m" << "generateContactConstraintParamVec( ~" << poseIter->time() << "[sec] )" << "\x1b[m" << endl;
     ccParamVec.clear();
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
