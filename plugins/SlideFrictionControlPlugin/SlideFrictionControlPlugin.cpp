@@ -266,6 +266,42 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             }
         }
     }
+    {// for final frame's SeqPtr and log file
+        int finalMotionIdx = numFrames*cycle;
+        refCMSeqPtr->at(finalMotionIdx) = refCMSeqPtr->at(finalMotionIdx-cycle);
+        refPSeqPtr->at(finalMotionIdx) = refPSeqPtr->at(finalMotionIdx-cycle);
+        refLSeqPtr->at(finalMotionIdx) = refLSeqPtr->at(finalMotionIdx-cycle);
+        refZmpSeqPtr->at(finalMotionIdx) = refZmpSeqPtr->at(finalMotionIdx-cycle);
+        // refWrenchesSeqPtr->frame(finalMotionIdx) = refWrenchesSeqPtr->frame(finalMotionIdx-cycle); // cannot copy frame
+        for(int j=0; j<refWrenchesSeqPtr->getNumParts(); ++j) refWrenchesSeqPtr->frame(finalMotionIdx)[j] = refWrenchesSeqPtr->frame(finalMotionIdx-cycle)[j];
+
+        double finalTime = numFrames*dt;
+        refPLOfs << finalTime << " " << refCMSeqPtr->at(finalMotionIdx).transpose() << " " << refPSeqPtr->at(finalMotionIdx).transpose() << " " << refLSeqPtr->at(finalMotionIdx).transpose() << " 0" << endl;
+        const SlideFrictionControlParam* const finalMpcParam = sfc->mpcParamDeque[0];
+        inputPLOfs << finalTime << " " << finalMpcParam->CM.transpose() << " " << finalMpcParam->P.transpose() << " " << finalMpcParam->L.transpose() << " " << finalMpcParam->F.transpose() << endl;
+        // contactOfs, wrenchOfs
+        contactOfs << finalTime; wrenchOfs << finalTime;
+        std::vector<ContactConstraintParam*> ccParamVec = finalMpcParam->ccParamVec;
+        for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
+            int colIdx = 0;
+            for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+                ContactConstraintParam* ccParam = *iter;
+                int inputDim = ccParam->inputDim;
+                if((*linkIter)->name() == ccParam->linkName){
+                    contactOfs << " "<< ccParam->p.transpose() << " " << ccParam->v.transpose() << " " << ccParam->w.transpose();
+                    VectorXd u = ccParam->inputForceConvertMat*(sfc->u0).segment(colIdx,inputDim);
+                    wrenchOfs << " " << u.transpose();// local
+                    goto END2;
+                }
+                colIdx += inputDim;
+            }
+            contactOfs << " 0 0 0  0 0 0  0 0 0";
+            wrenchOfs << " 0 0 0  0 0 0";
+        END2:
+            ;
+        }
+        // contact log file is not used in loadExtraSeq
+    }
  // BREAK:
 
     setSubItem("refCM", refCMSeqPtr, bodyMotionItemPtr);
