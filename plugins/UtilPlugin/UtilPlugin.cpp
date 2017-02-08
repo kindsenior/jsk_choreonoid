@@ -287,7 +287,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
 
     int linkNum = linkVec.size();
     int frameRate = motion->frameRate();
-    MultiValueSeqPtr optionalDataSeqPtr = motion->getOrCreateExtraSeq<MultiValueSeq>("optionalData");
+    MultiValueSeqPtr optionalDataSeqPtr = motion->getOrCreateExtraSeq<MultiValueSeq>("optionaldata");
     optionalDataSeqPtr->setNumParts(linkNum*2,true);
     for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
@@ -304,7 +304,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
         }
     }
 
-    setSubItem("optionalData", optionalDataSeqPtr, bodyMotionItemPtr);
+    setSubItem("optionaldata", optionalDataSeqPtr, bodyMotionItemPtr);
 }
 
 bool cnoid::getEndEffectorLinkVector(std::vector<Link*>& endEfectorLinkVec, BodyPtr& body)

@@ -30,7 +30,7 @@ void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport()
   double dt = ((double) 1)/motion->frameRate();
   int numFrames = motion->numFrames();
 
-  std::vector<string> extentionVec{"wrenches","optionalData"};
+  std::vector<string> extentionVec{"wrenches","optionaldata"};
   for(auto ext : extentionVec){
       stringstream fnamess;
       fnamess << poseSeqItem->name() << "." << ext;
