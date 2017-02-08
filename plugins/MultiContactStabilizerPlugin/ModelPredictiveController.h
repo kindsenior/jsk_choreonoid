@@ -229,7 +229,7 @@ public:
         double tmList[4] = {0,0,0,0};
 
         if(mpcParamDeque.size() == numWindows()){
-            calcAugmentedMatrix();// phi,psi,W1,W2 U->x0
+            calcAugmentedMatrixAndSetupArgument();// phi,psi,W1,W2 U, x1->x0
             setupQP();
 
             et = clock();
@@ -287,7 +287,7 @@ public:
         }
     }
 
-    void calcAugmentedMatrix()
+    void calcAugmentedMatrixAndSetupArgument()
     {
         psiCols = 0;
         equalMatRows = 0;

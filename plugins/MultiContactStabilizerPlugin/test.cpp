@@ -10,7 +10,7 @@ void OneMCSTest::testAugmentedMatrix()
 {
     cout << endl << "augmented matrix test" << endl;
 
-    mcs->calcAugmentedMatrix();
+    mcs->calcAugmentedMatrixAndSetupArgument();
 
     typename std::deque<MultiContactStabilizerParam*> mpcParamDeque =  mcs->mpcParamDeque;
     int stateDim = mcs->stateDim;
