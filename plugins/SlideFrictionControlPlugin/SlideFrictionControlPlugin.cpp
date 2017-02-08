@@ -48,31 +48,28 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     std::vector<std::vector<string>> limbKeysVec{{"rleg"},{"lleg"},{"rarm"},{"larm"}};
 
     const int cycle = sfc->dt*bodyMotionItemPtr->motion()->frameRate();
-    string PLStr, wrenchStr, contactStr;
-    getline(refPLIfs,PLStr);
+    string PLStr, wrenchStr;
+    getline(refPLIfs,PLStr);// first row is columnhead
     getline(wrenchIfs,wrenchStr);
-    getline(contactIfs,contactStr);// first row is columnhead
-    for(int i=0; getline(refPLIfs,PLStr),getline(wrenchIfs,wrenchStr),getline(contactIfs,contactStr); ++i){
+    for(int i=0; getline(refPLIfs,PLStr),getline(wrenchIfs,wrenchStr); ++i){
         motion->frame(i*cycle) >> *body;
         body->calcForwardKinematics();
 
         double Fz = 0;
         Vector3d zmp = Vector3d::Zero();
         std::map<string, VectorXd> wrenchMap;
-        stringstream PLSs(PLStr), wrenchSs(wrenchStr), contactSs(contactStr);
+        stringstream PLSs(PLStr), wrenchSs(wrenchStr);
         VectorXd wrench(6);
         Vector3d p,P,L,CM;
         double tmp;
         PLSs >> tmp;// time column
         wrenchSs >> tmp;
-        contactSs >> tmp;
         for(int j=0; j<3; ++j) PLSs >> CM(j);
         for(int j=0; j<3; ++j) PLSs >> P(j);
         for(int j=0; j<3; ++j) PLSs >> L(j);
         for(auto contactLink : contactLinkCandidateSet){
             for(int j=0; j<6; ++j) wrenchSs >> wrench(j);
-            for(int j=0; j<3; ++j) contactSs >> p(j);
-            for(int j=0; j<6; ++j) contactSs >> tmp;// vx -> wz
+            p = body->link(contactLink->name())->p();
             wrench.head(3) = body->link(contactLink->name())->R()*wrench.head(3);// world
             wrench.tail(3) = body->link(contactLink->name())->R()*wrench.tail(3);
             wrenchMap[contactLink->name()] = wrench;
