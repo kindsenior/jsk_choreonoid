@@ -38,6 +38,6 @@
 *.waist
 *.hip
 *.zmp
-*.optionalData
+*.optionaldata
 *.gsens
 *.wrenches
