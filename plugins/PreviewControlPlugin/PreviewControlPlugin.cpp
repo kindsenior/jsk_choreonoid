@@ -97,7 +97,7 @@ void PreviewControlPlugin::execControl()
     Vector3SeqPtr initialZMPSeqPtr;
     initialZMPSeqPtr.reset( new Vector3Seq() );
     initialZMPSeqPtr->setNumFrames(motion->numFrames(), true);
-    calcZMP( body, motion, initialZMPSeqPtr );// 入力動作のzmpの計算
+    calcZMP(body, motion, initialZMPSeqPtr);// 入力動作のzmpの計算
 
     // 目標zmp・初期zmp・初期重心軌道書き出し
     {
@@ -136,7 +136,7 @@ void PreviewControlPlugin::execControl()
 
         zmpSeqPtr.reset( new Vector3Seq() );
         zmpSeqPtr->setNumFrames(motion->numFrames(), true);
-        calcZMP( body, motion, zmpSeqPtr );// 実際のzmpの計算
+        calcZMP(body, motion, zmpSeqPtr , true);// 実際のzmpの計算
 
         // 予見制御用の実際のzmpと目標zmp、誤差zmp、時刻tmを計算
         std::queue<hrp::Vector3> ref_zmp_list;
@@ -252,7 +252,7 @@ void PreviewControlPlugin::execControl()
             ofstream ofs;
             ofs.open(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
 
-            calcZMP( body, motion, zmpSeqPtr );
+            calcZMP(body, motion, zmpSeqPtr, true);
             ofs << "time  inputZMPx inputZMPy inputZMPz outputZMPx outputZMPy outputZMPz outputCMx outputCMy outputCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
             for(int i = 0; i < motion->numFrames(); ++i){
                 motion->frame(i) >> *body;
