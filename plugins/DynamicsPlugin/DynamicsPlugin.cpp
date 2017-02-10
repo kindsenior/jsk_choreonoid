@@ -67,20 +67,22 @@ Vector6 calcInverseDynamicsSub(Link* link, const Vector3& vo_parent, const Vecto
 }
 
 
-void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& zmpSeqPtr, const bool local)
+void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& zmpSeqPtr, const bool checkLargeDiff)
 {
     int bodyItemIdx = 0,poseSeqIdx = 0;
     const double DEFAULT_GRAVITY_ACCELERATION = 9.80665;
     // double g = -DEFAULT_GRAVITY_ACCELERATION;
     Vector3d g(0, 0, DEFAULT_GRAVITY_ACCELERATION);
-    const double dt = 1/motion->frameRate();
+    const double dt = 1.0/motion->frameRate();
     const double dt2 = dt * dt;
 
     FILE* fp = fopen("/tmp/tmp.dat","w");
 
     body->rootLink()->dv() = VectorXd::Zero(3);
     Vector3 lastdv = VectorXd::Zero(3);
-    Vector3d prevZmp;
+    int filterSize = 5;
+    std::deque<float> zmpXDeque,zmpYDeque;
+    std::vector<float> sortedXVector, sortedYVector;
     for(int currentFrame = 0; currentFrame < motion->numFrames(); ++currentFrame){
         // 腰座標更新
         motion->frame(currentFrame) >> *body;
@@ -165,12 +167,25 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         Vector3d out_tau = f.tail<3>();
         
         zmp = Vector3d(-out_tau.y()/out_f.z(), out_tau.x()/out_f.z(), 0);
-        if(currentFrame > 0 && (zmp - prevZmp).norm() > 0.02){// thresh is 0.02[m]
-            cout << currentFrame << "(" << currentFrame*dt << " sec): zmp diff " << (zmp - prevZmp).norm() << "[m] is larger than thresh"<< endl;
-            zmp = prevZmp;// thresh 0.5[m]
+        if(checkLargeDiff){
+            zmpXDeque.push_back(zmp.x()); zmpYDeque.push_back(zmp.y());
+            if(zmpXDeque.size() == filterSize){
+                sortedXVector.resize(0); sortedYVector.resize(0);
+                std::copy(zmpXDeque.begin(), zmpXDeque.end(), std::back_inserter(sortedXVector));
+                std::copy(zmpYDeque.begin(), zmpYDeque.end(), std::back_inserter(sortedYVector));
+                std::sort(sortedXVector.begin(), sortedXVector.end());
+                std::sort(sortedYVector.begin(), sortedYVector.end());
+                int medianIndex = filterSize/2+filterSize%2;
+                Vector3 medianZmp = Vector3(sortedXVector[medianIndex], sortedYVector[medianIndex], zmp.z());// don't change z cordinate
+                if((zmp - medianZmp).norm() > 0.02){
+                    cout << currentFrame << "(" << currentFrame*dt << " sec): zmp diff " << (zmp - medianZmp).norm() << "[m] is larger than thresh"<< endl;
+                    zmp = medianZmp;
+                }
+                zmpXDeque.pop_front();
+                zmpYDeque.pop_front();
+            }
         }
         zmpSeqPtr->at(currentFrame) = zmp;
-        prevZmp = zmp;
 
 
         // // 西脇方式
