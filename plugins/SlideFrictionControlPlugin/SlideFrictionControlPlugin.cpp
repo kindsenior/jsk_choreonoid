@@ -383,9 +383,10 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam,Vecto
     P = (CM - lastCM)/dt;// overwrite P
     P << 0,0,0;// overwrite P
     // L -= CM.cross(P);// convert to around CoM
-    // sfcParam->CM = CM;
-    sfcParam->CM << 0.065,0,0;
-    sfcParam->CM += CM;
+    sfcParam->CM = CM;
+    // sfcParam->CM << 0.065,0,0;// move root link foward 65mm for JAXON
+    sfcParam->CM = CM + body->rootLink()->R()*Vector3(0.05,0,0);
+    // sfcParam->CM += CM;
     sfcParam->P = P;
     // sfcParam->L = L;
     sfcParam->L << 0,0,0;
@@ -411,8 +412,9 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam,Vecto
         (*iter)->R = body->link((*iter)->linkName)->R();
         // (*iter)->v = body->link((*iter)->linkName)->v();
         // (*iter)->w = body->link((*iter)->linkName)->w();
-        (*iter)->v << 0,body->link((*iter)->linkName)->v().y(),0;// overwrite
-        (*iter)->w << 0,0,body->link((*iter)->linkName)->w().z();// overwrite
+        // (*iter)->v << 0,body->link((*iter)->linkName)->v().y(),0;// overwrite x,z->0
+        (*iter)->v << body->link((*iter)->linkName)->v().x(),body->link((*iter)->linkName)->v().y(),0;// overwrite z->0
+        (*iter)->w << 0,0,body->link((*iter)->linkName)->w().z();// overwrite r,p->0
 
         if(typeid(**iter) == typeid(SimpleContactConstraintParam)){
             sfcParam->ccParamVec.push_back(new SimpleContactConstraintParam(dynamic_cast<SimpleContactConstraintParam*>(*iter)));
