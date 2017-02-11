@@ -522,6 +522,10 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
+  "PreviewControl": 
+    controlMode: DynamicsFilter
+    controlModeCheck: true
+    saveParameterInFileName: true
   "RMControlBar": 
     initialTrajectory: Load
     initialTrajectoryCheck: false
@@ -551,10 +555,6 @@ toolbars:
       yDivisionNumCheck: true
       dt: 0.1
       dtCheck: true
-  "PreviewControl": 
-    controlMode: TrajectoryPlanning
-    controlModeCheck: true
-    saveParameterInFileName: true
   "MultiContactStabilizerBar": 
     saveParameterInFileName: false
     MCS: 
