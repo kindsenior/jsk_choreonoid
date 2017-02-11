@@ -32,6 +32,11 @@ poseSeqItem1.load(str(os.path.join(sample_path, "forward-slide.pseq")), robotIte
 robotItem.addChildItem(poseSeqItem1)
 # ItemTreeView.instance().selectItem(poseSeqItem1)
 
+poseSeqItem = PoseSeqItem()
+poseSeqItem.load(str(os.path.join(sample_path, "fast-one-step.pseq")), robotItem)
+robotItem.addChildItem(poseSeqItem)
+ItemTreeView.instance().selectItem(poseSeqItem)
+
 floorItem = BodyItem()
 floorItem.load(os.path.join(shareDirectory(), "model/misc/floor.wrl"))
 worldItem.addChildItem(floorItem)
