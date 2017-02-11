@@ -138,7 +138,14 @@ protected:
     void initialize(const double mu_)
     {
         muTrans = mu_;
-        numInequals = 4 + edgeVec.size();// 静止摩擦制約4式
+        muRot = 0;
+        for(auto vertex : vertexVec) muRot += muTrans*vertex.norm();
+        muRot /= vertexVec.size();
+        muRot *= 0.5;// mergin
+        // std::cout << vertexVec.size() << " " << muRot << std::endl;
+
+        // numInequals = 4 + edgeVec.size();// 静止摩擦制約4式
+        numInequals = 6 + edgeVec.size();// 並進静止摩擦制約4式 + 回転静止摩擦制約式2式
     }
 
 public:
@@ -291,7 +298,8 @@ public:
           StaticContactConstraintParam(linkName_, vertexVec_, mu_),
           DistributedForceContactConstraintParam(linkName_, vertexVec_, rows, cols)
     {
-        numInequals = 4 + edgeVec.size();// overwrite DFCCP
+        // numInequals = 4 + edgeVec.size();// overwrite DFCCP
+        numInequals = 6 + edgeVec.size();// overwrite DFCCP
     }
 
     void calcInequalMatrix(){StaticContactConstraintParam::calcInequalMatrix();}

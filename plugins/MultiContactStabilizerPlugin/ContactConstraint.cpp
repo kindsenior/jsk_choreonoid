@@ -23,13 +23,24 @@ void SimpleContactConstraintParam::calcInequalMatrix()
 void StaticContactConstraintParam::calcInequalMatrix()
 {
     SimpleContactConstraintParam::calcInequalMatrix();
-    dmatrix tmpMat(4,inputForceDim);
+    // only translation friction constraint
+    // dmatrix tmpMat(4,inputForceDim);
+    // tmpMat <<
+    //     -1,0,muTrans, 0,0,0,
+    //     0,-1,muTrans, 0,0,0,
+    //     1,0,muTrans,  0,0,0,
+    //     0,1,muTrans,  0,0,0;
+    // inequalMat.block(edgeVec.size(),0, 4,inputDim) = tmpMat*inputForceConvertMat;
+    dmatrix tmpMat(6,inputForceDim);// 4+2=6
     tmpMat <<
         -1,0,muTrans, 0,0,0,
         0,-1,muTrans, 0,0,0,
         1,0,muTrans,  0,0,0,
-        0,1,muTrans,  0,0,0;
-    inequalMat.block(edgeVec.size(),0, 4,inputDim) = tmpMat*inputForceConvertMat;
+        0,1,muTrans,  0,0,0,
+        0,0,muRot,    0,0,1,
+        0,0,muRot,    0,0,-1;
+    inequalMat.block(edgeVec.size(),0, 6,inputDim) = tmpMat*inputForceConvertMat;
+    // cout << "inequalMat:" << endl << inequalMat << endl;
 }
 
 void SlideContactConstraintParam::calcInequalMatrix()
