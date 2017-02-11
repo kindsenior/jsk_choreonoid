@@ -178,8 +178,35 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_RED_left-leg-stand-rotate-left-slide.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 17
+              name: "left-leg-stand-rotate-left-slide-init"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_left-leg-stand-rotate-left-slide-init.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 18
+              name: "left-leg-stand-rotate-left-slide-full"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_left-leg-stand-rotate-left-slide-full.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 19
+              name: "cross-leg-left-turn"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_cross-leg-left-turn.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 17
+          id: 20
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -202,7 +229,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 18
+          id: 21
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -232,7 +259,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 19
+              id: 22
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -251,7 +278,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 20
+              id: 23
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -270,7 +297,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 21
+              id: 24
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -306,9 +333,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 16 ]
-      checked: [ 1, 2, 17, 18, 19, 20, 21 ]
-      expanded: [ 1, 2 ]
+      selected: [ 19, 2 ]
+      checked: [ 1, 2, 20, 21, 22, 23, 24 ]
+      expanded: [ 1, 2, 19 ]
   - 
     id: 3
     plugin: Base
@@ -398,7 +425,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 17
+      currentBodyItem: 2
   - 
     id: 8
     plugin: Body
@@ -406,13 +433,13 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 17
+      currentBodyItem: 2
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 31 ]
+          selectedLinks: [ 0 ]
         - 
-          id: 17
+          id: 20
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -421,7 +448,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 16
+      currentPoseSeqItem: 19
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
