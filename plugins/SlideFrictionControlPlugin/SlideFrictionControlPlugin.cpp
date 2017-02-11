@@ -161,7 +161,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     fnamess << poseSeqPath.stem().string() << "_SFC_inputPL_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream inputPLOfs;
     inputPLOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
-    inputPLOfs << "time CMx CMy CMz Px Py Pz Lx Ly Lz Fx Fy Fz" << endl;
+    inputPLOfs << "time inputCMx inputCMy inputCMz inputPx inputPy inputPz inputLx inputLy inputLz inputFx inputFy inputFz" << endl;
 
     for(int i=0; i < numFrames + sfc->numWindows(); ++i){
         // if(i > sfc->numWindows() + 1) goto BREAK;
