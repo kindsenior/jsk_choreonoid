@@ -494,8 +494,8 @@ toolbars:
     balancer: false
     autoGeneration: false
     timeScaleRatio: 1
-    preInitialDuration: 1
-    postFinalDuration: 1
+    preInitialDuration: 0
+    postFinalDuration: 0
     onlyTimeBarRange: false
     makeNewBodyItem: true
     stealthyStepMode: true
@@ -505,7 +505,7 @@ toolbars:
     impactReductionHeight: 0.005
     impactReductionTime: 0.04
     autoZmp: true
-    minZmpTransitionTime: 0.1
+    minZmpTransitionTime: 0.3
     zmpCenteringTimeThresh: 0.03
     zmpTimeMarginBeforeLiftingSpin: 0
     zmpMaxDistanceFromCenter: 0.02
