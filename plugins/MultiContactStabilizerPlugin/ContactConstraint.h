@@ -143,9 +143,13 @@ protected:
         muRot /= vertexVec.size();
         muRot *= 1;// slip
         // muRot *= 0.8;// little slip
-        muRot *= 0.75;
+        // muRot *= 0.75;// stopped foot slip on actual machine
+        // muRot *= 0.5;
         // std::cout << muRot << " " << 2.0/3*muTrans*0.05 << std::endl;
-        // muRot = 2.0/3*muTrans*0.05;
+        muRot = 2.0/3*muTrans*0.05;
+        // muRot *= 0.8;// margin
+        // muRot *= 0.4;// margin
+        muRot *= 0.4;// margin
 
         // numInequals = 4 + edgeVec.size();// 静止摩擦制約4式
         numInequals = 6 + edgeVec.size();// 並進静止摩擦制約4式 + 回転静止摩擦制約式2式
