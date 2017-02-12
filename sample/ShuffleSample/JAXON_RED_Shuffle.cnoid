@@ -90,6 +90,15 @@ items:
                 barLength: 1
             - 
               id: 7
+              name: "left-crab-short"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_RED_left-crab-short.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 8
               name: "rotate-left-slide-wide"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -98,7 +107,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 8
+              id: 9
               name: "left-crab-slow-short"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -107,7 +116,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 9
+              id: 10
               name: "rotate-left-slide-wide-short"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -116,7 +125,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 10
+              id: 11
               name: "left-turn-90deg"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -125,7 +134,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 11
+              id: 12
               name: "left-toe-turn-90deg"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -134,7 +143,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 12
+              id: 13
               name: "lf-rb-forward"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -143,7 +152,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 13
+              id: 14
               name: "lf-rb-backward"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -152,7 +161,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 14
+              id: 15
               name: "lf-rb-turn"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -161,7 +170,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 15
+              id: 16
               name: "lf-rb-toe-turn"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -170,7 +179,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 16
+              id: 17
               name: "left-leg-stand-rotate-left-slide"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -179,7 +188,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 17
+              id: 18
               name: "left-leg-stand-rotate-left-slide-init"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -188,7 +197,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 18
+              id: 19
               name: "left-leg-stand-rotate-left-slide-full"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -197,7 +206,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 19
+              id: 20
               name: "cross-leg-left-turn"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -206,7 +215,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 20
+          id: 21
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -229,7 +238,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 21
+          id: 22
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -259,7 +268,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 22
+              id: 23
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -278,7 +287,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 23
+              id: 24
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -297,7 +306,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 24
+              id: 25
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -333,9 +342,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 19, 2 ]
-      checked: [ 1, 2, 20, 21, 22, 23, 24 ]
-      expanded: [ 1, 2, 19 ]
+      selected: [ 7 ]
+      checked: [ 1, 2, 21, 22, 23, 24, 25 ]
+      expanded: [ 1, 2, 7, 20 ]
   - 
     id: 3
     plugin: Base
@@ -437,9 +446,9 @@ views:
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 0 ]
+          selectedLinks: [ 31 ]
         - 
-          id: 20
+          id: 21
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -448,7 +457,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 19
+      currentPoseSeqItem: 7
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -486,7 +495,7 @@ toolbars:
     penetrationBlockDepth: 0.0005
     lazyCollisionDetectionMode: true
   "BodyBar": 
-    current: 17
+    current: 2
   "LeggedBodyBar": 
     stanceWidth: 0.15
   "BodyMotionGenerationBar": 

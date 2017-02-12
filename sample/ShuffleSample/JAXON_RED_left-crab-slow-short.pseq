@@ -1,7 +1,7 @@
 # Body pose sequence format version 1.0 defined by cnoid-Robotics
 
 type: PoseSeq
-name: "left-crab-short"
+name: "left-crab-slow-short"
 targetBody: "JAXON_RED"
 refs: 
   - 
@@ -31,7 +31,7 @@ refs:
             -0, 0, 1 ]
         - 
           name: LARM_JOINT7
-          index: 14
+          index: 13
           translation: [ 0.0198425732, 0.371456088, 0.976314795 ]
           rotation: [ 
             0.459003031, 0.152244556, -0.875292987, 
@@ -39,7 +39,7 @@ refs:
             0.816139118, 0.317028262, 0.483125264 ]
         - 
           name: RARM_JOINT7
-          index: 24
+          index: 23
           translation: [ 0.0198425732, -0.371456088, 0.976314795 ]
           rotation: [ 
             0.459003031, -0.152244556, -0.875292987, 
@@ -47,7 +47,7 @@ refs:
             0.816139118, -0.317028262, 0.483125264 ]
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ 1.48769885e-16, 0.159999408, 0.0995002455 ]
           rotation: [ 
             1, 5.70596371e-14, 9.97474602e-10, 
@@ -57,7 +57,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ 1.48769885e-16, -0.159999408, 0.0995002455 ]
           rotation: [ 
             1, -5.70596371e-14, 9.97474602e-10, 
@@ -92,7 +92,7 @@ refs:
             -0, 0, 1 ]
         - 
           name: LARM_JOINT7
-          index: 14
+          index: 13
           translation: [ 0.0198425732, 0.371456088, 0.976314795 ]
           rotation: [ 
             0.459003031, 0.152244556, -0.875292987, 
@@ -100,7 +100,7 @@ refs:
             0.816139118, 0.317028262, 0.483125264 ]
         - 
           name: RARM_JOINT7
-          index: 24
+          index: 23
           translation: [ 0.0198425732, -0.371456088, 0.976314795 ]
           rotation: [ 
             0.459003031, -0.152244556, -0.875292987, 
@@ -108,7 +108,7 @@ refs:
             0.816139118, -0.317028262, 0.483125264 ]
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ 8.21565038e-17, 0.159999004, 0.0995000677 ]
           rotation: [ 
             1, -1.19923045e-14, 9.99571406e-10, 
@@ -118,7 +118,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ 1.69864123e-16, -0.159999004, 0.0995000677 ]
           rotation: [ 
             1, 1.19824124e-14, 9.99571295e-10, 
@@ -140,7 +140,7 @@ refs:
       ikLinks: 
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ -1.94406198e-09, 0.189999004, 0.0995000705 ]
           rotation: [ 
             0.939390812, 0.34284822, -9.39020674e-10, 
@@ -150,7 +150,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ -1.37061362e-09, -0.129999003, 0.0995000664 ]
           rotation: [ 
             0.939931468, -0.341363203, -2.14064877e-15, 
@@ -187,7 +187,7 @@ refs:
       ikLinks: 
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ -1.89964721e-09, 0.189999407, 0.0995002518 ]
           rotation: [ 
             0.939633012, 0.342183873, 9.37526275e-10, 
@@ -197,7 +197,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ -1.75521388e-08, -0.129999569, 0.0995002736 ]
           rotation: [ 
             0.939931226, -0.341363868, 6.24500451e-16, 
@@ -219,7 +219,7 @@ refs:
       ikLinks: 
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ 3.61717653e-09, 0.24999941, 0.0995002502 ]
           rotation: [ 
             0.939633092, -0.342183653, 1.14491749e-16, 
@@ -229,7 +229,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ 1.41658361e-08, -0.0700000237, 0.0995002915 ]
           rotation: [ 
             0.939810782, 0.341695323, -1.45716772e-16, 
@@ -265,7 +265,7 @@ refs:
       ikLinks: 
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ 1.78448158e-09, 0.249999407, 0.0995002478 ]
           rotation: [ 
             0.939633092, -0.342183653, 1.60648057e-10, 
@@ -275,7 +275,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ 1.77231902e-08, -0.0699995715, 0.0995002753 ]
           rotation: [ 
             0.93993092, 0.341364711, -9.40948708e-14, 
@@ -297,7 +297,7 @@ refs:
       ikLinks: 
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ -3.68023311e-09, 0.30999941, 0.0995002522 ]
           rotation: [ 
             0.939931226, 0.341363867, 1.60649088e-10, 
@@ -307,7 +307,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ -1.4924382e-08, -0.0100002195, 0.0995000278 ]
           rotation: [ 
             0.939930928, -0.341364687, 1.1647662e-12, 
@@ -337,16 +337,13 @@ refs:
       joints: [ 
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 
         10, 11 ]
-      # q: [ 
-      #   0.348368417, -0.0809367327, -0.303946261, 0.670690493, -0.366744232, 0.0809367327, -0.348367545, 0.0662672402, -0.313386922, 0.678217683, 
-      #   -0.36483076, -0.0662672402 ]
       q: [ 
         0.348367546, -0.0796168405, -0.304828859, 0.671434721, -0.366605862, 0.0796168405, -0.349240093, 0.0675675495, -0.312505063, 0.677603725, 
         -0.365098661, -0.0675675495 ]
       ikLinks: 
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ -1.77993784e-09, 0.309999407, 0.0995002455 ]
           rotation: [ 
             0.939931226, 0.341363867, -6.25541285e-15, 
@@ -356,7 +353,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ -2.05554973e-08, -0.0100002631, 0.0995000379 ]
           rotation: [ 
             0.939930928, -0.341364687, 4.71844785e-16, 
@@ -378,7 +375,7 @@ refs:
       ikLinks: 
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ 2.24881447e-12, 0.340000305, 0.0995000702 ]
           rotation: [ 
             0.999999939, -0.00034836841, 9.05261312e-14, 
@@ -388,7 +385,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ -1.38755978e-08, 0.0200001294, 0.0995000683 ]
           rotation: [ 
             0.999999939, 0.000348368409, -7.97028047e-13, 
@@ -436,7 +433,7 @@ refs:
             -9.37029328e-10, -3.40250494e-10, 1 ]
         - 
           name: LARM_JOINT7
-          index: 14
+          index: 13
           translation: [ 0.0198425731, 0.551456088, 0.976314795 ]
           rotation: [ 
             0.459003031, 0.152244556, -0.875292986, 
@@ -444,7 +441,7 @@ refs:
             0.816139118, 0.317028262, 0.483125265 ]
         - 
           name: RARM_JOINT7
-          index: 24
+          index: 23
           translation: [ 0.0198425732, -0.191456088, 0.976314795 ]
           rotation: [ 
             0.459003031, -0.152244557, -0.875292986, 
@@ -452,7 +449,7 @@ refs:
             0.816139117, -0.317028263, 0.483125265 ]
         - 
           name: LLEG_JOINT5
-          index: 32
+          index: 31
           translation: [ 4.38853509e-12, 0.340000609, 0.0995001296 ]
           rotation: [ 
             0.999999939, -0.00034836841, 6.91006588e-13, 
@@ -462,7 +459,7 @@ refs:
           partingDirection: [ 0, 0, 1 ]
         - 
           name: RLEG_JOINT5
-          index: 38
+          index: 37
           translation: [ -1.38744255e-08, 0.0200004262, 0.0995001244 ]
           rotation: [ 
             0.999999939, 0.000348368409, -2.13490582e-13, 
