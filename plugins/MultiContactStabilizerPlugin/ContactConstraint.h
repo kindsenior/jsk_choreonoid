@@ -141,8 +141,11 @@ protected:
         muRot = 0;
         for(auto vertex : vertexVec) muRot += muTrans*vertex.norm();
         muRot /= vertexVec.size();
-        muRot *= 0.5;// mergin
-        // std::cout << vertexVec.size() << " " << muRot << std::endl;
+        muRot *= 1;// slip
+        // muRot *= 0.8;// little slip
+        muRot *= 0.75;
+        // std::cout << muRot << " " << 2.0/3*muTrans*0.05 << std::endl;
+        // muRot = 2.0/3*muTrans*0.05;
 
         // numInequals = 4 + edgeVec.size();// 静止摩擦制約4式
         numInequals = 6 + edgeVec.size();// 並進静止摩擦制約4式 + 回転静止摩擦制約式2式
