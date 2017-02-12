@@ -86,7 +86,8 @@ void SlideFrictionControlParam::calcInputMatrix()
             0,dt,   0,       0, 0,0,
             0,-beta,dt*p(1), dt,0,0,
             beta,0,-dt*p(0), 0,dt,0,
-            0,0,0,           0,0,dt;//changed add Lz
+            // 0,0,0,           0,0,dt;//changed add Lz
+            -dt*(p(1)-CM(1)),dt*(p(0)-CM(0)),0, 0,0,dt;//changed add Lz, (rx-xg)*fy - (ry-yg)*fx. (xg,yg) is reference
         inputMat.block(0,colIdx, stateDim,(*iter)->inputDim) = tmpMat*R2*(*iter)->inputForceConvertMat;// product input conversion matrix (distribution->6dof force)
         colIdx += (*iter)->inputDim;
     }
