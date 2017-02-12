@@ -342,17 +342,25 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
             // vertex << 0.15,-0.08; vertexVec.push_back(vertex);
             // vertex << -0.1,0.08; vertexVec.push_back(vertex);
             // vertex << -0.1,-0.08; vertexVec.push_back(vertex);
+            // vertex << 0.13,0.065; vertexVec.push_back(vertex);
+            // vertex << 0.13,-0.065; vertexVec.push_back(vertex);
+            // vertex << -0.1,0.065; vertexVec.push_back(vertex);
+            // vertex << -0.1,-0.065; vertexVec.push_back(vertex);
             vertex << 0.12,0.06; vertexVec.push_back(vertex);
             vertex << 0.12,-0.06; vertexVec.push_back(vertex);
             vertex << -0.09,0.06; vertexVec.push_back(vertex);
             vertex << -0.09,-0.06; vertexVec.push_back(vertex);
-            vertex << 0.12,0.06; vertexVec.push_back(vertex);
-            vertex << 0.12,-0.06; vertexVec.push_back(vertex);
-            vertex << -0.09,0.06; vertexVec.push_back(vertex);
-            vertex << -0.09,-0.06; vertexVec.push_back(vertex);
+
+            std::vector<hrp::Vector2> smallVertexVec;
+            vertex << 0.08,0.03; smallVertexVec.push_back(vertex);
+            vertex << 0.08,-0.03; smallVertexVec.push_back(vertex);
+            vertex << -0.05,0.03; smallVertexVec.push_back(vertex);
+            vertex << -0.05,-0.03; smallVertexVec.push_back(vertex);
+
             if(contactState == 0){// static contact
                 // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
-                ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
+                // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
+                ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), smallVertexVec, 0.6));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceContactConstraintParam((*linkIter)->name(), vertexVec, 2,2));
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 1,1, 0.5));// 摩擦係数 要改良
@@ -362,7 +370,7 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
                 cout << " " << (*linkIter)->name() << ": Static" << endl;
             }else if(contactState == 1){// slide contact
                 // ccParamVec.push_back(new SlideContactConstraintParam((*linkIter)->name(), vertexVec, 0.5, getPrevDirection(poseIter, poseSeqPtr, linkIdx)));
-                ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.5));
+                ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.6));
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 1,1, 0.5));
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 3,3, 0.5));//3x3y
