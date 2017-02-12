@@ -99,11 +99,11 @@ items:
                 barLength: 1
             - 
               id: 8
-              name: "left-crab-short"
+              name: "left-crab-slow-short"
               plugin: PoseSeq
               class: PoseSeqItem
               data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-crab-short.pseq"
+                filename: "${PROJECT_DIR}/JAXON_RED_left-crab-slow-short.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
