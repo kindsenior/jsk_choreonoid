@@ -114,11 +114,28 @@ void SlideFrictionControlParam::calcEqualConstraints()
     equalVec.resize(numEquals);
 
     // common constraint in different kinds of contact
+    // sum of Fz
     equalVec(rowIdx) = F(2);
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         Matrix33 R = (*iter)->R;
         equalMat.block(rowIdx,colIdx, 1,(*iter)->inputDim) = R.block(2,0,1,3) * (*iter)->inputForceConvertMat.block(0,0, 3,(*iter)->inputDim);//fz product input convertion matrix (fx,fy,fzi)
         colIdx += (*iter)->inputDim;
+    }
+    ++rowIdx;
+
+    // Lz = sum of -(py-yg)*fx + (px-xg)*fy + nz
+    int inputForceDim = 6;
+    colIdx = 0;
+    equalVec(rowIdx) = 0;// Lz = 0
+    for(auto ccParam : ccParamVec){
+        Vector3 p = ccParam->p;
+        Matrix33 R = ccParam->R;
+        dmatrix crossRot = dmatrix(1,2);
+        crossRot << -(p(1)-CM(1)),(p(0)-CM(0));
+        equalMat.block(rowIdx,colIdx, 1,ccParam->inputDim)
+            = crossRot * R.block(0,0,2,3) * ccParam->inputForceConvertMat.block(0,0, 3,ccParam->inputDim)//fx,fy cordinate's input convertion matrix (fx,fy)
+            + R.block(2,0,1,3) * ccParam->inputForceConvertMat.block(3,0, 3,ccParam->inputDim);//nz cordinate's input convertion matrix (nx(fzi),ny(fzi),nz)
+        colIdx += ccParam->inputDim;
     }
     ++rowIdx;
 
@@ -189,7 +206,8 @@ void SlideFrictionControlParam::calcInputWeightMatrix()
 void SlideFrictionControlParam::convertToMpcParam()
 {
     inputDim = 0;
-    numEquals = 1;//Fzの合計
+    // numEquals = 1;//Fzの合計
+    numEquals = 2;//Fzの合計 + Lz=0
     numInequals = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         numEquals += (*iter)->numEquals;
