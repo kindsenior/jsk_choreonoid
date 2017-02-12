@@ -348,9 +348,9 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
             vertex << -0.1,-0.065; vertexVec.push_back(vertex);
             if(contactState == 0){// static contact
                 // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
-                // ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
+                ccParamVec.push_back(new StaticContactConstraintParam((*linkIter)->name(), vertexVec, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceContactConstraintParam((*linkIter)->name(), vertexVec, 2,2));
-                ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.5));// 摩擦係数 要改良
+                // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 1,1, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 3,3, 0.5));// 3x3y 摩擦係数 要改良
