@@ -397,7 +397,8 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam,Vecto
     // L -= CM.cross(P);// convert to around CoM
     sfcParam->CM = CM;
     // sfcParam->CM << 0.065,0,0;// move root link foward 65mm for JAXON
-    sfcParam->CM = CM + body->rootLink()->R()*Vector3(0.05,0,0);
+    // sfcParam->CM = CM + body->rootLink()->R()*Vector3(0.05,0,0);
+    sfcParam->CM = CM + body->rootLink()->R()*Vector3(0.065,0,0);// for rotate-left-slide
     // sfcParam->CM += CM;
     sfcParam->P = P;
     // sfcParam->L = L;

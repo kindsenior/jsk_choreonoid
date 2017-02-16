@@ -41,7 +41,8 @@ public:
         // maxCalcCount = 100;// fail
         // maxCalcCount = 500;// success
         // maxCalcCount = 1000;
-        maxCalcCount = 10000;
+        // maxCalcCount = 10000;
+        maxCalcCount = 20000;
         // maxCalcCount = 100000;
     };
 

@@ -294,6 +294,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
         std::vector<int> contactStateVec;
         for(auto link : linkVec){
             contactStateVec.push_back(getPrevContactState(frontPoseIter, poseSeqPtr, link->index()) < 2);// 0:静止接触 1:滑り接触
+            // contactStateVec.push_back(getPrevContactState(frontPoseIter, poseSeqPtr, link->index()) == 0);// 0:静止接触のみ
         }
         for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
             MultiValueSeq::Frame frame = optionalDataSeqPtr->frame(i);

@@ -80,7 +80,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
 
     body->rootLink()->dv() = VectorXd::Zero(3);
     Vector3 lastdv = VectorXd::Zero(3);
-    int filterSize = 5;
+    int filterSize = 10;
     std::deque<float> zmpXDeque,zmpYDeque;
     std::vector<float> sortedXVector, sortedYVector;
     for(int currentFrame = 0; currentFrame < motion->numFrames(); ++currentFrame){
