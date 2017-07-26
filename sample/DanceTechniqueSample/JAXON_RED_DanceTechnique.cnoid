@@ -19,18 +19,18 @@ items:
           plugin: Body
           class: BodyItem
           data: 
-            modelFile: "/home/kunio/ros/indigo/src/choreonoid-pkg/jsk_choreonoid/share/model/JAXON_RED_WITH_BUSH/jaxon_red.yaml"
+            modelFile: "/home/k-kojima/ros/indigo/src/choreonoid-pkg/jsk_choreonoid/share/model/JAXON_RED_WITH_BUSH/jaxon_red.yaml"
             currentBaseLink: "WAIST"
-            rootPosition: [ -3.14038035e-07, 0.300000551, 0.976799947 ]
+            rootPosition: [ 0.02, -0.09, 0.9 ]
             rootAttitude: [ 
-              0.999999935, 0.000351717938, 7.27770205e-05, 
-              -0.00035171548, 0.999999938, -3.37875363e-05, 
-              -7.27888996e-05, 3.37619373e-05, 0.999999997 ]
+              1, 0, 0, 
+              0, 1, 0, 
+              -0, 0, 1 ]
             jointPositions: [ 
-               0.001041, -0.078332, -0.337487,  0.674827, -0.337468,  0.078271,  0.001058,  0.078171, -0.339218,  0.674809, 
-              -0.335736, -0.078239,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.698132, -0.349066, 
-              -0.087266, -1.396263,  0.000000,  0.000000, -0.349066,  0.000000,  0.698132,  0.349066,  0.087266, -1.396263, 
-               0.000000,  0.000000, -0.349066,  0.000000,  0.000000,  0.000000,  0.000000 ]
+              -0.000000,  0.130060, -0.530670,  1.118948, -0.588277, -0.130060,  0.110630,  0.042392, -1.405196,  0.628766, 
+               0.174533, -0.118627,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000, -0.523598, -0.261799, 
+              -0.087266, -2.094391,  0.000000,  0.000000, -0.349067,  0.000000,  0.523596,  0.261799,  0.087266, -0.349067, 
+               0.000000,  0.000000, -0.349067, -1.396263,  1.396263, -1.396263,  1.396263 ]
             initialRootPosition: [ 0, 0, 1.0185 ]
             initialRootAttitude: [ 
               2.22044605e-16, -1, 0, 
@@ -41,190 +41,22 @@ items:
               -0.418684,  0.003093,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.523599, -0.349066, 
               -0.087266, -1.396263,  0.000000,  0.000000, -0.349066,  0.000000,  0.523599,  0.349066,  0.087266, -1.396263, 
                0.000000,  0.000000, -0.349066,  0.000000,  0.000000,  0.000000,  0.000000 ]
-            zmp: [ 0.000614441958, 0.298672324, 0 ]
+            zmp: [ 5.40035964e-316, 6.90189643e-310, 2.12199579e-314 ]
             collisionDetection: true
             selfCollisionDetection: false
             isEditable: true
           children: 
             - 
               id: 3
-              name: "BodyRTC"
-              plugin: OpenRTM
-              class: BodyRTCItem
-              data: 
-                isImmediateMode: true
-                controllerOptions: ""
-                moduleName: "${rtmros_choreonoid}/hrpsys_choreonoid/PDcontroller"
-                confFileName: "${rtmros_choreonoid}/hrpsys_choreonoid_tutorials/config/SensorReaderRTC_JAXON_RED.PD.conf"
-                configurationMode: "Use Configuration File"
-                AutoConnect: false
-                InstanceName: "JAXON_RED"
-                bodyPeriodicRate: 0.002
-                RelativePathBase: "RTC directory"
-            - 
-              id: 4
-              name: "foward-slide"
+              name: "get-down"
               plugin: PoseSeq
               class: PoseSeqItem
               data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_forward-slide.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 5
-              name: "rotate-left-slide"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_rotate-left-slide.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 6
-              name: "rotate-left-slide-short"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_rotate-left-slide-short.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 7
-              name: "left-crab"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-crab.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 8
-              name: "left-crab-short"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-crab-short.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 9
-              name: "rotate-left-slide-wide"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_rotate-left-slide-wide.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 10
-              name: "rotate-left-slide-wide-short"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_rotate-left-slide-wide-short.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 11
-              name: "left-crab-slow-short"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-crab-slow-short.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 12
-              name: "left-turn-90deg"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-turn-90deg.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 13
-              name: "left-toe-turn-90deg"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-toe-turn-90deg.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 14
-              name: "lf-rb-forward"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-forward.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 15
-              name: "lf-rb-backward"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-backward.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 16
-              name: "lf-rb-turn"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-turn.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 17
-              name: "lf-rb-toe-turn"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_lf-rb-toe-turn.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 18
-              name: "left-leg-stand-rotate-left-slide"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-leg-stand-rotate-left-slide.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 19
-              name: "left-leg-stand-rotate-left-slide-init"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-leg-stand-rotate-left-slide-init.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 20
-              name: "left-leg-stand-rotate-left-slide-full"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_left-leg-stand-rotate-left-slide-full.pseq"
-                format: POSE-SEQ-YAML
-                barLength: 1
-            - 
-              id: 21
-              name: "cross-leg-left-turn"
-              plugin: PoseSeq
-              class: PoseSeqItem
-              data: 
-                filename: "${PROJECT_DIR}/JAXON_RED_cross-leg-left-turn.pseq"
+                filename: "${PROJECT_DIR}/JAXON_get-down.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 22
+          id: 4
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -247,7 +79,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 23
+          id: 5
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -277,7 +109,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 24
+              id: 6
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -296,7 +128,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 25
+              id: 7
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -315,7 +147,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 26
+              id: 8
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -351,9 +183,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 10, 2 ]
-      checked: [ 1, 2, 22, 23, 24, 25, 26 ]
-      expanded: [ 1, 2, 21 ]
+      selected: [ 3 ]
+      checked: [ 1, 2, [ 3, "motion" ], 4, 5, 6, 7, 8 ]
+      expanded: [ 1, 2, 3 ]
   - 
     id: 3
     plugin: Base
@@ -398,16 +230,16 @@ views:
       cameras: 
         - 
           camera: [ System, Perspective ]
-          isCurrent: true
           fieldOfView: 0.6978
           near: 0.01
           far: 100
-          eye: [ 1.52292824, 0.246017934, 1.51066321 ]
-          direction: [ -0.835417296, 0.0418057077, -0.548023927 ]
-          up: [ -0.54733904, 0.02738978, 0.836462656 ]
+          eye: [ 0.205067092, -4.88809782, 0.736752301 ]
+          direction: [ -0, 1, -6.123234e-17 ]
+          up: [ 0, 6.123234e-17, 1 ]
         - 
           camera: [ System, Orthographic ]
-          orthoHeight: 20
+          isCurrent: true
+          orthoHeight: 1.81435
           near: 0.01
           far: 100
       backgroundColor: [ 0.100000001, 0.100000001, 0.300000012 ]
@@ -437,7 +269,7 @@ views:
     mounted: true
     state: 
       showAllJoints: true
-      jointId: true
+      jointId: false
       name: true
       numColumns: 1
       spinBox: true
@@ -455,9 +287,9 @@ views:
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 31 ]
+          selectedLinks: [ 0 ]
         - 
-          id: 22
+          id: 4
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -466,16 +298,16 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 10
+      currentPoseSeqItem: 3
       defaultTransitionTime: 0
-      updateAll: false
+      updateAll: true
       autoUpdate: false
       timeSync: true
       listingMode: "Part Tree"
       bodyItems: 
         - 
           id: 2
-          expandedParts: [ "ARMS", "LEGS", "LOWER-BODY", "Whole Body" ]
+          expandedParts: [ "LEGS", "LOWER-BODY", "UPPER-BODY", "Whole Body" ]
       timeLength: 11
       showLipSync: false
       gridInterval: 1
@@ -487,11 +319,11 @@ views:
 toolbars: 
   "TimeBar": 
     minTime: 0
-    maxTime: 12000
+    maxTime: 15
     frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
-    currentTime: 7.5
+    currentTime: 0.95
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
@@ -511,23 +343,48 @@ toolbars:
     current: 2
   "LeggedBodyBar": 
     stanceWidth: 0.15
+  "SlideFrictionControlBar": 
+    saveParameterInFileName: false
+    SFC: 
+      errorCMWeight: 100
+      errorCMWeightCheck: true
+      errorMomentumWeight: 10
+      errorMomentumWeightCheck: true
+      errorAngularMomentumWeight: 1000
+      errorAngularMomentumWeightCheck: true
+      errorYawAngularMomentumWeight: 1
+      errorYawAngularMomentumWeightCheck: true
+      inputForceWeight: 0.001
+      inputForceWeightCheck: true
+      inputMomentWeight: 10
+      inputMomentWeightCheck: true
+      inputYawMomentWeight: 1
+      inputYawMomentWeightCheck: true
+      blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+      blockingListCheck: true
+      xDivisionNum: 2
+      xDivisionNumCheck: true
+      yDivisionNum: 2
+      yDivisionNumCheck: true
+      dt: 1
+      dtCheck: true
   "BodyMotionGenerationBar": 
     autoGenerationForNewBody: true
     balancer: false
     autoGeneration: false
     timeScaleRatio: 1
-    preInitialDuration: 0
-    postFinalDuration: 0
+    preInitialDuration: 1
+    postFinalDuration: 1
     onlyTimeBarRange: false
     makeNewBodyItem: true
-    stealthyStepMode: true
+    stealthyStepMode: false
     stealthyHeightRatioThresh: 2
     flatLiftingHeight: 0.005
     flatLandingHeight: 0.005
     impactReductionHeight: 0.005
     impactReductionTime: 0.04
-    autoZmp: true
-    minZmpTransitionTime: 0.3
+    autoZmp: false
+    minZmpTransitionTime: 0.1
     zmpCenteringTimeThresh: 0.03
     zmpTimeMarginBeforeLiftingSpin: 0
     zmpMaxDistanceFromCenter: 0.02
@@ -544,86 +401,6 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
-  "RMControlBar": 
-    initialTrajectory: Load
-    initialTrajectoryCheck: false
-    saveParameterInFileName: false
-  "CascadedControlBar": 
-    saveParameterInFileName: false
-    CC: 
-      - 
-        SFC: 
-          errorCMWeight: 1e+08
-          errorCMWeightCheck: true
-          errorMomentumWeight: 1
-          errorMomentumWeightCheck: true
-          errorAngularMomentumWeight: 200
-          errorAngularMomentumWeightCheck: true
-          errorYawAngularMomentumWeight: 1
-          errorYawAngularMomentumWeightCheck: true
-          inputForceWeight: 10
-          inputForceWeightCheck: true
-          inputMomentWeight: 20
-          inputMomentWeightCheck: true
-          inputYawMomentWeight: 1
-          inputYawMomentWeightCheck: true
-          blockingList: 1,1,1,1,1
-          blockingListCheck: true
-          xDivisionNum: 2
-          xDivisionNumCheck: true
-          yDivisionNum: 2
-          yDivisionNumCheck: true
-          dt: 0.002
-          dtCheck: true
-      - 
-        SFC: 
-          errorCMWeight: 10000
-          errorCMWeightCheck: true
-          errorMomentumWeight: 1
-          errorMomentumWeightCheck: true
-          errorAngularMomentumWeight: 200
-          errorAngularMomentumWeightCheck: true
-          errorYawAngularMomentumWeight: 1
-          errorYawAngularMomentumWeightCheck: true
-          inputForceWeight: 10
-          inputForceWeightCheck: true
-          inputMomentWeight: 20
-          inputMomentWeightCheck: true
-          inputYawMomentWeight: 200
-          inputYawMomentWeightCheck: true
-          blockingList: 1,1,1,1,1,1,1,1,1,1
-          blockingListCheck: true
-          xDivisionNum: 2
-          xDivisionNumCheck: true
-          yDivisionNum: 2
-          yDivisionNumCheck: true
-          dt: 0.05
-          dtCheck: true
-  "SlideFrictionControlBar": 
-    saveParameterInFileName: false
-    SFC: 
-      errorCMWeight: 1000
-      errorCMWeightCheck: true
-      errorMomentumWeight: 1
-      errorMomentumWeightCheck: true
-      errorAngularMomentumWeight: 200
-      errorAngularMomentumWeightCheck: true
-      errorYawAngularMomentumWeight: 1
-      errorYawAngularMomentumWeightCheck: true
-      inputForceWeight: 10
-      inputForceWeightCheck: true
-      inputMomentWeight: 20
-      inputMomentWeightCheck: true
-      inputYawMomentWeight: 100
-      inputYawMomentWeightCheck: true
-      blockingList: 1,1,1,1,1,1,1
-      blockingListCheck: true
-      xDivisionNum: 2
-      xDivisionNumCheck: true
-      yDivisionNum: 2
-      yDivisionNumCheck: true
-      dt: 0.1
-      dtCheck: true
   "MultiContactStabilizerBar": 
     saveParameterInFileName: false
     MCS: 
@@ -645,6 +422,57 @@ toolbars:
     controlMode: DynamicsFilter
     controlModeCheck: true
     saveParameterInFileName: true
+  "CascadedControlBar": 
+    saveParameterInFileName: false
+    CC: 
+      - 
+        SFC: 
+          errorCMWeight: 100
+          errorCMWeightCheck: true
+          errorMomentumWeight: 10
+          errorMomentumWeightCheck: true
+          errorAngularMomentumWeight: 1000
+          errorAngularMomentumWeightCheck: true
+          errorYawAngularMomentumWeight: 1
+          errorYawAngularMomentumWeightCheck: true
+          inputForceWeight: 0.001
+          inputForceWeightCheck: true
+          inputMomentWeight: 10
+          inputMomentWeightCheck: true
+          inputYawMomentWeight: 1
+          inputYawMomentWeightCheck: true
+          blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+          blockingListCheck: true
+          xDivisionNum: 2
+          xDivisionNumCheck: true
+          yDivisionNum: 2
+          yDivisionNumCheck: true
+          dt: 1
+          dtCheck: true
+      - 
+        SFC: 
+          errorCMWeight: 100
+          errorCMWeightCheck: true
+          errorMomentumWeight: 10
+          errorMomentumWeightCheck: true
+          errorAngularMomentumWeight: 1000
+          errorAngularMomentumWeightCheck: true
+          errorYawAngularMomentumWeight: 1
+          errorYawAngularMomentumWeightCheck: true
+          inputForceWeight: 0.001
+          inputForceWeightCheck: true
+          inputMomentWeight: 10
+          inputMomentWeightCheck: true
+          inputYawMomentWeight: 1
+          inputYawMomentWeightCheck: true
+          blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+          blockingListCheck: true
+          xDivisionNum: 2
+          xDivisionNumCheck: true
+          yDivisionNum: 2
+          yDivisionNumCheck: true
+          dt: 1
+          dtCheck: true
 Body: 
   "BodyMotionEngine": 
     updateJointVelocities: false
@@ -653,10 +481,10 @@ Body:
       - 
         bodyItem: 2
         showCenterOfMass: false
-        showPpcom: false
+        showPpcom: true
         showZmp: true
       - 
-        bodyItem: 22
+        bodyItem: 4
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
@@ -679,12 +507,12 @@ viewAreas:
     contents: 
       type: splitter
       orientation: horizontal
-      sizes: [ 317, 1548 ]
+      sizes: [ 426, 2079 ]
       children: 
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 482, 482 ]
+          sizes: [ 750, 750 ]
           children: 
             - 
               type: pane
@@ -697,12 +525,12 @@ viewAreas:
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 688, 276 ]
+          sizes: [ 1071, 429 ]
           children: 
             - 
               type: splitter
               orientation: horizontal
-              sizes: [ 670, 872 ]
+              sizes: [ 713, 1360 ]
               children: 
                 - 
                   type: pane
@@ -722,18 +550,16 @@ layoutOfToolBars:
       - { name: "FileBar", x: 0, priority: 0 }
       - { name: "ScriptBar", x: 47, priority: 0 }
       - { name: "TimeBar", x: 94, priority: 0 }
-      - { name: "SceneBar", x: 1010, priority: 0 }
-      - { name: "GraphBar", x: 1310, priority: 0 }
-      - { name: "SimulationBar", x: 1417, priority: 0 }
-      - { name: "BodyBar", x: 1614, priority: 0 }
-      - { name: "KinematicsBar", x: 1874, priority: 0 }
-      - { name: "BodyMotionGenerationBar", x: 2108, priority: 0 }
-      - { name: "RMControlBar", x: 2245, priority: 0 }
-      - { name: "SlideFrictionControlBar", x: 2337, priority: 0 }
-      - { name: "MultiContactStabilizerBar", x: 2422, priority: 0 }
+      - { name: "SceneBar", x: 1100, priority: 0 }
+      - { name: "GraphBar", x: 1400, priority: 0 }
+      - { name: "SimulationBar", x: 1507, priority: 0 }
+      - { name: "BodyBar", x: 1704, priority: 0 }
+      - { name: "KinematicsBar", x: 1964, priority: 0 }
+      - { name: "BodyMotionGenerationBar", x: 2198, priority: 0 }
+      - { name: "RMControlBar", x: 2335, priority: 0 }
+      - { name: "SlideFrictionControlBar", x: 2427, priority: 0 }
     - 
-      - { name: "PreviewControl", x: 0, priority: 0 }
-      - { name: "CascadedControlBar", x: 164, priority: 0 }
-      - { name: "LeggedBodyBar", x: 284, priority: 0 }
-      - { name: "HrpsysSequenceFileExportPlugin", x: 589, priority: 0 }
-      - { name: "Sandbox", x: 664, priority: 0 }
+      - { name: "MultiContactStabilizerBar", x: 0, priority: 0 }
+      - { name: "PreviewControl", x: 90, priority: 0 }
+      - { name: "CascadedControlBar", x: 254, priority: 0 }
+      - { name: "LeggedBodyBar", x: 374, priority: 0 }

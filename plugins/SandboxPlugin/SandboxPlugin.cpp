@@ -149,7 +149,7 @@ public:
                 cout << collisions.size() << endl;
                 for(size_t i=0; i < collisions.size(); ++i){
                   CollisionLinkPair& collisionPair = *collisions[i];
-                  cout << " " << collisionPair.link[0]->name() << " " << collisionPair.link[1]->name() << " " << collisionPair.isSelfCollision();
+                  cout << "  " << collisionPair.link[0]->name() << "(" << collisionPair.link[0]->jointId() << ")  " << collisionPair.link[1]->name() << " " << collisionPair.isSelfCollision();
                   for(std::vector<Collision>::iterator iter = collisionPair.collisions.begin(); iter != collisionPair.collisions.end(); ++iter){
                     // cout << " " << iter->point.transpose() << " " << iter->normal.transpose() << endl;
                   }
@@ -161,6 +161,18 @@ public:
             // 各Poseへアクセス
             for(PoseSeq::iterator poseIter = poseSeq->begin(); poseIter != poseSeq->end(); ++poseIter){
                 PosePtr pose = poseIter->get<Pose>();// PosePtr取得
+
+                Pose::LinkInfo* linkInfo = pose->ikLinkInfo(37);
+                cout << poseIter->time() << "[sec]: ";
+                cout << linkInfo->isTouching() << " " << linkInfo->isStationaryPoint();
+                // cout << linkInfo->isTouching() << "->";
+                linkInfo->clearTouching();
+                // cout << linkInfo->isTouching() << endl;
+
+                linkInfo = pose->ikLinkInfo(31);
+                cout << linkInfo->isTouching() << " " << linkInfo->isStationaryPoint() << endl;
+                // cout << linkInfo->isTouching() << "->";
+                linkInfo->clearTouching();
 
                 // tb->setTime(poseIter->time());
                 // BodyPtr body = bodyItems[0]->body();
@@ -183,6 +195,7 @@ public:
 
                 // ss << endl;
             }// 各poseに対するforの終わり
+            poseSeqItems[i]->updateInterpolation();
         }// 各poseSeqに対するforの終わり
 
 

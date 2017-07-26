@@ -46,7 +46,7 @@ void StaticContactConstraintParam::calcInequalMatrix()
 void SlideContactConstraintParam::calcInequalMatrix()
 {
     SimpleContactConstraintParam::calcInequalMatrix();
-    inequalMat.block(edgeVec.size(),0, 2,3) << 1,0,muTrans*math::sign(direction(0)), 0,1,muTrans*math::sign(direction(1));
+    inequalMat.block(edgeVec.size(),0, 2,3) << 1,0,muTrans*math::sign(direction(0)), 0,1,muTrans*math::sign(direction(1));// signは不要?
 }
 
 void DistributedForceSlideContactConstraintParam::calcInequalMatrix()
@@ -65,6 +65,11 @@ void DistributedForceSlideContactConstraintParam::calcInequalMatrix()
         inequalMat(rowIdx+2,colIdx) = -muTrans*(ri(0)*di(1) - ri(1)*di(0));
         ++colIdx;
     }
+    // cout << "p:" << p.transpose() << endl;
+    // cout << "v:" << v.transpose() << endl;
+    // cout << "w:" << w.transpose() << endl;
+    // cout << "R:" << endl << R << endl;
+    // cout << "inequalMat:" << endl << inequalMat << endl;
 }
 
 // calcInequalMinimumVector

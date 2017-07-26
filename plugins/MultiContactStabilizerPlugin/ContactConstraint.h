@@ -185,7 +185,8 @@ public:
 class SlideContactConstraintParam : public SimpleContactConstraintParam
 {
 public:
-    double muTrans, muRot;
+    // double muTrans, muRot;
+    double muTrans;
     Vector3 direction;
 
     void calcInequalMatrix();
