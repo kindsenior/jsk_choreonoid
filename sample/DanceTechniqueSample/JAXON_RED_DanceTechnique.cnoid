@@ -55,8 +55,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_get-down.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 4
+              name: "crab-step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_crab-step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 4
+          id: 5
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -79,7 +88,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 5
+          id: 6
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -109,7 +118,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 6
+              id: 7
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -128,7 +137,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 7
+              id: 8
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -147,7 +156,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 8
+              id: 9
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -335,7 +344,7 @@ toolbars:
     mode: AUTO
     enablePositionDragger: true
     penetrationBlock: true
-    collisionLinkHighlight: false
+    collisionLinkHighlight: true
     snapDistance: 0.025
     penetrationBlockDepth: 0.0005
     lazyCollisionDetectionMode: true
