@@ -73,8 +73,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_knee-switch_knee-slide.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 6
+              name: "backflip"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_backflip.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 6
+          id: 7
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -97,7 +106,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 7
+          id: 8
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -127,7 +136,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 8
+              id: 9
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -146,7 +155,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 9
+              id: 10
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -165,7 +174,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 10
+              id: 11
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -201,8 +210,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 5, 2 ]
-      checked: [ 1, 2, 6, 7, 8, 9, 10 ]
+      selected: [ 6, 7 ]
+      checked: [ 1, 2, 7, 8, 9, 10, 11 ]
       expanded: [ 1, 2, 3, 5 ]
   - 
     id: 3
@@ -293,7 +302,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 2
+      currentBodyItem: 7
   - 
     id: 8
     plugin: Body
@@ -301,13 +310,13 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 2
+      currentBodyItem: 7
       bodyItems: 
         - 
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 6
+          id: 7
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -316,7 +325,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 5
+      currentPoseSeqItem: 6
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -325,7 +334,7 @@ views:
       bodyItems: 
         - 
           id: 2
-          expandedParts: [ "LEGS", "LOWER-BODY", "UPPER-BODY", "Whole Body" ]
+          expandedParts: [ "ARMS", "LEGS", "LOWER-BODY", "UPPER-BODY", "Whole Body" ]
       timeLength: 11
       showLipSync: false
       gridInterval: 1
@@ -337,7 +346,7 @@ views:
 toolbars: 
   "TimeBar": 
     minTime: 0
-    maxTime: 15
+    maxTime: 5
     frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
