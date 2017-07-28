@@ -64,8 +64,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_crab-step.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 5
+              name: "knee-switch_knee-slide"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_knee-switch_knee-slide.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 5
+          id: 6
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -88,7 +97,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 6
+          id: 7
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -118,7 +127,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 7
+              id: 8
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -137,7 +146,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 8
+              id: 9
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -156,7 +165,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 9
+              id: 10
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -192,9 +201,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 3 ]
-      checked: [ 1, 2, [ 3, "motion" ], 4, 5, 6, 7, 8 ]
-      expanded: [ 1, 2, 3 ]
+      selected: [ 5, 2 ]
+      checked: [ 1, 2, 6, 7, 8, 9, 10 ]
+      expanded: [ 1, 2, 3, 5 ]
   - 
     id: 3
     plugin: Base
@@ -298,7 +307,7 @@ views:
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 4
+          id: 6
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -307,7 +316,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 3
+      currentPoseSeqItem: 5
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
