@@ -16,7 +16,7 @@ add_library(${TARGET} SHARED UtilPlugin)
 target_link_libraries(${TARGET} CnoidPoseSeqPlugin)
 
 set_target_properties(${TARGET}
-  PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CATKIN_DEVEL_PREFIX}/lib/choreonoid-${choreonoid_VER})
+  PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${choreonoid_PLUGINDIR})
 
 set(INCLUDE_DEST_DIR ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${PLUGIN_NAME})
 execute_process(
