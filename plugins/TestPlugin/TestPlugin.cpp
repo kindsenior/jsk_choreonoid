@@ -1,5 +1,5 @@
 /**
-   @author Shin'ichiro Nakaoka
+   @author Noriaki Takasugi
 */
 
 #include <cnoid/Plugin>

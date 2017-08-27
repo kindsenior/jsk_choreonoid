@@ -1,3 +1,6 @@
+/**
+   @author Noriaki Takasugi
+*/
 
 #include <iostream>
 #include <cnoid/PyUtil>
