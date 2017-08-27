@@ -1,4 +1,6 @@
-
+/**
+   @author Noriaki Takasugi
+*/
 
 #include <cnoid/PyUtil>
 #include "../BodyUtil.h"

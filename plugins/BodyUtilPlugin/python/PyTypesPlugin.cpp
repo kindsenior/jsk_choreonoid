@@ -1,3 +1,6 @@
+/**
+   @author Noriaki Takasugi
+*/
 
 #include <cnoid/PyUtil>
 #include <cnoid/EigenTypes>

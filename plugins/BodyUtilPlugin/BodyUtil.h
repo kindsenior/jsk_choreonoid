@@ -1,4 +1,6 @@
-
+/**
+   @author Noriaki Takasugi
+*/
 
 #include <vector>
 #include <iostream>
