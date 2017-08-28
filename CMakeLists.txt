@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(jsk_choreonoid)
 
+## include cmake util function
+include(${PROJECT_SOURCE_DIR}/cmake/util.cmake)
+
 message("********************find pkg********************")
 message("PKG_CONFIG_PATH: $ENV{PKG_CONFIG_PATH}")
 # find_package(catkin REQUIRED COMPONENTS mk choreonoid)
@@ -13,6 +16,15 @@ if(NOT ${choreonoid_FOUND})
 endif(NOT ${choreonoid_FOUND})
 
 pkg_check_modules(choreonoid-body-plugin choreonoid-body-plugin REQUIRED)
+
+# for python wrapper
+## python package
+find_package(PythonLibs 2.7 REQUIRED)
+include_directories(${PYTHON_INCLUDE_PATH})
+## boost package
+find_package(Boost 1.47.0 REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+link_directories(${Boost_LIBRARY_DIRS})
 
 string(REGEX REPLACE ".0" "" choreonoid_VER ${choreonoid_VERSION})
 execute_process(COMMAND pkg-config --variable=plugindir choreonoid
