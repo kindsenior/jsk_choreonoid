@@ -4,7 +4,7 @@ import os
 import roslib
 import time
 from jsk_choreonoid import body_util
-from jsk_choreonoid.util import load_model
+from jsk_choreonoid import util
 from cnoid import BodyUtil
 import numpy as np
 
@@ -21,8 +21,8 @@ def measure_time(func, *args, **kwargs):
 if __name__ == "__main__":
     model_path = os.path.join(roslib.packages.get_pkg_dir("hrp2_models"),
                               "HRP2JSKNT_for_OpenHRP3/HRP2JSKNTmain.wrl")
-    # robot, robotItem, worldItem = load_model(model_path) # use choreonoid
-    robot = load_model(model_path, use_choreonoid=False) # not use choreonoid
+    world = util.World(model_path)
+    robot = world.robot
 
     for name, args in zip(["angleVector", "links", "jointList"],
                           [(np.random.randn(34),), (), ()]):
