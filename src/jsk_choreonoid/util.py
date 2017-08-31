@@ -49,7 +49,12 @@ class World(object):
         if self.is_choreonoid:  # use choreonoid
             # set world item
             if worldItem is None:
-                self.set_worldItem()
+                worldItems = get_all_items(Base.ItemTreeView.instance().rootItem(), BodyPlugin.WorldItem)
+                if len(worldItems) == 0:
+                    self.set_worldItem()
+                else:
+                    self.worldItem = worldItems[0]
+                    self.set_child_items(worldItems[0])
             else:
                 self.worldItem = worldItem
                 self.set_child_items(worldItem)
