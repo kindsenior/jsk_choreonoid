@@ -11,7 +11,10 @@ def get_child_items(item, class_type=None):
     return ret
 
 
-def get_all_items(item, class_type, ret=[]):
+def get_all_items(item, class_type, ret=None):
+    # prepare buffer
+    if ret is None:
+        ret = []
     # add self
     if class_type is None or type(item) is class_type:
         ret.append(item)
