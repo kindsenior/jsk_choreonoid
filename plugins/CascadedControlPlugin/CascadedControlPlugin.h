@@ -58,6 +58,7 @@ namespace cnoid{
             require("Body");
             require("PoseSeq");
             require("MultiContactStabilizer");
+            require("SlideFrictionControl");
             // require("Dynamics");
         }
 
