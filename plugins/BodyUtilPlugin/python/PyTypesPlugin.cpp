@@ -9,7 +9,6 @@
 #include <boost/foreach.hpp>
 #include <boost/range/value_type.hpp>
 
-namespace python = boost::python;
 using namespace cnoid;
 
 namespace {
