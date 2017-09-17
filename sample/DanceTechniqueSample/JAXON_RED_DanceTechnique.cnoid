@@ -596,3 +596,4 @@ layoutOfToolBars:
       - { name: "PreviewControl", x: 90, priority: 0 }
       - { name: "CascadedControlBar", x: 254, priority: 0 }
       - { name: "LeggedBodyBar", x: 374, priority: 0 }
+      - { name: "HrpsysSequenceFileExportPlugin", x: 679, priority: 0 }
