@@ -67,7 +67,9 @@ int QP::execQP(dvector& U)
     // options.printLevel = PL_NONE;// default comment
     setOptions( options );
 
+    cout << "\x1b[31m";
     returnValue ret = init(H,g,A,lb,ub,lbA,ubA, maxCalcCount);
+    cout << "\x1b[m" << endl;
     real_t xOpt[valueDim];
     getPrimalSolution(xOpt);
     for(int i=0; i < valueDim; ++i){
