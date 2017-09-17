@@ -454,51 +454,51 @@ toolbars:
     CC: 
       - 
         SFC: 
-          errorCMWeight: 100
+          errorCMWeight: 1e+08
           errorCMWeightCheck: true
-          errorMomentumWeight: 10
+          errorMomentumWeight: 1
           errorMomentumWeightCheck: true
-          errorAngularMomentumWeight: 1000
+          errorAngularMomentumWeight: 200
           errorAngularMomentumWeightCheck: true
           errorYawAngularMomentumWeight: 1
           errorYawAngularMomentumWeightCheck: true
-          inputForceWeight: 0.001
+          inputForceWeight: 10
           inputForceWeightCheck: true
-          inputMomentWeight: 10
+          inputMomentWeight: 20
           inputMomentWeightCheck: true
           inputYawMomentWeight: 1
           inputYawMomentWeightCheck: true
-          blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+          blockingList: 1,1,1,1,1
           blockingListCheck: true
           xDivisionNum: 2
           xDivisionNumCheck: true
           yDivisionNum: 2
           yDivisionNumCheck: true
-          dt: 1
+          dt: 0.002
           dtCheck: true
       - 
         SFC: 
-          errorCMWeight: 100
+          errorCMWeight: 10000
           errorCMWeightCheck: true
-          errorMomentumWeight: 10
+          errorMomentumWeight: 1
           errorMomentumWeightCheck: true
-          errorAngularMomentumWeight: 1000
+          errorAngularMomentumWeight: 200
           errorAngularMomentumWeightCheck: true
           errorYawAngularMomentumWeight: 1
           errorYawAngularMomentumWeightCheck: true
-          inputForceWeight: 0.001
+          inputForceWeight: 10
           inputForceWeightCheck: true
-          inputMomentWeight: 10
+          inputMomentWeight: 20
           inputMomentWeightCheck: true
-          inputYawMomentWeight: 1
+          inputYawMomentWeight: 200
           inputYawMomentWeightCheck: true
-          blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+          blockingList: 1,1,1,1,1,1,1,1,1,1
           blockingListCheck: true
           xDivisionNum: 2
           xDivisionNumCheck: true
           yDivisionNum: 2
           yDivisionNumCheck: true
-          dt: 1
+          dt: 0.05
           dtCheck: true
 Body: 
   "BodyMotionEngine": 
