@@ -117,6 +117,7 @@ items:
             timeLength: 12000
             allLinkPositionOutputMode: false
             deviceStateOutput: true
+            selfCollision: false
             controllerThreads: true
             recordCollisionData: false
             controllerOptions: ""
@@ -124,7 +125,7 @@ items:
             integrationMode: "Runge Kutta"
             gravity: [ 0, 0, -9.80665 ]
             staticFriction: 1
-            slipFriction: 1
+            dynamicFriction: 1
             cullingThresh: 0.005
             contactCullingDepth: 0.03
             errorCriterion: 0.001
@@ -210,7 +211,7 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 6, 7 ]
+      selected: [ 4 ]
       checked: [ 1, 2, 7, 8, 9, 10, 11 ]
       expanded: [ 1, 2, 3, 5 ]
   - 
@@ -235,7 +236,6 @@ views:
       worldLightIntensity: 0.5
       worldLightAmbient: 0.3
       additionalLights: true
-      shadowLights: 
       fog: true
       floorGrid: true
       floorGridSpan: 10
@@ -251,22 +251,24 @@ views:
       normalVisualization: false
       normalLength: 0.01
       coordinateAxes: true
+      fpsTestIteration: 1
       showFPS: false
       enableNewDisplayListDoubleRendering: false
       useBufferForPicking: true
+      upsideDown: false
       cameras: 
         - 
           camera: [ System, Perspective ]
           fieldOfView: 0.6978
           near: 0.01
           far: 100
-          eye: [ 0.205067092, -4.88809782, 0.736752301 ]
-          direction: [ -0, 1, -6.123234e-17 ]
-          up: [ 0, 6.123234e-17, 1 ]
+          eye: [ 4.29269899, -0.938475248, 2.00868339 ]
+          direction: [ -0.945390476, 0.212198328, -0.247403954 ]
+          up: [ -0.241397815, 0.0541831277, 0.968912423 ]
         - 
           camera: [ System, Orthographic ]
           isCurrent: true
-          orthoHeight: 1.81435
+          orthoHeight: 2.32967
           near: 0.01
           far: 100
       backgroundColor: [ 0.100000001, 0.100000001, 0.300000012 ]
@@ -302,7 +304,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 7
+      currentBodyItem: 2
   - 
     id: 8
     plugin: Body
@@ -310,22 +312,26 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 7
+      currentBodyItem: 2
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 0 ]
+          selectedLinks: [ 32 ]
         - 
           id: 7
           selectedLinks: [ 0 ]
   - 
     id: 9
+    plugin: OpenRTM
+    class: RTSNameServerView
+  - 
+    id: 10
     name: "Pose Roll"
     plugin: PoseSeq
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 6
+      currentPoseSeqItem: 4
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -339,25 +345,21 @@ views:
       showLipSync: false
       gridInterval: 1
   - 
-    id: 10
+    id: 11
     plugin: Python
     class: PythonConsoleView
     mounted: true
 toolbars: 
   "TimeBar": 
     minTime: 0
-    maxTime: 5
+    maxTime: 6.72
     frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
-    currentTime: 0.95
+    currentTime: 2.9
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
-  "RMControlBar": 
-    initialTrajectory: Load
-    initialTrajectoryCheck: false
-    saveParameterInFileName: false
   "KinematicsBar": 
     mode: AUTO
     enablePositionDragger: true
@@ -370,31 +372,6 @@ toolbars:
     current: 2
   "LeggedBodyBar": 
     stanceWidth: 0.15
-  "SlideFrictionControlBar": 
-    saveParameterInFileName: false
-    SFC: 
-      errorCMWeight: 100
-      errorCMWeightCheck: true
-      errorMomentumWeight: 10
-      errorMomentumWeightCheck: true
-      errorAngularMomentumWeight: 1000
-      errorAngularMomentumWeightCheck: true
-      errorYawAngularMomentumWeight: 1
-      errorYawAngularMomentumWeightCheck: true
-      inputForceWeight: 0.001
-      inputForceWeightCheck: true
-      inputMomentWeight: 10
-      inputMomentWeightCheck: true
-      inputYawMomentWeight: 1
-      inputYawMomentWeightCheck: true
-      blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
-      blockingListCheck: true
-      xDivisionNum: 2
-      xDivisionNumCheck: true
-      yDivisionNum: 2
-      yDivisionNumCheck: true
-      dt: 1
-      dtCheck: true
   "BodyMotionGenerationBar": 
     autoGenerationForNewBody: true
     balancer: false
@@ -428,6 +405,35 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
+  "SlideFrictionControlBar": 
+    saveParameterInFileName: false
+    SFC: 
+      errorCMWeight: 100
+      errorCMWeightCheck: true
+      errorMomentumWeight: 10
+      errorMomentumWeightCheck: true
+      errorAngularMomentumWeight: 1000
+      errorAngularMomentumWeightCheck: true
+      errorYawAngularMomentumWeight: 1
+      errorYawAngularMomentumWeightCheck: true
+      inputForceWeight: 0.001
+      inputForceWeightCheck: true
+      inputMomentWeight: 10
+      inputMomentWeightCheck: true
+      inputYawMomentWeight: 1
+      inputYawMomentWeightCheck: true
+      blockingList: 1,1,1,1,1,1,1,1,1,1,1,1,1
+      blockingListCheck: true
+      xDivisionNum: 2
+      xDivisionNumCheck: true
+      yDivisionNum: 2
+      yDivisionNumCheck: true
+      dt: 1
+      dtCheck: true
+  "RMControlBar": 
+    initialTrajectory: Load
+    initialTrajectoryCheck: false
+    saveParameterInFileName: false
   "MultiContactStabilizerBar": 
     saveParameterInFileName: false
     MCS: 
@@ -478,17 +484,17 @@ toolbars:
           dtCheck: true
       - 
         SFC: 
-          errorCMWeight: 10000
+          errorCMWeight: 30000
           errorCMWeightCheck: true
-          errorMomentumWeight: 1
+          errorMomentumWeight: 0.5
           errorMomentumWeightCheck: true
-          errorAngularMomentumWeight: 200
+          errorAngularMomentumWeight: 100
           errorAngularMomentumWeightCheck: true
           errorYawAngularMomentumWeight: 1
           errorYawAngularMomentumWeightCheck: true
-          inputForceWeight: 10
+          inputForceWeight: 30
           inputForceWeightCheck: true
-          inputMomentWeight: 20
+          inputMomentWeight: 60
           inputMomentWeightCheck: true
           inputYawMomentWeight: 200
           inputYawMomentWeightCheck: true
@@ -498,7 +504,7 @@ toolbars:
           xDivisionNumCheck: true
           yDivisionNum: 2
           yDivisionNumCheck: true
-          dt: 0.05
+          dt: 0.02
           dtCheck: true
 Body: 
   "BodyMotionEngine": 
@@ -511,7 +517,7 @@ Body:
         showPpcom: true
         showZmp: true
       - 
-        bodyItem: 4
+        bodyItem: 7
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
@@ -569,8 +575,8 @@ viewAreas:
                   current: 4
             - 
               type: pane
-              views: [ 3, 10, 9 ]
-              current: 9
+              views: [ 3, 11, 10 ]
+              current: 10
 layoutOfToolBars: 
   rows: 
     - 
