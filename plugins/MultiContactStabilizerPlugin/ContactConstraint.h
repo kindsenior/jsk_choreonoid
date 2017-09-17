@@ -146,6 +146,8 @@ protected:
         // muRot *= 0.75;// stopped foot slip on actual machine
         // muRot *= 0.5;
         // std::cout << muRot << " " << 2.0/3*muTrans*0.05 << std::endl;
+
+        // for translational slide
         muRot = 2.0/3*muTrans*0.05;
         // muRot *= 0.8;// margin
         // muRot *= 0.4;// margin
