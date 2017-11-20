@@ -203,10 +203,10 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 
 
     // 離着陸CM
-    motion->frame(takeoffFrame) >> *mBody;
+    (BodyMotion::ConstFrame) motion->frame(takeoffFrame) >> *mBody;
     mBody->calcForwardKinematics();
     const Vector3d takeoffCM = mBody->calcCenterOfMass();
-    motion->frame(landingFrame) >> *mBody;
+    (BodyMotion::ConstFrame) motion->frame(landingFrame) >> *mBody;
     mBody->calcForwardKinematics();
     const Vector3d landingCM = mBody->calcCenterOfMass();
 
@@ -220,10 +220,10 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     Vector3d jumpL = Vector3d::Zero();// 重心回り
 
     // 初期終端重心
-    motion->frame(initRMCFrame) >> *mBody;
+    (BodyMotion::ConstFrame) motion->frame(initRMCFrame) >> *mBody;
     mBody->calcForwardKinematics();
     const Vector3d initCM = mBody->calcCenterOfMass();
-    motion->frame(endRMCFrame) >> *mBody;
+    (BodyMotion::ConstFrame) motion->frame(endRMCFrame) >> *mBody;
     mBody->calcForwardKinematics();
     const Vector3d endCM = mBody->calcCenterOfMass();
 
@@ -243,7 +243,7 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 
     // 目標重心位置
     for(int i = 0; i < motion->numFrames(); ++i){
-        motion->frame(i) >> *mBody;
+        (BodyMotion::ConstFrame) motion->frame(i) >> *mBody;
         mBody->calcForwardKinematics();
         refCMSeq[i] = mBody->calcCenterOfMass();
 
@@ -472,7 +472,7 @@ void RMControlPlugin::execControl()
             double dt = 1.0/motion->frameRate();
 
             // 運動量ヤコビアンが正しいかどうかの確認
-            motion->frame(0) >> *mBody;// 腰座標、q更新 body更新
+            (BodyMotion::ConstFrame) motion->frame(0) >> *mBody;// 腰座標、q更新 body更新
 
             VectorXd dq_(mBody->numJoints());
             MultiValueSeq::Frame q = motion->jointPosSeq()->frame(0);
@@ -556,11 +556,11 @@ void RMControlPlugin::execControl()
                 // 足先速度調査
                 Vector3d lv,lw,rv,rw, lp, rp;
                 Matrix3d lR,rR;
-                motion->frame(nextFrame) >> *mBody;
+                (BodyMotion::ConstFrame) motion->frame(nextFrame) >> *mBody;
                 mBody->calcForwardKinematics();
                 lp = mLFootLink->p(); rp = mRFootLink->p();
                 lR = mLFootLink->R(); rR = mRFootLink->R();
-                motion->frame(currentFrame) >> *mBody;
+                (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *mBody;
                 mBody->calcForwardKinematics();
                 lv = ( lp - mLFootLink->p() ) /dt;
                 rv = ( rp - mRFootLink->p() ) /dt;
@@ -702,7 +702,7 @@ void RMControlPlugin::execControl()
                 // cout << "dq " << dq.transpose() << endl;
 
                 // RootLink位置更新
-                motion->frame(currentFrame) >> *mBody;
+                (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *mBody;
                 mBody->rootLink()->p() += xib.block(0,0, 3,1) * dt;
                 Vector3d omega = xib.block(3,0, 3,1);
                 if(omega.norm() != 0) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
@@ -731,7 +731,7 @@ void RMControlPlugin::execControl()
 
                 // 計画後重心軌道をファイル書き出し
                 {
-                    motion->frame(currentFrame) >> *mBody;// 腰・q更新
+                    (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *mBody;// 腰・q更新
                     mBody->calcForwardKinematics();
 
                     mBody->rootLink()->v() = xib.block(0,0, 3,1);

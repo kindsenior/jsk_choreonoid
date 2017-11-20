@@ -333,7 +333,7 @@ void cnoid::updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const in
 
     // 特定リンクのvとwの更新
     if(linkSet.size() != 0){
-        motion->frame(prevFrame) >> *body;
+        (BodyMotion::ConstFrame) motion->frame(prevFrame) >> *body;
         body->calcForwardKinematics();
         std::map<std::string, SE3> SE3Map;
         for(std::set<Link*>::iterator iter = linkSet.begin(); iter != linkSet.end(); ++iter){
@@ -343,7 +343,7 @@ void cnoid::updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const in
             se3.rotation() = body->link(linkName)->R();
             SE3Map[linkName] = se3;
         }
-        motion->frame(currentFrame) >> *body;
+        (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *body;
         body->calcForwardKinematics();
         for(std::set<Link*>::iterator iter = linkSet.begin(); iter != linkSet.end(); ++iter){
             string linkName = (*iter)->name();
@@ -355,7 +355,7 @@ void cnoid::updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const in
         }
     }
 
-    motion->frame(currentFrame) >> *body;
+    (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *body;
 
 		Vector3d v,w;
 		VectorXd dq,ddq;
