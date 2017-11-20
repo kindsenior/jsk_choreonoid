@@ -36,8 +36,13 @@ void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport()
       fnamess << poseSeqItem->name() << "." << ext;
       ofstream ofs;
       ofs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
-      MultiValueSeqPtr multiValueSeqPtr = bodyMotionItem->findSubItem<MultiValueSeqItem>(ext)->seq();
 
+      MultiValueSeqItemPtr seqItem = bodyMotionItem->findSubItem<MultiValueSeqItem>(ext);
+      if(!seqItem){
+          cout << ext << " is not found in PoseSeq: " << poseSeqItem->name() << endl;
+          continue;
+      }
+      MultiValueSeqPtr multiValueSeqPtr = seqItem->seq();
       for(int i=0; i<numFrames; ++i){
           ofs << i*dt;
           MultiValueSeq::Frame frame = multiValueSeqPtr->frame(i);
