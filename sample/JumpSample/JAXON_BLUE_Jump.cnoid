@@ -91,8 +91,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_jump-250msec.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 8
+              name: "jump-300msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-300msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 8
+          id: 9
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -126,8 +135,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 7 ]
-      checked: [ 2, 8 ]
+      selected: [ 8 ]
+      checked: [ 2, 9 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -236,7 +245,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 7
+      currentPoseSeqItem: 8
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -422,7 +431,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 8
+        bodyItem: 9
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
@@ -501,3 +510,4 @@ layoutOfToolBars:
       - { name: "PreviewControl", x: 0, priority: 0 }
       - { name: "CascadedControlBar", x: 164, priority: 0 }
       - { name: "HrpsysSequenceFileExportPlugin", x: 284, priority: 0 }
+      - { name: "LeggedBodyBar", x: 359, priority: 0 }
