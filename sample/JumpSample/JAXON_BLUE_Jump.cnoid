@@ -55,8 +55,44 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_jump.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 4
+              name: "jump-100msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-100msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 5
+              name: "jump-150msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-150msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 6
+              name: "jump-200msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-200msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 7
+              name: "jump-250msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-250msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 4
+          id: 8
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -90,9 +126,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 3 ]
-      checked: [ 2, 4 ]
-      expanded: [ 1, 2, 3 ]
+      selected: [ 7 ]
+      checked: [ 2, 8 ]
+      expanded: [ 1, 2 ]
   - 
     id: 2
     plugin: Base
@@ -200,7 +236,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 3
+      currentPoseSeqItem: 7
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -386,7 +422,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 4
+        bodyItem: 8
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
