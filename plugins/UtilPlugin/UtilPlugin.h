@@ -53,7 +53,6 @@ int getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseS
 
 int getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
 
-Vector3d getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId);
 
 Vector3d getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
 

@@ -12,38 +12,38 @@ namespace{
 // 特定のリンクの次のポーズを求める
 PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
-    std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
+    // std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
     for(iter = (++poseIter); iter != poseSeq->end(); ++iter){
         // std::cout << " " << iter->time();
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
         if(linkInfo){
-            std::cout << " link" << linkId << "'s next pose time:" << iter->time() << std::endl;
+            // std::cout << " link" << linkId << "'s next pose time:" << iter->time() << std::endl;
             return iter;
         }
 
     }
     --iter;
-    std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
+    // std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
     return iter;
 }
 
 // 特定リンクの前のポーズを求める
 PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
-    std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
+    // std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
     for(iter = (--poseIter); iter != (--poseSeq->begin()); --iter){
         // std::cout << " " << iter->time();
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
         if(linkInfo){
-            std::cout << " link" << linkId << "'s prev pose time:" << iter->time() << std::endl;
+            // std::cout << " link" << linkId << "'s prev pose time:" << iter->time() << std::endl;
             return iter;
         }
 
     }
     ++iter;
-    std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
+    // std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
     return iter;
 }
 
@@ -51,7 +51,7 @@ PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, in
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
 int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
 {
-    std::cout << "getContactState()";
+    // std::cout << "getContactState()";
     int state = 0;
 
     // 滑り判定(静止0 滑り1)
@@ -66,8 +66,16 @@ int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
         state += 2;// 2^1
     }
 
-    std::cout << " >>state:" << state << std::endl;
+    // std::cout << " >>state:" << state << std::endl;
     return state;
+}
+
+Vector3d getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId)
+{
+    Vector3d ret = pose2->ikLinkInfo(linkId)->p - pose1->ikLinkInfo(linkId)->p;
+    ret /= ret.norm();
+    // std::cout << "getDirection()>>direction:" << ret.transpose() << std::endl;
+    return ret;
 }
 
 }
@@ -115,16 +123,17 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
 
 void cnoid::calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet, BodyPtr body, const PoseSeqPtr& poseSeqPtr)
 {
+    cout << endl << "calcContactLinkCandidateSet()" << endl;
     for(PoseSeq::iterator poseIter = (++poseSeqPtr->begin()); poseIter != poseSeqPtr->end(); incContactPose(poseIter,poseSeqPtr,body)){
-        cout << endl << endl;
         if(!isContactStateChanging(poseIter, poseSeqPtr, body))continue;
         PosePtr curPosePtr = poseIter->get<Pose>();
         for(Pose::LinkInfoMap::iterator linkInfoIter = curPosePtr->ikLinkBegin(); linkInfoIter != curPosePtr->ikLinkEnd(); ++linkInfoIter){
             //接触している且つslaveでない
             if(linkInfoIter->second.isTouching() && !linkInfoIter->second.isSlave()) contactLinkCandidateSet.insert(body->link(linkInfoIter->first));
         }
+        cout << endl;
     }
-    cout << endl << "Contact Link Candidates:";
+    cout << endl << " Contact Link Candidates:";
     for(std::set<Link*>::iterator iter = contactLinkCandidateSet.begin(); iter != contactLinkCandidateSet.end(); ++iter){
         cout << " " << (*iter)->name();
     }
@@ -175,13 +184,6 @@ int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPt
     return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId );
 }
 
-Vector3d cnoid::getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId)
-{
-    Vector3d ret = pose2->ikLinkInfo(linkId)->p - pose1->ikLinkInfo(linkId)->p;
-    ret /= ret.norm();
-    std::cout << "getDirection()>>direction:" << ret.transpose() << std::endl;
-    return ret;
-}
 
 Vector3d cnoid::getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
 {
@@ -284,6 +286,8 @@ void cnoid::generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseS
 
 void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const std::vector<Link*>& linkVec)
 {
+    cout << endl << "generateOptionalData()" << endl;
+
     PoseSeqPtr poseSeqPtr = poseSeqItemPtr->poseSeq();
     BodyMotionItemPtr bodyMotionItemPtr = poseSeqItemPtr->bodyMotionItem();
     BodyMotionPtr motion = bodyMotionItemPtr->motion();
@@ -307,22 +311,26 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
             }
         }
         backPoseIter = frontPoseIter;
+        cout << endl;
     }
+    cout << endl << endl;
 
     setSubItem("optionaldata", optionalDataSeqPtr, bodyMotionItemPtr);
 }
 
 bool cnoid::getEndEffectorLinkVector(std::vector<Link*>& endEfectorLinkVec, BodyPtr& body)
 {
-    cout << "generateEndEffectorLinkVector( " << body->name() << ")" << endl;
+    cout << endl << "generateEndEffectorLinkVector( " << body->name() << " )" << endl;
     const Listing& endEffectorNodes = *body->info()->findListing("endEffectors");
     if(endEffectorNodes.isValid() && endEffectorNodes.size() != 0){
+        cout << " End effector link vector contains";
         for(int i=0; i<endEffectorNodes.size(); ++i){
             endEfectorLinkVec.push_back(body->link(endEffectorNodes[i].toString()));
-        }
+            cout << " " << endEffectorNodes[i].toString();
+        }cout << " in this order" << endl;
         return true;
     }else{
-        cout << "Please set endEffectorNodes in yaml file" << endl;
+        cout << " Please set endEffectorNodes in yaml file" << endl << endl;
         return false;
     }
 }
