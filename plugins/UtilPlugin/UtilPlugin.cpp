@@ -8,6 +8,70 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
+namespace{
+// 特定のリンクの次のポーズを求める
+PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
+{
+    std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
+    PoseSeq::iterator iter;
+    for(iter = (++poseIter); iter != poseSeq->end(); ++iter){
+        // std::cout << " " << iter->time();
+        Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
+        if(linkInfo){
+            std::cout << " link" << linkId << "'s next pose time:" << iter->time() << std::endl;
+            return iter;
+        }
+
+    }
+    --iter;
+    std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
+    return iter;
+}
+
+// 特定リンクの前のポーズを求める
+PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
+{
+    std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
+    PoseSeq::iterator iter;
+    for(iter = (--poseIter); iter != (--poseSeq->begin()); --iter){
+        // std::cout << " " << iter->time();
+        Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
+        if(linkInfo){
+            std::cout << " link" << linkId << "'s prev pose time:" << iter->time() << std::endl;
+            return iter;
+        }
+
+    }
+    ++iter;
+    std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
+    return iter;
+}
+
+// 2つのPose間の接触状態を2進数で表す
+// 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
+int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
+{
+    std::cout << "getContactState()";
+    int state = 0;
+
+    // 滑り判定(静止0 滑り1)
+    const double deltaPos = 0.005, deltaAngle = 0.001;// 要検討 5[mm] 0.001[rad]
+    const Pose::LinkInfo *linkInfo1 = pose1->ikLinkInfo(linkId), *linkInfo2 = pose2->ikLinkInfo(linkId);
+    if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
+        state += 1;// 2^0
+    }
+
+    // 遊脚判定(接触0 非接触1)
+    if(!linkInfo1->isTouching() || !linkInfo2->isTouching()){
+        state += 2;// 2^1
+    }
+
+    std::cout << " >>state:" << state << std::endl;
+    return state;
+}
+
+}
+
 // calc COM, Momentum, Angular Momentum
 void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
 {
@@ -67,29 +131,6 @@ void cnoid::calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet
     cout << endl << endl;
 }
 
-// 2つのPose間の接触状態を2進数で表す
-// 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
-int cnoid::getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
-{
-    std::cout << "getContactState()";
-    int state = 0;
-
-    // 滑り判定(静止0 滑り1)
-    const double deltaPos = 0.005, deltaAngle = 0.001;// 要検討 5[mm] 0.001[rad]
-    const Pose::LinkInfo *linkInfo1 = pose1->ikLinkInfo(linkId), *linkInfo2 = pose2->ikLinkInfo(linkId);
-    if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
-        state += 1;// 2^0
-    }
-
-    // 遊脚判定(接触0 非接触1)
-    if(!linkInfo1->isTouching() || !linkInfo2->isTouching()){
-        state += 2;// 2^1
-    }
-
-    std::cout << " >>state:" << state << std::endl;
-    return state;
-}
-
 // どちらの足でもいいので次の接触ポーズにイテレータを進める
 // end()を返すこともある
 void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body)
@@ -115,44 +156,6 @@ void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq
     poseIter = iter;
     std::cout << " next contact pose not found. return pose time:" << poseIter->time() << std::endl;
     return;
-}
-
-// 特定のリンクの次のポーズを求める
-PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
-{
-    std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
-    PoseSeq::iterator iter;
-    for(iter = (++poseIter); iter != poseSeq->end(); ++iter){
-        // std::cout << " " << iter->time();
-        Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
-        if(linkInfo){
-            std::cout << " link" << linkId << "'s next pose time:" << iter->time() << std::endl;
-            return iter;
-        }
-
-    }
-    --iter;
-    std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
-    return iter;
-}
-
-// 特定リンクの前のポーズを求める
-PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
-{
-    std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
-    PoseSeq::iterator iter;
-    for(iter = (--poseIter); iter != (--poseSeq->begin()); --iter){
-        // std::cout << " " << iter->time();
-        Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
-        if(linkInfo){
-            std::cout << " link" << linkId << "'s prev pose time:" << iter->time() << std::endl;
-            return iter;
-        }
-
-    }
-    ++iter;
-    std::cout << " link" << linkId << "'s contact pose not found. return pose time:" << iter->time() << std::endl;
-    return iter;
 }
 
 // poseIterが最後のポーズの時は-1を返す
