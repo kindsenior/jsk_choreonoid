@@ -324,7 +324,7 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 
     }// end motion loop
 
-    setSubItem("refCM", refPSeqPtr, motionItem);
+    setSubItem("refCM", refCMSeqPtr, motionItem);
     setSubItem("refP", refPSeqPtr, motionItem);
     setSubItem("refL", refLSeqPtr, motionItem);
 
