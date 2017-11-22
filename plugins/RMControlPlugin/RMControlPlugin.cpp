@@ -183,7 +183,7 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 
         // Poseの接地判定
         Pose::LinkInfoMap::iterator itr = poseItr->get<Pose>()->ikLinkBegin();
-        for(int i = 0; i <= 2; ++i){// 3番目まで調べる
+        for(int i = 0; i <= 10; ++i){// 10番目まで調べる
             TouchFlg |= itr->second.isTouching() && !itr->second.isBaseLink();
             ++itr;
         }

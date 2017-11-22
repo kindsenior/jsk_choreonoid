@@ -8,7 +8,7 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
-namespace{
+namespace {
 // 特定のリンクの次のポーズを求める
 PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
