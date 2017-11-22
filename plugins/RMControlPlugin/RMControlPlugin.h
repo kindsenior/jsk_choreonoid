@@ -96,6 +96,8 @@ public:
     void loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
                       const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL);
 
+    void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
+
     // 分解運動量制御
     void execControl();
 
