@@ -184,6 +184,14 @@ int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPt
     return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId );
 }
 
+// 特定の接触状態のLinkSetを取得
+void cnoid::getNextTargetContactLinkSet(std::set<Link*>& linkSet, BodyPtr& body, const int contactState, const std::set<Link*>& contactLinkCandidateSet, const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq)
+{
+    for(std::set<Link*>::iterator candidateLinkIter = contactLinkCandidateSet.begin(); candidateLinkIter != contactLinkCandidateSet.end(); ++candidateLinkIter){
+        int linkIdx = (*candidateLinkIter)->index();
+        if(contactState == getNextContactState(poseIter, poseSeq, linkIdx)) linkSet.insert(body->link(linkIdx));
+    }
+}
 
 Vector3d cnoid::getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
 {
