@@ -321,7 +321,7 @@ toolbars:
     frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
-    currentTime: 2
+    currentTime: 0
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
