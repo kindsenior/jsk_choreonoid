@@ -73,7 +73,7 @@ public:
         require("PoseSeq");
         // require("Dynamics");
     }
-    
+
     virtual bool initialize();
 
     // ロボットモデル依存の部分あり

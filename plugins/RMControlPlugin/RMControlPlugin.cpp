@@ -138,8 +138,6 @@ void RMControlPlugin::splineInterpolation(const Vector3d f0, const Vector3d v0, 
 void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
                                        const Vector3d initDCM, const Vector3d endDCM, const Vector3d initL, const Vector3d endL)
 {
-
-    // BodyItem* bodyItem = motionItem->findOwnerItem<BodyItem>(true);// motionItemからbodyItemを見つける
     const BodyMotionPtr motion = motionItem->motion();
 
     Vector3SeqPtr refCMSeqPtr = motionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
@@ -335,8 +333,6 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
                                    const Vector3d initP, const Vector3d endP, const Vector3d initL, const Vector3d endL)
 {
-
-    // BodyItem* bodyItem = motionItem->findOwnerItem<BodyItem>(true);// motionItemからbodyItemを見つける
     const BodyMotionPtr motion = motionItem->motion();
 
     stringstream ss,fnamess;
@@ -709,7 +705,7 @@ void RMControlPlugin::execControl()
     // 最初のBodyItemのみ処理
     ItemList<BodyItem> bodyItems = ItemTreeView::mainInstance()->checkedItems<BodyItem>();// checkedItems チェックされたアイテムを取得
     mBody = bodyItems[0]->body();
-    bodyItems[0]->setCurrentBaseLink( mBody->link(BASE_LINK) );// 左足をbaseに設定
+    // bodyItems[0]->setCurrentBaseLink( mBody->link(BASE_LINK) );// 左足をbaseに設定
     mSubMasses.resize(mBody->numLinks());
     cout << "numLinks:" <<  mBody->numLinks() << endl;
 
@@ -750,7 +746,6 @@ void RMControlPlugin::execControl()
     calcContactLinkCandidateSet(contactLinkCandidateSet, mBody, poseSeqItem->poseSeq());
 
     // 目標運動量軌道作成
-    Vector3Seq refPSeq,refLSeq;
     Vector3d initDCM,endDCM,initL,endL;// initDCMとendPを明示的に0で初期化していない
     string modeStr = mBar->dialog->initialTrajectoryCombo->currentText().toStdString();
     cout << "control mode: " << modeStr << endl;

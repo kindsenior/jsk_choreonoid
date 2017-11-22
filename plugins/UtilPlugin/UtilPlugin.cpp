@@ -217,7 +217,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
             }
         }
     }
-    
+
     std::cout << " state not changing or no foot ikLink or no contact link" << std::endl;
     return false;
 }
@@ -296,7 +296,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
     int frameRate = motion->frameRate();
     MultiValueSeqPtr optionalDataSeqPtr = motion->getOrCreateExtraSeq<MultiValueSeq>("optionaldata");
     optionalDataSeqPtr->setNumParts(linkNum*2,true);
-    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,body)){
+    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
         std::vector<int> contactStateVec;
         for(auto link : linkVec){
@@ -310,7 +310,6 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
                 frame[j+linkNum] = 5;
             }
         }
-        backPoseIter = frontPoseIter;
         cout << endl;
     }
     cout << endl << endl;
