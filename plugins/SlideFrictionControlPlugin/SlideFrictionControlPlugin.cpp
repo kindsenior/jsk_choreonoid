@@ -52,7 +52,7 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     getline(refPLIfs,PLStr);// first row is columnhead
     getline(wrenchIfs,wrenchStr);
     for(int i=0; getline(refPLIfs,PLStr),getline(wrenchIfs,wrenchStr); ++i){
-        motion->frame(i*cycle) >> *body;
+        (BodyMotion::ConstFrame) motion->frame(i*cycle) >> *body;
         body->calcForwardKinematics();
 
         double Fz = 0;

@@ -140,7 +140,7 @@ public:
                 // ss << zmp.x() << " " << zmp.y() << " " << zmp.z() << endl;// 今一不明
 
                 // 姿勢更新
-                motion->frame(j) >> *body;
+                (BodyMotion::ConstFrame) motion->frame(j) >> *body;
                 bodyItems[0]->notifyKinematicStateChange(true);
 
                 // collision取得
@@ -274,7 +274,7 @@ public:
         }
 
         if(idx < motion->numFrames()){
-            motion->frame(idx) >> *robot;
+            (BodyMotion::ConstFrame) motion->frame(idx) >> *robot;
             bodyItemPtr->notifyKinematicStateChange(true);
             ++idx;
         }else{

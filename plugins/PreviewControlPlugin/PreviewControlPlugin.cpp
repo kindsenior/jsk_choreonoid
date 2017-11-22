@@ -110,7 +110,7 @@ void PreviewControlPlugin::execControl()
         Vector3d lastVelVec = VectorXd::Zero(3);
         ofs << "time initZMPx initZMPy initZMPz refZMPx refZMPy refZMPz initCMx initCMy initCMz rootPosX rootPosY rootPosZ rootVelX rootVelY rootVelZ rootAccX rootAccY rootAccZ" << endl;
         for(int i = 0; i < motion->numFrames(); ++i){
-            motion->frame(i) >> *body;
+            (BodyMotion::ConstFrame) motion->frame(i) >> *body;
             body->calcForwardKinematics();
             body->calcCenterOfMass();
       
@@ -180,7 +180,7 @@ void PreviewControlPlugin::execControl()
         outputZMPSeqPtr.reset(new Vector3Seq());
         outputZMPSeqPtr->setNumFrames(motion->numFrames(), true);
 
-        motion->frame(0) >> *body;
+        (BodyMotion::ConstFrame) motion->frame(0) >> *body;
         body->calcForwardKinematics();
         Vector3d CM = body->calcCenterOfMass();
         rats2::preview_dynamics_filter<rats2::extended_preview_control> df(dt, CM.z(), ref_zmp_list.front());
@@ -211,7 +211,7 @@ void PreviewControlPlugin::execControl()
         for(int i = 0; i < motion->numFrames(); ++i){
             Vector3d lFootPos,rFootPos, lHipPos, rHipPos, refCM;
             Matrix3 lFootR,rFootR;
-            motion->frame(i) >> *body;
+            (BodyMotion::ConstFrame) motion->frame(i) >> *body;
             body->calcForwardKinematics();// 状態更新
 
             lFootPos = lFootLink->p(); lFootR = lFootLink->R();// 足先位置取得
@@ -255,7 +255,7 @@ void PreviewControlPlugin::execControl()
             calcZMP(body, motion, zmpSeqPtr, true);
             ofs << "time  inputZMPx inputZMPy inputZMPz outputZMPx outputZMPy outputZMPz outputCMx outputCMy outputCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
             for(int i = 0; i < motion->numFrames(); ++i){
-                motion->frame(i) >> *body;
+                (BodyMotion::ConstFrame) motion->frame(i) >> *body;
                 body->calcForwardKinematics();
                 body->calcCenterOfMass();
                 ofs << i*dt
