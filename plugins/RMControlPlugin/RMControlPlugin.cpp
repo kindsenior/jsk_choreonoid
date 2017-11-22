@@ -373,6 +373,43 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
     ofs.close();
 }
 
+void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet)
+{
+    PoseSeqPtr poseSeq = poseSeqItem->poseSeq();
+    BodyMotionPtr motion = poseSeqItem->bodyMotionItem()->motion();
+
+    Vector3SeqPtr refCMSeqPtr = poseSeqItem->bodyMotionItem()->findSubItem<Vector3SeqItem>("refCM")->seq();
+
+    const int frameRate = motion->frameRate();
+    // const int numFrames = motion->numFrames();
+    const double dt = 1.0/motion->frameRate();
+
+    for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeq,mBody)){
+        if(!isContactStateChanging(frontPoseIter, poseSeq, mBody)) continue;
+
+        std::set<Link*> swingLinkSet;
+        getNextTargetContactLinkSet(swingLinkSet, mBody, 3, contactLinkCandidateSet, backPoseIter, poseSeq);
+         if(swingLinkSet.size() > 0){
+            cout << "swing phase: " << backPoseIter->time() << " -> " << frontPoseIter->time() << " [sec]" << endl;
+            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+                (BodyMotion::ConstFrame) motion->frame(i) >> *mBody;
+                mBody->calcForwardKinematics();
+                Vector3d initCM = mBody->calcCenterOfMass();
+                Vector3d refCM = refCMSeqPtr->at(i);
+                // Vector3d rootPos = mBody->rootLink()->p();
+                // for(auto swingLink: swingLinkSet){
+                //     Link* targetLink = mBody->link(swingLink->name());
+                //     JointPathPtr jointPath = getCustomJointPath(mBody, mBody->rootLink(), targetLink);
+                //     jointPath->calcInverseKinematics(targetLink->p() - rootPos + refCM, targetLink->R());
+                // }
+                mBody->rootLink()->p() += refCM - initCM;
+                mBody->calcForwardKinematics();
+                motion->frame(i) << *mBody;
+            }
+        }
+    }
+}
+
 void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItem, const std::set<Link*>& contactLinkCandidateSet)
 {
     BodyMotionPtr motion = bodyMotionItem->motion();
@@ -759,6 +796,8 @@ void RMControlPlugin::execControl()
         cout << " Loaded ref P/L" << endl;
     }
 
+    // 跳躍期間のrootLinkを目標重心軌道に合わせて修正
+    modifyJumpingTrajectory(poseSeqItem, contactLinkCandidateSet);
 
     sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, contactLinkCandidateSet);// ParamString is not gotten from ParamSetupLayout and is empty
 
