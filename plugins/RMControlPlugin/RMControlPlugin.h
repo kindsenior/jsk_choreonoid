@@ -82,12 +82,6 @@ public:
                        MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
                        MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, std::vector<Constraint>& jointConstraintVec);
 
-
-    // スプライン補間
-    void splineInterpolation(const Vector3d f0, const Vector3d v0, const Vector3d f1, const Vector3d v1, const double tau,
-                             Vector3d& a0, Vector3d& a1, Vector3d& a2, Vector3d& a3);
-
-
     // 目標運動量・角運動量軌道生成
     // void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
     void generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,

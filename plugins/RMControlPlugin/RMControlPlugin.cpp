@@ -17,6 +17,42 @@ bool RMControlPlugin::initialize()
     return true;
 }
 
+namespace {
+// スプライン補間
+void splineInterpolation(Vector3d& a0, Vector3d& a1, Vector3d& a2, Vector3d& a3,
+                         const Vector3d f0, const Vector3d v0, const Vector3d f1, const Vector3d v1, const double tau)
+{
+    a0 = f0;
+    a1 = v0;
+    MatrixXd A(2,3);
+    Matrix2d T;
+    T <<
+        pow(tau, 2), pow(tau, 3),
+        2 * tau, 3 * pow(tau, 2);
+    MatrixXd P(2,3);
+    P.row(0) = f1.transpose() - f0.transpose()  - v0.transpose() * tau;
+    P.row(1) = v1.transpose() - v0.transpose();
+    A = T.inverse() * P;
+    a2 = A.block(0,0, 1,3).transpose();
+    a3 = A.block(1,0, 1,3).transpose();
+
+}
+
+void minjerkInterpolation(Vector3d& a0, Vector3d& a1, Vector3d& a2, Vector3d& a3, Vector3d& a4, Vector3d& a5,
+                          const Vector3d& x0, const Vector3d& dx0, const Vector3d& ddx0, const Vector3d& x1, const Vector3d& dx1, const Vector3d& ddx1, const double& T)
+{
+    a0 = x0;
+    a1 = dx0;
+    a2 = ddx0/2;
+
+    const double T2 = pow(T,2), T3 = pow(T,3), T4 = pow(T,4), T5 = pow(T,5);
+
+    a3 = ddx1/(2*T)  - 3*ddx0/(2*T)  - 4*dx1/T2 - 6*dx0/T2 + 10*x1/T3 - 10*x0/T3;
+    a4 = -ddx1/T2    + 3*ddx0/(2*T2) + 7*dx1/T3 + 8*dx0/T3 - 15*x1/T4 + 15*x0/T4;
+    a5 = ddx1/(2*T3) - ddx0/(2*T3)   - 3*dx1/T4 - 3*dx0/T4 + 6*x1/T5  - 6*x0/T5;
+}
+
+}
 
 // ロボットモデル依存の部分あり
 // 各種行列を計算
@@ -110,28 +146,6 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, Ma
     // MessageView::instance()->putln(ss.str());
     return;
 }
-
-
-// スプライン補間
-void RMControlPlugin::splineInterpolation(const Vector3d f0, const Vector3d v0, const Vector3d f1, const Vector3d v1, const double tau,
-                                          Vector3d& a0, Vector3d& a1, Vector3d& a2, Vector3d& a3)
-{
-    a0 = f0;
-    a1 = v0;
-    MatrixXd A(2,3);
-    Matrix2d T;
-    T <<
-        pow(tau, 2), pow(tau, 3),
-        2 * tau, 3 * pow(tau, 2);
-    MatrixXd P(2,3);
-    P.row(0) = f1.transpose() - f0.transpose()  - v0.transpose() * tau;
-    P.row(1) = v1.transpose() - v0.transpose();
-    A = T.inverse() * P;
-    a2 = A.block(0,0, 1,3).transpose();
-    a3 = A.block(1,0, 1,3).transpose();
-
-}
-
 
 // 目標運動量・角運動量軌道生成
 // void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
@@ -259,11 +273,12 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     }
 
     // 目標運動量 motion loop
+    Vector3d a0,a1,a2,a3,a4,a5;
+    int startFrame,endFrame;
     for(int i = 0; i < motion->numFrames(); ++i){
 
         // 角運動量
         refLSeqPtr->at(i) = Vector3d::Zero();
-
 
         // 運動量
         if(takeoffFrame < i && i < landingFrame){// 跳躍期
@@ -273,38 +288,55 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
             refPSeqPtr->at(i) = m * takeoffDCM;
             refPSeqPtr->at(i).z() = - m * g * (i - takeoffFrame)*dt + m * takeoffDCM.z();
         }else if(initRMCFrame <= i && i <= endRMCFrame){// 接地期
-            int startFrame,endFrame;
-            Vector3d f0,v0,f1,v1;
-            if(i <= takeoffFrame){
+            // Vector3d f0,v0,f1,v1;
+            // if(i <= takeoffFrame){
+            //     startFrame = initRMCFrame;
+            //     endFrame = takeoffFrame;
+            //     f0 = initCM; v0 = initDCM;
+            //     f1 = takeoffCM; v1 = takeoffDCM;
+            // }else if(landingFrame <= i){
+            //     startFrame = landingFrame;
+            //     endFrame = endRMCFrame;
+            //     f0 = landingCM; v0 = landingDCM;
+            //     f1 = endCM; v1 = endDCM;
+            // }
+            // double tau = (endFrame - startFrame) * dt;
+
+            // スプライン補間/躍度最小補間
+            if(i == initRMCFrame){
                 startFrame = initRMCFrame;
                 endFrame = takeoffFrame;
-                f0 = initCM; v0 = initDCM;
-                f1 = takeoffCM; v1 = takeoffDCM;
-            }else if(landingFrame <= i){
+                splineInterpolation(a0,a1,a2,a3, initCM,initDCM, takeoffCM,takeoffDCM, (takeoffFrame-initRMCFrame)*dt);
+            }else if(i == landingFrame){
                 startFrame = landingFrame;
                 endFrame = endRMCFrame;
-                f0 = landingCM; v0 = landingDCM;
-                f1 = endCM; v1 = endDCM;
+                // splineInterpolation(a0,a1,a2,a3, landingCM,landingDCM, endCM,endDCM, (endRMCFrame-landingFrame)*dt);
+                minjerkInterpolation(a0,a1,a2,a3,a4,a5, landingCM,landingDCM,Vector3d(0,0,-g), endCM,endDCM,Vector3d::Zero(3), (endRMCFrame-landingFrame)*dt);
             }
-            double tau = (endFrame - startFrame) * dt;
-            Vector3d a0,a1,a2,a3;
-            splineInterpolation(f0, v0, f1, v1, tau, a0, a1, a2, a3);// スプライン補間
-            refCMSeqPtr->at(i) = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
-            refPSeqPtr->at(i) = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
+
+            if(i <= takeoffFrame){
+                refCMSeqPtr->at(i) = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
+                refPSeqPtr->at(i) = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
+            }else{
+                double dT = (i-startFrame)*dt;
+                double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
+                refCMSeqPtr->at(i) = a0 + a1*dT + a2*dT2 + a3*dT3 + a4*dT4 + a5*dT5;
+                refPSeqPtr->at(i) = (a1 + 2*a2*dT + 3*a3*dT2 + 4*a4*dT3 + 5*a5*dT4) * m;
+            }
 
             // 境界条件表示
             if(i == initRMCFrame || i == landingFrame){
                 cout << "time " << i*dt << endl;
-                cout << "f0 " << f0.transpose() << endl;
+                // cout << "f0 " << f0.transpose() << endl;
                 cout << "refCMSeq " << refCMSeqPtr->at(i).transpose() << endl;
-                cout << "v0 " << v0.transpose() << endl;
+                // cout << "v0 " << v0.transpose() << endl;
                 cout << "refPSeq " << refPSeqPtr->at(i).transpose() << endl;
                 cout << endl;
             }else if(i == takeoffFrame || i == endRMCFrame){
                 cout << "time " << i*dt << endl;
-                cout << "f1 " << f1.transpose() << endl;
+                // cout << "f1 " << f1.transpose() << endl;
                 cout << "refCMSeq " << refCMSeqPtr->at(i).transpose() << endl;
-                cout << "v1 " << v1.transpose() << endl;
+                // cout << "v1 " << v1.transpose() << endl;
                 cout << "refPSeq " << refPSeqPtr->at(i).transpose() << endl;
                 cout << endl;
             }
