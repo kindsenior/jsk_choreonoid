@@ -829,7 +829,7 @@ void RMControlPlugin::execControl()
     }
 
     // 跳躍期間のrootLinkを目標重心軌道に合わせて修正
-    modifyJumpingTrajectory(poseSeqItem, contactLinkCandidateSet);
+    // modifyJumpingTrajectory(poseSeqItem, contactLinkCandidateSet);
 
     sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, contactLinkCandidateSet);// ParamString is not gotten from ParamSetupLayout and is empty
 
