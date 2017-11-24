@@ -89,7 +89,7 @@ endEffectors:
   - RLEG_JOINT5
   - LLEG_JOINT5
   - RARM_JOINT7
-  - RARM_JOINT7
+  - LARM_JOINT7
 
 poseConversionInfo:
   - targetBodies: [ HRP4C ]
