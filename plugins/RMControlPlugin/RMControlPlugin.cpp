@@ -405,6 +405,64 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
     ofs.close();
 }
 
+void RMControlPlugin::generateRefWrenchSeq(BodyPtr& body, PoseSeqItemPtr& poseSeqItem, const std::vector<Link*>& endEffectorLinkVec)
+{
+    PoseSeqPtr poseSeq = poseSeqItem->poseSeq();
+    BodyMotionItemPtr bodyMotionItem = poseSeqItem->bodyMotionItem();
+    BodyMotionPtr motion = bodyMotionItem->motion();
+
+    int numLinks = endEffectorLinkVec.size();
+    MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
+    refWrenchesSeqPtr->setNumParts(6*numLinks,true);
+
+    Vector3SeqPtr refPSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("refP")->seq();
+
+    const int numFrames = motion->numFrames();
+    const int frameRate = motion->frameRate();
+    const double dt = 1.0/motion->frameRate();
+    const double g = 9.80665;
+    const double m = mBody->mass();
+    for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeq,mBody)){
+        if(!isContactStateChanging(frontPoseIter, poseSeq, mBody)) continue;
+
+        std::vector<int> contactStateVec;
+        int numContactLinks = 0;
+        for(auto endEffectorLink : endEffectorLinkVec){
+            int contactState = getPrevContactState(frontPoseIter, poseSeq, endEffectorLink->index());
+            contactStateVec.push_back(contactState);
+            if(contactState < 2) ++numContactLinks;
+        }
+
+        for(int i=backPoseIter->time()*frameRate; (i < frontPoseIter->time()*frameRate) && (i < numFrames); ++i){
+            MultiValueSeq::Frame wrenches = refWrenchesSeqPtr->frame(i);
+            int idx = 0;
+            Vector3d f = (refPSeqPtr->at(i+1) - refPSeqPtr->at(i))/dt + m*Vector3d(0,0,g);
+            for(int contactState: contactStateVec){// in the order of endEffectorLinkVec
+                switch (contactState){
+                case 0: // stopped contact foot
+                    for(int count=0; count < 3; ++count,++idx) wrenches[idx] = f(count)/numContactLinks; // uniform force distribution
+                    for(int count=0; count < 3; ++count,++idx) wrenches[idx] = 0;
+                    break;
+                case 1: // slide foot
+                    cout << "\x1b[31m" << "RMC does not support slide contacts" << "\x1b[m" << endl;
+                    break;
+                case 2: // swing stoped foot (same with swing foot)
+                    // break;
+                case 3:// swing foot
+                    for(int count=0; count<6; ++count,++idx) wrenches[idx] = 0;
+                    break;
+                default:
+                    cout << "\x1b[31m" << "The contact type not supported in RMC" <<  "\x1b[m" << endl;
+                    break;
+                }
+            }
+            refWrenchesSeqPtr->frame(i) = wrenches;
+        }
+    }
+    refWrenchesSeqPtr->frame(numFrames) = refWrenchesSeqPtr->frame(numFrames-1);// final frame
+    setSubItem("wrenches", refWrenchesSeqPtr, bodyMotionItem);
+}
+
 void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet)
 {
     PoseSeqPtr poseSeq = poseSeqItem->poseSeq();
@@ -830,6 +888,9 @@ void RMControlPlugin::execControl()
 
     // 跳躍期間のrootLinkを目標重心軌道に合わせて修正
     // modifyJumpingTrajectory(poseSeqItem, contactLinkCandidateSet);
+
+    generateRefWrenchSeq(mBody, poseSeqItem, endEffectorLinkVec);
+    cout << " Generated ref wrenches" << endl;
 
     sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, contactLinkCandidateSet);// ParamString is not gotten from ParamSetupLayout and is empty
 
