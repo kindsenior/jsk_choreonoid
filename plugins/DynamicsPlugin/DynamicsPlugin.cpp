@@ -85,7 +85,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
     std::vector<float> sortedXVector, sortedYVector;
     for(int currentFrame = 0; currentFrame < motion->numFrames(); ++currentFrame){
         // 腰座標更新
-        motion->frame(currentFrame) >> *body;
+        (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *body;
 
         // 関節角速度・角加速度更新
         // int prevFrame = std::max(currentFrame - 1, 0);
