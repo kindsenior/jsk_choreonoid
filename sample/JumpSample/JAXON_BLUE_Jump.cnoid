@@ -521,11 +521,11 @@ layoutOfToolBars:
       - { name: "BodyBar", x: 1614, priority: 0 }
       - { name: "KinematicsBar", x: 1874, priority: 0 }
       - { name: "BodyMotionGenerationBar", x: 2108, priority: 0 }
-      - { name: "RMControlBar", x: 2245, priority: 0 }
-      - { name: "SlideFrictionControlBar", x: 2337, priority: 0 }
-      - { name: "MultiContactStabilizerBar", x: 2422, priority: 0 }
     - 
       - { name: "PreviewControl", x: 0, priority: 0 }
       - { name: "CascadedControlBar", x: 164, priority: 0 }
       - { name: "HrpsysSequenceFileExportPlugin", x: 284, priority: 0 }
+      - { name: "RMControlBar", x: 357, priority: 1 }
       - { name: "LeggedBodyBar", x: 359, priority: 0 }
+      - { name: "SlideFrictionControlBar", x: 753, priority: 2 }
+      - { name: "MultiContactStabilizerBar", x: 838, priority: 3 }
