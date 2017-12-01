@@ -310,11 +310,12 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
             }else if(i == landingFrame){
                 startFrame = landingFrame;
                 endFrame = endRMCFrame;
-                // splineInterpolation(a0,a1,a2,a3, landingCM,landingDCM, endCM,endDCM, (endRMCFrame-landingFrame)*dt);
-                minjerkInterpolation(a0,a1,a2,a3,a4,a5, landingCM,landingDCM,Vector3d(0,0,-g), endCM,endDCM,Vector3d::Zero(3), (endRMCFrame-landingFrame)*dt);
+                splineInterpolation(a0,a1,a2,a3, landingCM,landingDCM, endCM,endDCM, (endRMCFrame-landingFrame)*dt);
+                // minjerkInterpolation(a0,a1,a2,a3,a4,a5, landingCM,landingDCM,Vector3d(0,0,-g), endCM,endDCM,Vector3d::Zero(3), (endRMCFrame-landingFrame)*dt);
             }
 
-            if(i <= takeoffFrame){
+            // if(i <= takeoffFrame){
+            if(i <= takeoffFrame || true){
                 refCMSeqPtr->at(i) = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
                 refPSeqPtr->at(i) = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
             }else{
