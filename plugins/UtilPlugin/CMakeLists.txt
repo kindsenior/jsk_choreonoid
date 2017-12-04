@@ -3,14 +3,15 @@ message("This is UtilPlugin")
 set(PLUGIN_NAME UtilPlugin)
 set(TARGET Cnoid${PLUGIN_NAME})
 set(headers
-	UtilPlugin.h
-	ParamNode.h
-	ParamWidget.h
-	ParamSetupLayout.h
-	ParamSetupDialog.h
-	SetupToolBar.h)
+  UtilPlugin.h
+  Interpolator.h
+  ParamNode.h
+  ParamWidget.h
+  ParamSetupLayout.h
+  ParamSetupDialog.h
+  SetupToolBar.h)
 
-add_library(${TARGET} SHARED UtilPlugin)
+add_library(${TARGET} SHARED UtilPlugin Interpolator)
 
 # -l
 target_link_libraries(${TARGET} CnoidPoseSeqPlugin)
