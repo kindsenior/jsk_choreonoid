@@ -50,8 +50,12 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
         for(int j=0; j<cycle; ++j){
             double r = ((double)j/cycle);
             refZmpSeqPtr->at(i+j) = frontZmp + r*diffZmp;
-            refCMSeqPtr->at(i+j) = frontCM + r*diffCM;
-            refPSeqPtr->at(i+j) = frontP + r*diffP;
+            Vector3d CM = frontCM + r*diffCM;
+            CM.z() = refCMSeqPtr->at(i+j).z(); // keep z coodinates
+            refCMSeqPtr->at(i+j) = CM;
+            Vector3d P = frontP + r*diffP;
+            P.z() = refPSeqPtr->at(i+j).z(); // keep z coodinates
+            refPSeqPtr->at(i+j) = P;
             refLSeqPtr->at(i+j) = frontL + r*diffL;
             for(int k=0; k<frontWrenches.size(); ++k){
                 refWrenchesSeqPtr->frame(i+j)[k] = (1-r)*frontWrenches[k] + r*nextWrenches[k];
@@ -165,8 +169,8 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     if(loadFlg){
         loadExtraSeq(mPoseSeqPath ,childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
     }else{
-
-        generatePreModelPredictiveControlParamDeque(parentSfc, body, poseSeqPtr, motion, contactLinkCandidateSet);
+        generateVerticalTrajectory(body, poseSeqItemPtr, contactLinkCandidateSet);
+        generatePreModelPredictiveControlParamDeque(parentSfc, body, poseSeqItemPtr, contactLinkCandidateSet);
         {// add last param for interpolation
             SlideFrictionControlParam* lastSfcParam = (SlideFrictionControlParam*) parentSfc->preMpcParamDeque.back();
             SlideFrictionControlParam* tmpParam = new SlideFrictionControlParam(lastSfcParam->index()+1, parentSfc, lastSfcParam);
