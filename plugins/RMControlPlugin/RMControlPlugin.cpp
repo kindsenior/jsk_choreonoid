@@ -280,7 +280,7 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     for(int i = 0; i < motion->numFrames(); ++i){
 
         // 角運動量
-        refLSeqPtr->at(i) = Vector3d::Zero();
+        refLSeqPtr->at(i) = Vector3d::Zero(); // overwrite angular momentum to 0
 
         // 運動量
         if(takeoffFrame < i && i < landingFrame){// 跳躍期
@@ -488,7 +488,7 @@ void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const
 
         std::set<Link*> swingLinkSet;
         getNextTargetContactLinkSet(swingLinkSet, mBody, 3, contactLinkCandidateSet, backPoseIter, poseSeq);
-         if(swingLinkSet.size() > 0){
+        if(swingLinkSet.size() > 0){
             cout << "swing phase: " << backPoseIter->time() << " -> " << frontPoseIter->time() << " [sec]" << endl;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 (BodyMotion::ConstFrame) motion->frame(i) >> *mBody;

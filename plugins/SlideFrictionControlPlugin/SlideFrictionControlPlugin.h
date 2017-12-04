@@ -59,7 +59,7 @@ namespace cnoid{
             require("PoseSeq");
             // require("Dynamics");
         }
-    
+
         virtual bool initialize();
         void execControl();
 

@@ -58,11 +58,13 @@ int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
     const double deltaPos = 0.005, deltaAngle = 0.001;// 要検討 5[mm] 0.001[rad]
     const Pose::LinkInfo *linkInfo1 = pose1->ikLinkInfo(linkId), *linkInfo2 = pose2->ikLinkInfo(linkId);
     if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
+        cout << "  posdiff = " << (linkInfo1->p - linkInfo2->p).norm() << " > " << deltaPos << " or angle diff = " << AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() << " > " << deltaAngle << endl;
         state += 1;// 2^0
     }
 
     // 遊脚判定(接触0 非接触1)
     if(!linkInfo1->isTouching() || !linkInfo2->isTouching()){
+        cout << "  pose1: " << linkInfo1->isTouching() << "  " << " pose2: " << linkInfo2->isTouching() << endl;
         state += 2;// 2^1
     }
 
@@ -83,6 +85,8 @@ Vector3d getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId
 // calc COM, Momentum, Angular Momentum
 void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
 {
+    cout << "generateInitSeq()" << endl;
+
     boost::filesystem::path poseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
     BodyMotionItemPtr bodyMotionItemPtr = poseSeqItemPtr->bodyMotionItem();
     BodyMotionPtr motion = bodyMotionItemPtr->motion();
@@ -109,9 +113,9 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
         CM = body->calcCenterOfMass();
         body->calcTotalMomentum(P,L);
         // L -= CM.cross(P);// convert to around CoM
-        L << 0,0,0;
+        L << 0,0,0; // overwrite L to 0,0,0
 
-        initCMSeqPtr->at(i) =  CM;
+        initCMSeqPtr->at(i) = CM;
         // calculate momentum in simple model
         P = filter.update(m*(CM - initCMSeqPtr->at(max(i-1,0)))/dt); //use median filter
         initPSeqPtr->at(i) = P;
@@ -217,7 +221,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
 
     LeggedBodyHelperPtr lbh = getLeggedBodyHelper(body);
     for(Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter){
-        std::cout << "  linkID:" << linkInfoIter->first << " link name:" << body->link(linkInfoIter->first)->name() << " " << linkInfoIter->second.isTouching() << std::endl;
+        std::cout << "  linkID:" << linkInfoIter->first << " link name:" << body->link(linkInfoIter->first)->name() << " isTouching:" << linkInfoIter->second.isTouching() << std::endl;
         for(int i = 0; i < lbh->numFeet(); ++i){
             if(lbh->footLink(i)->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
                 int prevState,nextState;

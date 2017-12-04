@@ -136,7 +136,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
 
     refPLOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
 
-    Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
+    Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");// 上書き確認
     Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
     Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
@@ -589,7 +589,7 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
             Vector3d P = refPSeqPtr->at(i);
             // 動作軌道に依存するパラメータの設定
-            if(i == backPoseIter->time()*frameRate){
+            if(i == backPoseIter->time()*frameRate){ // 接触状態の変わり目だけ別処理
                 ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
             }else{
                 std::vector<ContactConstraintParam*> dummyCcparamVec;
