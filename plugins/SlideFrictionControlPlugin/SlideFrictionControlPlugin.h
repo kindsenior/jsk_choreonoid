@@ -21,12 +21,14 @@
 #include <cnoid/FileUtil>
 
 #include <UtilPlugin/UtilPlugin.h>
+#include <UtilPlugin/Interpolator.h>
 
 #include "SlideFrictionControl.h"
 #include "SlideFrictionControlBar.h"
 
 namespace cnoid{
     void generatePreModelPredictiveControlParamDeque(hrp::SlideFrictionControl* sfc, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet);
+    void generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*> contactLinkCandidateSet);
     void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
     void loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
 

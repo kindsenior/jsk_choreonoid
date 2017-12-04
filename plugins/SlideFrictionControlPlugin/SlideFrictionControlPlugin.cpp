@@ -468,6 +468,90 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam,Vecto
 
 }
 
+void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*> contactLinkCandidateSet)
+{
+    cout << "generateVerticalTrajectory()" << endl;
+
+    PoseSeqPtr poseSeq = poseSeqItem->poseSeq();
+    BodyMotionItemPtr bodyMotionItem = poseSeqItem->bodyMotionItem();
+    const int frameRate = bodyMotionItem->motion()->frameRate();
+    const int numFrames = bodyMotionItem->motion()->numFrames();
+    const double dt = 1.0/frameRate;
+    const double m = body->mass();
+    const double g = 9.80665;
+
+    // initial trajectories
+    Vector3SeqPtr initCMSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("initCM")->seq();
+    Vector3SeqPtr initPSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("initP")->seq();
+    Vector3SeqPtr initLSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("initL")->seq();
+
+    // reference trajectories
+    Vector3SeqPtr refCMSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
+    Vector3SeqPtr refPSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
+    Vector3SeqPtr refLSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
+
+    for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); incContactPose(frontPoseIter,poseSeq,body)){
+        if(!isContactStateChanging(frontPoseIter, poseSeq, body)) continue;
+
+        bool isTakeoff = true, isJumping = true, isLanding = true;
+        for(auto linkIter : contactLinkCandidateSet){
+            int linkIdx = linkIter->index();
+            // 静止遊脚はない前提
+            // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
+            if(getNextContactState(frontPoseIter, poseSeq, linkIdx) != 3) isTakeoff &= false;
+            if(getPrevContactState(frontPoseIter, poseSeq, linkIdx) != 3) isJumping &= false;
+            if(getPrevContactState(backPoseIter,  poseSeq, linkIdx) != 3) isLanding &= false;
+        }
+
+        double startTime = backPoseIter->time(), endTime = frontPoseIter->time();
+        int startFrame = startTime*frameRate, endFrame = endTime*frameRate;
+        Vector3d startCM = initCMSeqPtr->at(startFrame), endCM = initCMSeqPtr->at(endFrame);
+        Vector3d startP = initPSeqPtr->at(startFrame),   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
+        std::vector<Vector3d> a;
+        a.resize(6);
+        if(isTakeoff || isLanding){// takeoff and landing phases
+            cout << " " << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing" << endl;
+            setCubicSplineInterpolation(a, startCM,startP/m, endCM,endP/m, endTime - startTime);
+            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+                double dT = i*dt - startTime;
+                double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
+                Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
+                CM.z() = (a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5).z(); // only overwrite z coordinate
+                P.z() = m*(a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4).z();
+                refCMSeqPtr->at(i) = CM;
+                refPSeqPtr->at(i) = P;
+                refLSeqPtr->at(i) = Vector3d(0,0,0);
+            }
+        }else if(isJumping){// jumping phases
+            cout << " " << startTime << "[sec] -> " << endTime << "[sec]: jumping" << endl;
+            double jumptime = endTime - startTime;
+            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+                double t = i*dt;
+                Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
+                refCMSeqPtr->at(i) = startCM + (endCM - startCM) * (t - startTime) /jumptime; // xy
+                refCMSeqPtr->at(i).z() = - 0.5 * g * (t - startTime) * (t - endTime)
+                    + (endCM.z()* (t - startTime) - startCM.z()* (t - endTime)) / jumptime; //z
+                refPSeqPtr->at(i) = startP; // xy
+                refPSeqPtr->at(i).z() = - m * g * (t - endTime)*dt + startP.z(); // z
+                refLSeqPtr->at(i) = Vector3d(0,0,0);
+            }
+        }else{// other phases
+            cout << " " << startTime << "[sec] -> " << endTime << "[sec]: normal phase" << endl;
+            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+                refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
+                refPSeqPtr->at(i) = initPSeqPtr->at(i);
+                refLSeqPtr->at(i) = Vector3d(0,0,0);
+            }
+        }
+
+        backPoseIter = frontPoseIter;
+    }
+
+    setSubItem("refCM", refCMSeqPtr, bodyMotionItem);
+    setSubItem("refP", refPSeqPtr, bodyMotionItem);
+    setSubItem("refL", refLSeqPtr, bodyMotionItem);
+}
+
 void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sfc, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet)
 {
     cout << "generatePreModelPredictiveControlParamDeque()" << endl;
@@ -546,6 +630,9 @@ void SlideFrictionControlPlugin::execControl()
     // 接触候補セットの作成
     std::set<Link*> contactLinkCandidateSet;
     calcContactLinkCandidateSet(contactLinkCandidateSet, body, poseSeqPtr);
+
+    // 垂直方向の軌道生成
+    generateVerticalTrajectory(body, poseSeqItemPtr, contactLinkCandidateSet);
 
     sfc = new SlideFrictionControl();
     sfc->m = body->mass();
