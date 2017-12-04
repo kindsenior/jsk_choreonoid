@@ -44,6 +44,7 @@
 #include <cnoid/FileUtil>
 
 #include <UtilPlugin/UtilPlugin.h>
+#include <UtilPlugin/Interpolator.h>
 
 #include "RMControlBar.h"
 

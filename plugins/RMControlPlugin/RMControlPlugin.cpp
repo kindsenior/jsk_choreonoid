@@ -274,6 +274,8 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 
     // 目標運動量 motion loop
     Vector3d a0,a1,a2,a3,a4,a5;
+    std::vector<Vector3d> a;
+    a.resize(6);
     int startFrame,endFrame;
     for(int i = 0; i < motion->numFrames(); ++i){
 
@@ -306,23 +308,27 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
             if(i == initRMCFrame){
                 startFrame = initRMCFrame;
                 endFrame = takeoffFrame;
-                splineInterpolation(a0,a1,a2,a3, initCM,initDCM, takeoffCM,takeoffDCM, (takeoffFrame-initRMCFrame)*dt);
+                // splineInterpolation(a0,a1,a2,a3, initCM,initDCM, takeoffCM,takeoffDCM, (takeoffFrame-initRMCFrame)*dt);
+                setCubicSplineInterpolation(a, initCM,initDCM, takeoffCM,takeoffDCM, (takeoffFrame-initRMCFrame)*dt);
             }else if(i == landingFrame){
                 startFrame = landingFrame;
                 endFrame = endRMCFrame;
-                splineInterpolation(a0,a1,a2,a3, landingCM,landingDCM, endCM,endDCM, (endRMCFrame-landingFrame)*dt);
+                // splineInterpolation(a0,a1,a2,a3, landingCM,landingDCM, endCM,endDCM, (endRMCFrame-landingFrame)*dt);
+                setCubicSplineInterpolation(a, landingCM,landingDCM, endCM,endDCM, (endRMCFrame-landingFrame)*dt);
                 // minjerkInterpolation(a0,a1,a2,a3,a4,a5, landingCM,landingDCM,Vector3d(0,0,-g), endCM,endDCM,Vector3d::Zero(3), (endRMCFrame-landingFrame)*dt);
             }
 
             // if(i <= takeoffFrame){
             if(i <= takeoffFrame || true){
-                refCMSeqPtr->at(i) = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
-                refPSeqPtr->at(i) = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
+                // refCMSeqPtr->at(i) = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
+                // refPSeqPtr->at(i) = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
+                refCMSeqPtr->at(i) = a[0] + a[1] * (i-startFrame)*dt + a[2] * pow ( (i-startFrame)*dt , 2 ) + a[3] * pow( (i-startFrame)*dt, 3 );
+                refPSeqPtr->at(i) = ( a[1] + 2 * a[2] * (i-startFrame)*dt + 3 * a[3] * pow ( (i-startFrame)*dt , 2 ) ) * m;
             }else{
                 double dT = (i-startFrame)*dt;
                 double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
-                refCMSeqPtr->at(i) = a0 + a1*dT + a2*dT2 + a3*dT3 + a4*dT4 + a5*dT5;
-                refPSeqPtr->at(i) = (a1 + 2*a2*dT + 3*a3*dT2 + 4*a4*dT3 + 5*a5*dT4) * m;
+                refCMSeqPtr->at(i) = a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5;
+                refPSeqPtr->at(i) = (a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4) * m;
             }
 
             // 境界条件表示
