@@ -5,6 +5,7 @@ set(TARGET Cnoid${PLUGIN_NAME})
 set(headers
   UtilPlugin.h
   Interpolator.h
+  Filter.h
   ParamNode.h
   ParamWidget.h
   ParamSetupLayout.h
