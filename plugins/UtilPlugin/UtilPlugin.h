@@ -25,6 +25,8 @@
 #include <cnoid/FileUtil>
 #include <cnoid/ValueTree>
 
+#include "Filter.h"
+
 namespace cnoid{
 
 struct SubMass

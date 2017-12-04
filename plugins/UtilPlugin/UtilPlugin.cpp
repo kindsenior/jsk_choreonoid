@@ -88,6 +88,7 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
     BodyMotionPtr motion = bodyMotionItemPtr->motion();
     const int frameRate = motion->frameRate();
     const double dt = 1.0/frameRate;
+    const double m = body->mass();
 
     stringstream ss;
     ss << poseSeqPath.stem().string() << "_initCM_" << frameRate << "fps.dat";
@@ -98,6 +99,8 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
     Vector3SeqPtr initPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
     Vector3SeqPtr initLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initL");
     int numFrames = motion->numFrames();
+
+    MedianFilter filter = MedianFilter(3,3);
     for(int i=0; i < numFrames; ++i){
         updateBodyState(body, motion, i);
         body->calcForwardKinematics(true,true);
@@ -109,6 +112,8 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
         L << 0,0,0;
 
         initCMSeqPtr->at(i) =  CM;
+        // calculate momentum in simple model
+        P = filter.update(m*(CM - initCMSeqPtr->at(max(i-1,0)))/dt); //use median filter
         initPSeqPtr->at(i) = P;
         initLSeqPtr->at(i) = L;
 
