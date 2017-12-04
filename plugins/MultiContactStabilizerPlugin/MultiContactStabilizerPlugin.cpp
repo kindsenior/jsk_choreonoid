@@ -152,7 +152,7 @@ void cnoid::generatePreModelPredictiveControlParamDeque(MultiContactStabilizer* 
 
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
     int index = 0;
-    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeqPtr,body)){
+    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
 
         // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
@@ -170,6 +170,8 @@ void cnoid::generatePreModelPredictiveControlParamDeque(MultiContactStabilizer* 
             mcs->preMpcParamDeque.push_back((MultiContactStabilizerParam*) mcsParam);
             ++index;
         }
+
+        backPoseIter = frontPoseIter;
     }
 }
 

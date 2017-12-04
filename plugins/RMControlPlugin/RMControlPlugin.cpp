@@ -429,7 +429,7 @@ void RMControlPlugin::generateRefWrenchSeq(BodyPtr& body, PoseSeqItemPtr& poseSe
     const double dt = 1.0/motion->frameRate();
     const double g = 9.80665;
     const double m = mBody->mass();
-    for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeq,mBody)){
+    for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); incContactPose(frontPoseIter,poseSeq,mBody)){
         if(!isContactStateChanging(frontPoseIter, poseSeq, mBody)) continue;
 
         std::vector<int> contactStateVec;
@@ -465,6 +465,8 @@ void RMControlPlugin::generateRefWrenchSeq(BodyPtr& body, PoseSeqItemPtr& poseSe
             }
             refWrenchesSeqPtr->frame(i) = wrenches;
         }
+
+        backPoseIter = frontPoseIter;
     }
     refWrenchesSeqPtr->frame(numFrames) = refWrenchesSeqPtr->frame(numFrames-1);// final frame
     setSubItem("wrenches", refWrenchesSeqPtr, bodyMotionItem);
@@ -481,7 +483,7 @@ void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const
     // const int numFrames = motion->numFrames();
     const double dt = 1.0/motion->frameRate();
 
-    for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); backPoseIter = frontPoseIter,incContactPose(frontPoseIter,poseSeq,mBody)){
+    for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); incContactPose(frontPoseIter,poseSeq,mBody)){
         if(!isContactStateChanging(frontPoseIter, poseSeq, mBody)) continue;
 
         std::set<Link*> swingLinkSet;
@@ -504,6 +506,7 @@ void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const
                 motion->frame(i) << *mBody;
             }
         }
+        backPoseIter = frontPoseIter;
     }
 }
 
