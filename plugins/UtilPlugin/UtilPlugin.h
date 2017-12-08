@@ -98,7 +98,7 @@ public:
         require("Body");
         require("PoseSeq");
     }
-    
+
     virtual bool initialize()
     {
         return true;

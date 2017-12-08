@@ -31,8 +31,10 @@ void SlideFrictionControl::setupQP()
 int SlideFrictionControl::execQP()
 {
     static int count = 0;
+    // cout << setprecision(3);
     if(COUT){
         cout << psiCols << " x " << URows << endl;
+        // cout << setw(3)  << "psi:" << endl << psiMat << endl << endl;
         cout << "psi:" << endl << psiMat << endl << endl;
         cout << "phi:" << endl << phiMat << endl << endl;
         cout << "refXVec:" << endl << refXVec.transpose() << endl << endl;
@@ -42,6 +44,7 @@ int SlideFrictionControl::execQP()
         cout << "block:" << endl << blockMat << endl << endl;
         cout << "blockInv:" << endl << blockMatInv << endl << endl;
     }
+    // cout << setprecision(6);// default 6
     int ret  = qpInterface.execQP(U);
 
     ++count;

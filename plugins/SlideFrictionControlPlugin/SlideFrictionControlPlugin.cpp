@@ -458,7 +458,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
                 sfcParam->ccParamVec.push_back(ccParam);
             }
         }else{
-            cout << "Warning! ContactConstraintParam's pointer Copy Constructor called" << endl;
+            cout << "\x1b[31m" << "Warning! ContactConstraintParam's pointer Copy Constructor called" << "\x1b[m" << endl;
             sfcParam->ccParamVec.push_back(new ContactConstraintParam(dynamic_cast<ContactConstraintParam*>(*iter)));
         }
     }
@@ -522,7 +522,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }else if(isJumping){// jumping phases
-            cout << " " << startTime << "[sec] -> " << endTime << "[sec]: jumping" << endl;
+            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: jumping\x1b[m" << endl;
             double jumptime = endTime - startTime;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 double t = i*dt;
@@ -535,7 +535,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }else{// other phases
-            cout << " " << startTime << "[sec] -> " << endTime << "[sec]: normal phase" << endl;
+            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: normal phase\x1b[m" << endl;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);

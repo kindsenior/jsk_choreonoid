@@ -28,7 +28,7 @@ public:
     dmatrix inequalMat;
     dvector inequalMinVec, inequalMaxVec;
     dvector minVec, maxVec;
-    
+
     QP(){};
 
     QP(int nV, int nE, int nIne)
