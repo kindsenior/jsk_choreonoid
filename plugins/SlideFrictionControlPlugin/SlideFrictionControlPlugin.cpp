@@ -484,11 +484,6 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
     Vector3SeqPtr initPSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("initP")->seq();
     Vector3SeqPtr initLSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("initL")->seq();
 
-    // reference trajectories
-    Vector3SeqPtr refCMSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
-    Vector3SeqPtr refPSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
-    Vector3SeqPtr refLSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
-
     for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); incContactPose(frontPoseIter,poseSeq,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeq, body)) continue;
 
@@ -517,9 +512,9 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
                 CM.z() = (a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5).z(); // only overwrite z coordinate
                 P.z() = m*(a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4).z();
-                refCMSeqPtr->at(i) = CM;
-                refPSeqPtr->at(i) = P;
-                refLSeqPtr->at(i) = Vector3d(0,0,0);
+                initCMSeqPtr->at(i) = CM;
+                initPSeqPtr->at(i) = P;
+                initLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }else if(isJumping){// jumping phases
             cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: jumping\x1b[m" << endl;
@@ -527,28 +522,28 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 double t = i*dt;
                 Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
-                refCMSeqPtr->at(i) = startCM + (endCM - startCM) * (t - startTime) /jumptime; // xy
-                refCMSeqPtr->at(i).z() = - 0.5 * g * (t - startTime) * (t - endTime)
+                initCMSeqPtr->at(i) = startCM + (endCM - startCM) * (t - startTime) /jumptime; // xy
+                initCMSeqPtr->at(i).z() = - 0.5 * g * (t - startTime) * (t - endTime)
                     + (endCM.z()* (t - startTime) - startCM.z()* (t - endTime)) / jumptime; //z
-                refPSeqPtr->at(i) = startP; // xy
-                refPSeqPtr->at(i).z() = - m * g * (t - endTime)*dt + startP.z(); // z
-                refLSeqPtr->at(i) = Vector3d(0,0,0);
+                initPSeqPtr->at(i) = m*takeoffdCM; // xy
+                initPSeqPtr->at(i).z() = - m * g * (t - startTime) + m*takeoffdCM.z(); // z
+                initLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }else{// other phases
             cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: normal phase\x1b[m" << endl;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-                refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
-                refPSeqPtr->at(i) = initPSeqPtr->at(i);
-                refLSeqPtr->at(i) = Vector3d(0,0,0);
+                initCMSeqPtr->at(i) = initCMSeqPtr->at(i);
+                initPSeqPtr->at(i) = initPSeqPtr->at(i);
+                initLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }
 
         backPoseIter = frontPoseIter;
     }
 
-    setSubItem("refCM", refCMSeqPtr, bodyMotionItem);
-    setSubItem("refP", refPSeqPtr, bodyMotionItem);
-    setSubItem("refL", refLSeqPtr, bodyMotionItem);
+    setSubItem("initCM", initCMSeqPtr, bodyMotionItem);
+    setSubItem("initP", initPSeqPtr, bodyMotionItem);
+    setSubItem("initL", initLSeqPtr, bodyMotionItem);
 }
 
 void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sfc, BodyPtr body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet)
@@ -566,9 +561,9 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     updateBodyState(body, motion, 0, contactLinkCandidateSet);
     body->calcForwardKinematics();// use end effector's velocity
 
-    Vector3SeqPtr refCMSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refCM")->seq();
-    Vector3SeqPtr refPSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refP")->seq();
-    Vector3SeqPtr refLSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refL")->seq();
+    Vector3SeqPtr initCMSeqPtr = motionItem->findSubItem<Vector3SeqItem>("initCM")->seq();
+    Vector3SeqPtr initPSeqPtr = motionItem->findSubItem<Vector3SeqItem>("initP")->seq();
+    Vector3SeqPtr initLSeqPtr = motionItem->findSubItem<Vector3SeqItem>("initL")->seq();
 
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
     int index = 0;
@@ -587,7 +582,7 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
             body->calcForwardKinematics();// use end effector's velocity
 
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
-            Vector3d P = refPSeqPtr->at(i);
+            Vector3d P = initPSeqPtr->at(i);
             // 動作軌道に依存するパラメータの設定
             if(i == backPoseIter->time()*frameRate){ // 接触状態の変わり目だけ別処理
                 ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
