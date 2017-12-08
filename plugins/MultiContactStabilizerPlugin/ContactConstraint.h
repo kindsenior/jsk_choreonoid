@@ -93,6 +93,49 @@ public:
     }
 };
 
+class FloatConstraintParam : virtual public ContactConstraintParam
+{
+protected:
+    void initialize()
+    {
+        inputForceDim = 6;
+        inputDim = inputForceDim;
+        // numEquals = 6;
+        numEquals = 0;
+        numInequals = 0;
+        inputForceConvertMat = dmatrix::Identity(inputForceDim,inputDim);
+        inputWeightConvertMat = dmatrix::Identity(inputForceDim,inputDim);
+    }
+
+public:
+    // void calcEqualMatrix(){equalMat = dmatrix::Identity(numEquals, inputDim);}
+    // void calcEqualVector(){equalVec = dvector::Zero(numEquals);}
+    void calcInequalMatrix(){inequalMat.resize(0,0);}
+    void calcInequalMinimumVector(){inequalMinVec.resize(0);}
+    void calcInequalMaximumVector(){inequalMaxVec.resize(0);}
+    void calcMinimumVector(){minVec = dvector::Zero(inputDim);} // bound vectors are necessary and use bounds instead of equal constraints
+    void calcMaximumVector(){maxVec = dvector::Zero(inputDim);}
+
+    explicit FloatConstraintParam(const FloatConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec)
+    {
+        *this = *ccParam;
+    }
+
+    FloatConstraintParam(const std::string linkName_, const std::vector<Vector3> edgeVec_)
+        : ContactConstraintParam(linkName_, edgeVec_)
+    {
+        initialize();
+    }
+
+    FloatConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_)
+        : ContactConstraintParam(linkName_, vertexVec_)
+    {
+        initialize();
+    }
+
+};
+
 class SimpleContactConstraintParam : virtual public ContactConstraintParam
 {
 protected:

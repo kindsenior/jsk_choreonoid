@@ -331,7 +331,8 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
-        if(contactState < 2){// 接触フラグが0か1 要改良
+        // if(contactState < 2){// 接触フラグが0か1 要改良
+        if(true){
             std::vector<hrp::Vector2> vertexVec;
             hrp::Vector2 vertex;// 頂点の2次元座標を代入 (要 足の形状取得)
             // vertex << 0.1,0.05; vertexVec.push_back(vertex);
@@ -378,6 +379,11 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 3,3, 0.5));//3x3y
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 4,2, 0.5));//4x2y
                 cout << " " << (*linkIter)->name() << ": Slide" << endl;
+            }else if(contactState == 3){// float
+                // ccParamVec.push_back(new FloatConstraintParam((*linkIter)->name(), vertexVec));
+                // cout << " " << (*linkIter)->name() << ": Float" << endl;
+            }else{
+                cout << " " << "\x1b[31m" << (*linkIter)->name() << " is static float and this is not supported" << "\x1b[m" << endl;
             }
         }
     }
@@ -457,6 +463,8 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
             }else{
                 sfcParam->ccParamVec.push_back(ccParam);
             }
+        }else if(typeid(**iter) == typeid(FloatConstraintParam)){
+            sfcParam->ccParamVec.push_back(new FloatConstraintParam(dynamic_cast<FloatConstraintParam*>(*iter)));
         }else{
             cout << "\x1b[31m" << "Warning! ContactConstraintParam's pointer Copy Constructor called" << "\x1b[m" << endl;
             sfcParam->ccParamVec.push_back(new ContactConstraintParam(dynamic_cast<ContactConstraintParam*>(*iter)));
