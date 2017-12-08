@@ -616,10 +616,16 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
             Vector3d P = initPSeqPtr->at(i);
             // 動作軌道に依存するパラメータの設定
             if(i == backPoseIter->time()*frameRate){ // 接触状態の変わり目だけ別処理
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, initCMSeqPtr->at(i), P, thresh((P - initPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
+                // backward-difference for jump
+                ::generateSlideFrictionControlParam(sfcParam, initCMSeqPtr->at(i), P, thresh((initPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
             }else{
                 std::vector<ContactConstraintParam*> dummyCcparamVec;
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, dummyCcparamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, initCMSeqPtr->at(i), P, thresh((P - initPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
+                // backward-difference for jump
+                ::generateSlideFrictionControlParam(sfcParam, initCMSeqPtr->at(i), P, thresh((initPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, dummyCcparamVec, dt);
             }
 
             sfc->preMpcParamDeque.push_back((SlideFrictionControlParam*) sfcParam);
