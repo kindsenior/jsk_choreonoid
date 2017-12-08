@@ -395,7 +395,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
     Vector3d L;
     // CM = body->calcCenterOfMass();
     // body->calcTotalMomentum(P,L);
-    P << 0,0,0;// overwrite P
+    // P << 0,0,0;// overwrite P impossible in jumping motion
     // L -= CM.cross(P);// convert to around CoM
     // sfcParam->CM = CM;
     // sfcParam->CM << 0.065,0,0;// move root link foward 65mm for JAXON
