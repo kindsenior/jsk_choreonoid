@@ -501,17 +501,38 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
         int startFrame = startTime*frameRate, endFrame = endTime*frameRate;
         Vector3d startCM = initCMSeqPtr->at(startFrame), endCM = initCMSeqPtr->at(endFrame);
         Vector3d startP = initPSeqPtr->at(startFrame),   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
-        std::vector<Vector3d> a;
-        a.resize(6);
+        PoseSeq::iterator takeoffIter,landingIter;
+        Vector3d takeoffdCM, landingdCM;
+        double jumpTime;
+        std::vector<Vector3d> a(6, Vector3d::Zero()); // 6-order polynominal
+        // a.resize(6);
         if(isTakeoff || isLanding){// takeoff and landing phases
-            cout << " " << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing" << endl;
-            setCubicSplineInterpolation(a, startCM,startP/m, endCM,endP/m, endTime - startTime);
+            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing\x1b[m" << endl;
+
+            if(isTakeoff){// takeoff phase is necessary and must be first
+                takeoffIter = frontPoseIter;
+                landingIter = frontPoseIter; incContactPose(landingIter,poseSeq,body);
+                jumpTime = landingIter->time() - takeoffIter->time();
+                Vector3d takeoffCM = initCMSeqPtr->at(takeoffIter->time()*frameRate), landingCM = initCMSeqPtr->at(landingIter->time()*frameRate);
+                takeoffdCM = (landingCM - takeoffCM) / jumpTime;
+                landingdCM = takeoffdCM;
+                takeoffdCM.z() = 0.5 * g * jumpTime + (landingCM.z() - takeoffCM.z()) / jumpTime;
+                landingdCM.z() = takeoffdCM.z() - g * jumpTime;
+                setCubicSplineInterpolation(a, startCM,startP/m, endCM,takeoffdCM, endTime - startTime);
+            }else{
+                setCubicSplineInterpolation(a, startCM,landingdCM, endCM,endP/m, endTime - startTime);
+            }
+
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 double dT = i*dt - startTime;
                 double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
                 Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
-                CM.z() = (a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5).z(); // only overwrite z coordinate
-                P.z() = m*(a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4).z();
+                // cubic-spline
+                CM = a[0] + a[1] * dT + a[2] * dT2 + a[3] * dT3; // overwrite
+                P = m*(a[1] + 2 * a[2] * dT + 3 * a[3] * dT2);
+                // // minjerk
+                // CM.z() = (a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5).z(); // only overwrite z coordinate
+                // P.z() = m*(a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4).z();
                 initCMSeqPtr->at(i) = CM;
                 initPSeqPtr->at(i) = P;
                 initLSeqPtr->at(i) = Vector3d(0,0,0);
