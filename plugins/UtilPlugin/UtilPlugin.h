@@ -84,6 +84,9 @@ void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
 void setSubItem(std::string seqName, const Vector3SeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem);
 void setSubItem(std::string seqName, const MultiValueSeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem);
 
+double thresh(double x, double thresh, double target = 0);
+VectorXd thresh(VectorXd x, double thresh, VectorXd target = VectorXd::Zero(3));
+
 template <typename t_matrix>
 t_matrix PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6);
 

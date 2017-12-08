@@ -501,6 +501,9 @@ void cnoid::setSubItem(std::string seqName, const MultiValueSeqPtr& seqPtr, Body
     }
 }
 
+double cnoid::thresh(double x, double thresh, double target){return fabs(x) > thresh ? x : target;}
+VectorXd cnoid::thresh(VectorXd x, double thresh, VectorXd target){return x.norm() > thresh ? x : (x.size() == target.size() ? target : VectorXd::Constant(x.size(),x[0]));}
+
 template <typename t_matrix>
 t_matrix cnoid::PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6)
 {
