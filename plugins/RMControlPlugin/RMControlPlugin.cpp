@@ -375,7 +375,6 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
     const BodyMotionPtr motion = motionItem->motion();
 
     stringstream ss,fnamess;
-    // fnamess << "/home/kunio/Dropbox/log/choreonoid/refPL_" << motion->frameRate() << ".dat";
     fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion->frameRate() << "fps.dat";
     ofstream ofs(fnamess.str().c_str());
     ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
@@ -825,7 +824,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 void RMControlPlugin::execControl()
 {
     MessageView::instance()->putln("RMControl called !");
-    cout << "RMControl()" << endl;
+    cout << "\x1b[31m" << "RMControl()" << "\x1b[m" << endl;
 
     // yamlファイルから足先リンク取得
     // YAMLReader parser;
@@ -904,7 +903,7 @@ void RMControlPlugin::execControl()
 
     sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, contactLinkCandidateSet);// ParamString is not gotten from ParamSetupLayout and is empty
 
-    cout << "Finished RMControl" << endl;
+    cout << "\x1b[31m" << "Finished RMControl" << "\x1b[m" << endl;
 }
 
 CNOID_IMPLEMENT_PLUGIN_ENTRY(RMControlPlugin)

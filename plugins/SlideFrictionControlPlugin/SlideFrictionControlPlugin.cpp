@@ -381,7 +381,7 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
                 cout << " " << (*linkIter)->name() << ": Slide" << endl;
             }else if(contactState == 3){// float
                 // ccParamVec.push_back(new FloatConstraintParam((*linkIter)->name(), vertexVec));
-                // cout << " " << (*linkIter)->name() << ": Float" << endl;
+                cout << " " << (*linkIter)->name() << ": Float" << endl;
             }else{
                 cout << " " << "\x1b[31m" << (*linkIter)->name() << " is static float and this is not supported" << "\x1b[m" << endl;
             }
@@ -649,7 +649,7 @@ void SlideFrictionControlPlugin::execControl()
 {
     stringstream ss,fnamess;
     MessageView::instance()->putln("SlideFrictionControl called !");
-    cout << "SlideFrictionControl()" << endl;
+    cout << "\x1b[31m" << "SlideFrictionControl()" << "\x1b[m" << endl;
 
     BodyItemPtr bodyItemPtr;
     PoseSeqItemPtr poseSeqItemPtr;
@@ -698,7 +698,7 @@ void SlideFrictionControlPlugin::execControl()
 
     sweepControl(mPoseSeqPath, mBar->dialog->layout()->getParamString(), sfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
 
-    cout << "Finished SlideFrictionControl" << endl;
+    cout << "\x1b[31m" << "Finished SlideFrictionControl" << "\x1b[m" << endl;
 }
 
 CNOID_IMPLEMENT_PLUGIN_ENTRY(SlideFrictionControlPlugin)

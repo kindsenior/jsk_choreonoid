@@ -68,7 +68,7 @@ void CascadedControlPlugin::execControl(bool loadFlg)
 {
     stringstream ss,fnamess;
     MessageView::instance()->putln("CascadedControl called !");
-    cout << "CascadedControl()" << endl;
+    cout << "\x1b[31m" << "CascadedControl()" << "\x1b[m" << endl;
 
     BodyItemPtr bodyItemPtr;
     PoseSeqItemPtr poseSeqItemPtr;
@@ -183,7 +183,7 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     interpolateExtraSeq(mBodyMotionItemPtr, childSfc->dt);
     // sweepControl(mPoseSeqPath, parentSfcLayout->getParamString(), parentSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// parentモーション走査
 
-    cout << "Finished CascadedControl" << endl;
+    cout << "\x1b[31m" << "Finished CascadedControl" << "\x1b[m" << endl;
 }
 
 CNOID_IMPLEMENT_PLUGIN_ENTRY(CascadedControlPlugin)
