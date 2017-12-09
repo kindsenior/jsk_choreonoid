@@ -175,12 +175,11 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             VectorXd x0(sfc->stateDim);
             x0 = sfc->x0;
 
-            Vector3d CM,P,L;
-            CM << x0[0],x0[2],refCMSeqPtr->at(i).z(); // keep z coordinate
-            P << x0[1],x0[3],0; // should keep z coordinate ?
-            L << x0[4],x0[5],x0[6];
-            CM /= body->mass();
             int motionIdx = (i - sfc->numWindows())*cycle;
+            Vector3d CM,P,L;
+            CM << x0[0]/body->mass(),x0[2]/body->mass(),refCMSeqPtr->at(motionIdx).z(); // keep z coordinate
+            P << x0[1],x0[3],refPSeqPtr->at(motionIdx).z(); // keep z coordinate
+            L << x0[4],x0[5],x0[6];
             refCMSeqPtr->at(motionIdx) = CM;
             refPSeqPtr->at(motionIdx) = P;
             refLSeqPtr->at(motionIdx) = L;
