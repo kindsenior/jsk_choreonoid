@@ -508,18 +508,18 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             if(getPrevContactState(backPoseIter,  poseSeq, linkIdx) != 3) isLanding &= false;
         }
 
-        double startTime = backPoseIter->time(), endTime = frontPoseIter->time();
-        int startFrame = startTime*frameRate, endFrame = endTime*frameRate;
-        Vector3d startCM = initCMSeqPtr->at(startFrame), endCM = initCMSeqPtr->at(endFrame);
-        Vector3d startP = initPSeqPtr->at(startFrame),   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
         PoseSeq::iterator takeoffIter,landingIter;
         Vector3d takeoffdCM, landingdCM;
         double jumpTime;
         std::vector<Vector3d> a(6, Vector3d::Zero()); // 6-order polynominal
         // a.resize(6);
         if(isTakeoff || isLanding){// takeoff and landing phases
-            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing\x1b[m" << endl;
+            cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: include takeoff or landing phase\x1b[m" << endl;
 
+            PoseSeq::iterator startPoseIter, endPoseIter;
+            double startTime, endTime;
+            int startFrame, endFrame;
+            Vector3d startCM, endCM, startP, endP; // use simple model momentum calculated by UtilPlugin
             if(isTakeoff){// takeoff phase is necessary and must be first
                 takeoffIter = frontPoseIter;
                 landingIter = frontPoseIter; incContactPose(landingIter,poseSeq,body);
@@ -529,12 +529,33 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 landingdCM = takeoffdCM;
                 takeoffdCM.z() = 0.5 * g * jumpTime + (landingCM.z() - takeoffCM.z()) / jumpTime;
                 landingdCM.z() = takeoffdCM.z() - g * jumpTime;
+
+                startPoseIter = frontPoseIter; --startPoseIter;
+                endPoseIter = frontPoseIter;
+                startTime = startPoseIter->time(); endTime = endPoseIter->time();
+                startFrame = startTime*frameRate; endFrame = endTime*frameRate;
+                startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
+                startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
+
                 setCubicSplineInterpolation(a, startCM,startP/m, endCM,takeoffdCM, endTime - startTime);
             }else{
+                startPoseIter = backPoseIter;
+                endPoseIter = backPoseIter; ++endPoseIter;
+                startTime = startPoseIter->time(); endTime = endPoseIter->time();
+                startFrame = startTime*frameRate; endFrame = endTime*frameRate;
+                startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
+                startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
+
                 setCubicSplineInterpolation(a, startCM,landingdCM, endCM,endP/m, endTime - startTime);
             }
 
+            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing phase\x1b[m" << endl;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+                refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
+                refPSeqPtr->at(i) = initPSeqPtr->at(i);
+                refLSeqPtr->at(i) = Vector3d(0,0,0);
+            }
+            for(int i=startPoseIter->time()*frameRate; i < endPoseIter->time()*frameRate; ++i){
                 double dT = i*dt - startTime;
                 double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
                 Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
@@ -549,7 +570,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }else if(isJumping){// jumping phases
-            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: jumping\x1b[m" << endl;
+            cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: jumping phase\x1b[m" << endl;
+            double startTime = backPoseIter->time(), endTime = frontPoseIter->time();
+            int startFrame = startTime*frameRate, endFrame = endTime*frameRate;
+            Vector3d startCM = initCMSeqPtr->at(startFrame), endCM = initCMSeqPtr->at(endFrame);
+            Vector3d startP = initPSeqPtr->at(startFrame),   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
             double jumptime = endTime - startTime;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 double t = i*dt;
@@ -562,7 +587,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }else{// other phases
-            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: normal phase\x1b[m" << endl;
+            cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: normal phase\x1b[m" << endl;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
