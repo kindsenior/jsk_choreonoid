@@ -876,7 +876,8 @@ void RMControlPlugin::execControl()
     generateOptionalData(mBody, poseSeqItem, endEffectorLinkVec);
 
     // BodyMotion作成
-    generateBodyMotionFromBar(mBody, poseSeqItem, bodyMotionItem);
+    if(motion->numFrames() == 0) generateBodyMotionFromBar(mBody, poseSeqItem, bodyMotionItem);
+    else cout << "numFrames: " << motion->numFrames() << "  Need not generate motion" << endl;
 
     std::set<Link*> contactLinkCandidateSet;
     calcContactLinkCandidateSet(contactLinkCandidateSet, mBody, poseSeqItem->poseSeq());
