@@ -891,6 +891,9 @@ void RMControlPlugin::execControl()
     if(modeStr == generateMode){
         generateRefPLSeq(bodyMotionItem, poseSeqItem->poseSeq(), initDCM, endDCM, initL, endL);
         cout << " Generated ref P/L" << endl;
+
+        generateRefWrenchSeq(mBody, poseSeqItem, endEffectorLinkVec);
+        cout << " Generated ref wrenches" << endl;
     }else{
         loadRefPLSeq(bodyMotionItem, poseSeqItem->poseSeq(), initDCM, endDCM, initL, endL);
         cout << " Loaded ref P/L" << endl;
@@ -898,9 +901,6 @@ void RMControlPlugin::execControl()
 
     // 跳躍期間のrootLinkを目標重心軌道に合わせて修正
     // modifyJumpingTrajectory(poseSeqItem, contactLinkCandidateSet);
-
-    generateRefWrenchSeq(mBody, poseSeqItem, endEffectorLinkVec);
-    cout << " Generated ref wrenches" << endl;
 
     sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, contactLinkCandidateSet);// ParamString is not gotten from ParamSetupLayout and is empty
 
