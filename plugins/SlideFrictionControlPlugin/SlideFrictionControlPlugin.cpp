@@ -408,7 +408,8 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
     // sfcParam->CM = CM + body->rootLink()->R()*Vector3(0.065,0,0);// for rotate-left-slide
     sfcParam->CM = CM + body->rootLink()->R()*Vector3(0,0,0);
     // sfcParam->CM += CM;
-    sfcParam->P = P;
+    // sfcParam->P = P;
+    sfcParam->P << 0,0,P.z();// overwrite only xy coordinates
     // sfcParam->L = L;
     sfcParam->L << 0,0,0;
     // sfcParam->F = body->mass()*g;
