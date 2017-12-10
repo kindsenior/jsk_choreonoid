@@ -104,7 +104,7 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
     Vector3SeqPtr initLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initL");
     int numFrames = motion->numFrames();
 
-    MedianFilter filter = MedianFilter(3,3);
+    MedianFilter filter = MedianFilter(3,3);// sync with delay in generateVerticalTrajectory()
     for(int i=0; i < numFrames; ++i){
         updateBodyState(body, motion, i);
         body->calcForwardKinematics(true,true);
