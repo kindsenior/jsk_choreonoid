@@ -540,10 +540,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
                 setCubicSplineInterpolation(a, startCM,startP/m, endCM,takeoffdCM, endTime - startTime);
             }else{
+                int delayOffset = 2;// forward-difference delay + median-filter delay = 1 + 1 = 2
                 startPoseIter = backPoseIter;
                 endPoseIter = backPoseIter; ++endPoseIter;
-                startTime = startPoseIter->time(); endTime = endPoseIter->time();
-                startFrame = startTime*frameRate; endFrame = endTime*frameRate;
+                startTime = startPoseIter->time(); endTime = endPoseIter->time() + delayOffset*dt; // add delay
+                startFrame = startTime*frameRate; endFrame = min((int)(endTime*frameRate), numFrames-1); // add delay
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
@@ -556,7 +557,8 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
             }
-            for(int i=startPoseIter->time()*frameRate; i < endPoseIter->time()*frameRate; ++i){
+            // for(int i=startPoseIter->time()*frameRate; i < endPoseIter->time()*frameRate; ++i){
+            for(int i=startPoseIter->time()*frameRate; i < endFrame; ++i){ // use endFrame including delay
                 double dT = i*dt - startTime;
                 double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
                 Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
