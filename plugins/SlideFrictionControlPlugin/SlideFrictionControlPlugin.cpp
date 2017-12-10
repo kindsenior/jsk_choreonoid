@@ -598,6 +598,19 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
         backPoseIter = frontPoseIter;
     }
 
+    {
+        boost::filesystem::path poseSeqPath = boost::filesystem::path(poseSeqItem->filePath());
+        stringstream fnamess; fnamess.str("");
+        fnamess << poseSeqPath.stem().string() << "_SFC_prePL" << "_" << frameRate << "fps.dat";
+        ofstream ofs;
+        ofs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+        ofs << "time preCMx preCMy preCMz prePx prePy prePz preLx preLy preLz processTime" << endl;
+        for(int i=0; i<numFrames; ++i){
+            ofs << i*dt << " " << refCMSeqPtr->at(i).transpose() << " " << refPSeqPtr->at(i).transpose() << refLSeqPtr->at(i).transpose() << endl;
+        }
+        ofs.close();
+    }
+
     setSubItem("refCM", refCMSeqPtr, bodyMotionItem);
     setSubItem("refP", refPSeqPtr, bodyMotionItem);
     setSubItem("refL", refLSeqPtr, bodyMotionItem);
