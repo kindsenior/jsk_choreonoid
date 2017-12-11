@@ -47,7 +47,7 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
         Vector3d diffL = refLSeqPtr->at(i+cycle) - frontL;
         MultiValueSeq::Frame frontWrenches = refWrenchesSeqPtr->frame(i);
         MultiValueSeq::Frame nextWrenches = refWrenchesSeqPtr->frame(i+cycle);
-        for(int j=0; j<cycle; ++j){
+        for(int j=1; j<cycle; ++j){
             double r = ((double)j/cycle);
             refZmpSeqPtr->at(i+j) = frontZmp + r*diffZmp;
             Vector3d CM = frontCM + r*diffCM;
@@ -60,6 +60,26 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             for(int k=0; k<frontWrenches.size(); ++k){
                 refWrenchesSeqPtr->frame(i+j)[k] = (1-r)*frontWrenches[k] + r*nextWrenches[k];
             }
+        }
+    }
+
+    // remove nan during jumping phase
+    Vector3d prevZmp;
+    int prevIdx;
+    for(int i=0; i<numFrames; ++i){
+        Vector3d zmp = refZmpSeqPtr->at(i);
+        if(std::isnan(zmp.x())){ // check x coordinate
+            int nextVaridIdx = i;
+            while(std::isnan(refZmpSeqPtr->at(nextVaridIdx).x())) ++nextVaridIdx; // check x coordinate
+            Vector3d diffZmp = refZmpSeqPtr->at(nextVaridIdx) - prevZmp;
+            cout << "jumping phase(nan check): " << prevIdx << " -> " << nextVaridIdx << endl;
+            for(int j=prevIdx+1; j<nextVaridIdx; ++j){
+                refZmpSeqPtr->at(j) = ((double)(j - prevIdx))/(nextVaridIdx - prevIdx)*diffZmp + prevZmp;
+            }
+            i = nextVaridIdx;
+        }else{
+            prevIdx = i;
+            prevZmp = zmp;
         }
     }
 }
