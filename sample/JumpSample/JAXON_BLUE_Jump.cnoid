@@ -416,11 +416,11 @@ toolbars:
           dtCheck: true
       - 
         SFC: 
-          errorCMWeight: 10000
+          errorCMWeight: 100
           errorCMWeightCheck: true
-          errorMomentumWeight: 1
+          errorMomentumWeight: 20000
           errorMomentumWeightCheck: true
-          errorAngularMomentumWeight: 200
+          errorAngularMomentumWeight: 5000
           errorAngularMomentumWeightCheck: true
           errorYawAngularMomentumWeight: 1
           errorYawAngularMomentumWeightCheck: true
