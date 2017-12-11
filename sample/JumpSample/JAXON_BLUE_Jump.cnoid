@@ -300,6 +300,10 @@ toolbars:
     snapDistance: 0.025
     penetrationBlockDepth: 0.0005
     lazyCollisionDetectionMode: true
+  "RMControlBar": 
+    initialTrajectory: Load
+    initialTrajectoryCheck: false
+    saveParameterInFileName: true
   "BodyBar": 
     current: 2
   "LeggedBodyBar": 
@@ -337,10 +341,6 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
-  "RMControlBar": 
-    initialTrajectory: Generate
-    initialTrajectoryCheck: false
-    saveParameterInFileName: true
   "SlideFrictionControlBar": 
     saveParameterInFileName: false
     SFC: 
