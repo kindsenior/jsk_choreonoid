@@ -306,7 +306,7 @@ refs:
           isTouching: true
           partingDirection: [ 0, 0, 1 ]
   - 
-    time: 1.7
+    time: 1.6
     refer: 
       type: Pose
       name: ""
@@ -367,7 +367,7 @@ refs:
           isTouching: true
           partingDirection: [ 0, 0, 1 ]
   - 
-    time: 2
+    time: 1.8
     refer: 
       type: Pose
       name: ""
