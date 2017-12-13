@@ -15,7 +15,7 @@ PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, in
     // std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
     for(iter = (++poseIter); iter != poseSeq->end(); ++iter){
-        // std::cout << " " << iter->time();
+        // std::cout << " " << iter->time() << "sec";
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
         if(linkInfo){
             // std::cout << " link" << linkId << "'s next pose time:" << iter->time() << std::endl;
@@ -34,7 +34,7 @@ PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, in
     // std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
     for(iter = (--poseIter); iter != (--poseSeq->begin()); --iter){
-        // std::cout << " " << iter->time();
+        // std::cout << " " << iter->time() << "sec";
         Pose::LinkInfo* linkInfo = iter->get<Pose>()->ikLinkInfo(linkId);
         if(linkInfo){
             // std::cout << " link" << linkId << "'s prev pose time:" << iter->time() << std::endl;
