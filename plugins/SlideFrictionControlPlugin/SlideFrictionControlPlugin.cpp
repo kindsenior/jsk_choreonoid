@@ -512,7 +512,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
         PoseSeq::iterator takeoffIter,landingIter;
         Vector3d takeoffdCM, landingdCM;
         double jumpTime;
-        CubicSplineInterpolator interpolator = CubicSplineInterpolator();
+        CubicSplineInterpolator interpolator = CubicSplineInterpolator();// spline
         if(isTakeoff || isLanding){// takeoff and landing phases
             cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: include takeoff or landing phase\x1b[m" << endl;
 
@@ -520,7 +520,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             double startTime, endTime;
             int startFrame, endFrame;
             Vector3d startCM, endCM, startP, endP; // use simple model momentum calculated by UtilPlugin
-            if(isTakeoff){// takeoff phase is necessary and must be first
+            if(isTakeoff){// takeoff phase is necessary and must be first in if branching for setting takeoffdCM
                 takeoffIter = frontPoseIter;
                 landingIter = frontPoseIter; incContactPose(landingIter,poseSeq,body);
                 jumpTime = landingIter->time() - takeoffIter->time();
@@ -537,8 +537,8 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
-                interpolator.calcCoefficients(startCM,startP/m, endCM,takeoffdCM, endTime - startTime);
-            }else{
+                interpolator.calcCoefficients(startCM,startP/m, endCM,takeoffdCM, endTime - startTime);// spline
+            }else{// landing phase
                 int delayOffset = 2;// forward-difference delay + median-filter delay = 1 + 1 = 2
                 startPoseIter = backPoseIter;
                 endPoseIter = backPoseIter; ++endPoseIter;
@@ -547,7 +547,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
-                interpolator.calcCoefficients(startCM,landingdCM, endCM,endP/m, endTime - startTime);
+                interpolator.calcCoefficients(startCM,landingdCM, endCM,endP/m, endTime - startTime);// spline
             }
 
             cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing phase\x1b[m" << endl;
@@ -566,6 +566,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 // // minjerk
                 // CM.z() = (a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5).z(); // only overwrite z coordinate
                 // P.z() = m*(a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4).z();
+
                 refCMSeqPtr->at(i) = CM;
                 refPSeqPtr->at(i) = P;
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
@@ -610,7 +611,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
         ofs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
         ofs << "time preCMx preCMy preCMz prePx prePy prePz preLx preLy preLz processTime" << endl;
         for(int i=0; i<numFrames; ++i){
-            ofs << i*dt << " " << refCMSeqPtr->at(i).transpose() << " " << refPSeqPtr->at(i).transpose() << refLSeqPtr->at(i).transpose() << endl;
+            ofs << i*dt << " " << refCMSeqPtr->at(i).transpose() << " " << refPSeqPtr->at(i).transpose() << " " << refLSeqPtr->at(i).transpose() << endl;
         }
         ofs.close();
     }
