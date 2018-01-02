@@ -600,6 +600,9 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
         backPoseIter = frontPoseIter;
     }
+    refCMSeqPtr->at(numFrames-1) = refCMSeqPtr->at(numFrames-2);// final frame
+    refPSeqPtr->at(numFrames-1) = refPSeqPtr->at(numFrames-2);
+    refLSeqPtr->at(numFrames-1) = refLSeqPtr->at(numFrames-2);
 
     {
         boost::filesystem::path poseSeqPath = boost::filesystem::path(poseSeqItem->filePath());
