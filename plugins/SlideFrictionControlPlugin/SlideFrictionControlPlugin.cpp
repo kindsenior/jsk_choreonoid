@@ -512,8 +512,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
         PoseSeq::iterator takeoffIter,landingIter;
         Vector3d takeoffdCM, landingdCM;
         double jumpTime;
-        std::vector<Vector3d> a(6, Vector3d::Zero()); // 6-order polynominal
-        // a.resize(6);
+        CubicSplineInterpolator interpolator = CubicSplineInterpolator();
         if(isTakeoff || isLanding){// takeoff and landing phases
             cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: include takeoff or landing phase\x1b[m" << endl;
 
@@ -538,7 +537,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
-                setCubicSplineInterpolation(a, startCM,startP/m, endCM,takeoffdCM, endTime - startTime);
+                interpolator.calcCoefficients(startCM,startP/m, endCM,takeoffdCM, endTime - startTime);
             }else{
                 int delayOffset = 2;// forward-difference delay + median-filter delay = 1 + 1 = 2
                 startPoseIter = backPoseIter;
@@ -548,7 +547,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
-                setCubicSplineInterpolation(a, startCM,landingdCM, endCM,endP/m, endTime - startTime);
+                interpolator.calcCoefficients(startCM,landingdCM, endCM,endP/m, endTime - startTime);
             }
 
             cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing phase\x1b[m" << endl;
@@ -559,12 +558,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             }
             // for(int i=startPoseIter->time()*frameRate; i < endPoseIter->time()*frameRate; ++i){
             for(int i=startPoseIter->time()*frameRate; i < endFrame; ++i){ // use endFrame including delay
-                double dT = i*dt - startTime;
-                double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
-                Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
+                Vector3d CM, P;
                 // cubic-spline
-                CM = a[0] + a[1] * dT + a[2] * dT2 + a[3] * dT3; // overwrite
-                P = m*(a[1] + 2 * a[2] * dT + 3 * a[3] * dT2);
+                CM = interpolator.x(i*dt - startTime); // overwrite
+                P = m*interpolator.dx(i*dt - startTime); // overwrite
+
                 // // minjerk
                 // CM.z() = (a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5).z(); // only overwrite z coordinate
                 // P.z() = m*(a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4).z();
