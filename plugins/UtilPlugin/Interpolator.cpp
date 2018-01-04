@@ -3,6 +3,7 @@
 */
 
 #include "Interpolator.h"
+// #include <iostream>
 
 using namespace cnoid;
 
@@ -107,6 +108,12 @@ void AccelerationInterpolator::calcCoefficients(const VectorXd& x0, const Vector
     MatrixXd terminalX(3,numDimensions);
     terminalX << x1.transpose(), dx1.transpose(), ddx1.transpose();// vstack of vectors
     constAccMat = - (extendedA.inverse() * (Avec[4]*Avec[3]*Avec[2]*Avec[1]*C0*initX + C1*terminalX)).transpose();
+    // for(int i=0; i<numPhases; ++i){
+    //     // std::cout << "A" << i << ":" << std::endl << Avec[i] << std::endl;
+    //     std::cout << "B" << i << ":" << std::endl << Bvec[i] << std::endl;
+    // }
+    // std::cout << "A4*A3*A2*A1:" << std::endl << Avec[4]*Avec[3]*Avec[2]*Avec[1] << std::endl;
+    // std::cout << "(ddz0, ddz1): " << constAccMat.row(2) << std::endl;
 
     // eg) coefficientMatVec[i] = ((a_0x,a_1x,a_2x,a_3x),(a_0y,a_1y,a_2y,a_3y),(a_0z,a_1z,a_2z,a_3z))
     coefficientMatVec[0] = (MatrixXd(numDimensions,polynominalDegree) << x0,dx0,                          ddx0/2,               (constAccMat.col(0)-ddx0              )/(6*durationVec[0])).finished();
@@ -118,6 +125,9 @@ void AccelerationInterpolator::calcCoefficients(const VectorXd& x0, const Vector
     for(int i=2; i<numPhases; ++i){
         coefficientMatVec[i].block(0,0,numDimensions,2) = ( Avec[i-1]*coefficientMatVec[i-1].block(0,0,numDimensions,2).transpose() + Bvec[i-1]*constAccMat.transpose() ).transpose();
     }
+    // for(int i=0; i<numPhases; ++i){
+    //     std::cout << "a0,a1,a2,a3 " << phaseInitTimeVec[i] << "->" << phaseInitTimeVec[i]+durationVec[i] << " : " << coefficientMatVec[i].row(2) << std::endl;
+    // }
 
 }
 

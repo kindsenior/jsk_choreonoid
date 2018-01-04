@@ -540,6 +540,9 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
                 // interpolator.calcCoefficients(startCM,startP/m, endCM,takeoffdCM, endTime - startTime);// spline
                 interpolator.calcCoefficients(startCM,startP/m,Vector3d::Zero(), endCM,takeoffdCM,Vector3(0,0,-g), endTime - startTime);// acc
+                cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff phase\x1b[m" << endl;
+                cout << "  startCM: " << startCM.transpose() << endl << "  startdCM:   " << startP.transpose()/m << endl;
+                cout << "  endCM:   " << endCM.transpose()   << endl << "  takeoffdCM: " << takeoffdCM.transpose() << endl;
             }else{// landing phase
                 int delayOffset = 2;// forward-difference delay + median-filter delay = 1 + 1 = 2
                 startPoseIter = backPoseIter;
@@ -551,9 +554,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
                 // interpolator.calcCoefficients(startCM,landingdCM, endCM,endP/m, endTime - startTime);// spline
                 interpolator.calcCoefficients(startCM,landingdCM,Vector3(0,0,-g), endCM,endP/m,Vector3d::Zero(), endTime - startTime);// acc
+                cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: landing phase\x1b[m" << endl;
+                cout << "  startCM: " << startCM.transpose() << endl << "  landingdCM: " << landingdCM.transpose() << endl;
+                cout << "  endCM:   " << endCM.transpose()   << endl << "  enddCM:     " << endP.transpose()/m << endl;
             }
 
-            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff or landing phase\x1b[m" << endl;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
