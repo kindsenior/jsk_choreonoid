@@ -13,7 +13,6 @@ void setCubicSplineInterpolation(std::vector<Vector3d>& a, const Vector3d& x0, c
 class Interpolator
 {
 protected:
-    int numDimensions;
 
 public:
     std::vector<VectorXd> coefficientVec;
