@@ -67,3 +67,74 @@ VectorXd CubicSplineInterpolator::x(double t){
 VectorXd CubicSplineInterpolator::dx(double t){
     return coefficientVec[1] + 2 * coefficientVec[2] * t + 3 * coefficientVec[3] * pow(t,2);
 }
+
+void AccelerationInterpolator::calcCoefficients(const VectorXd& x0, const VectorXd& dx0, const VectorXd& ddx0, const VectorXd& x1, const VectorXd& dx1, const VectorXd& ddx1,
+                                                const double duration, const double constPhaseRatio, std::vector<double> phaseRatioVec)
+{
+    const int numDimensions = x0.size();
+
+    if(phaseRatioVec.size() != numPhases){
+        double Tconst = constPhaseRatio*duration, Tvariable = (1-constPhaseRatio*2)/3 * duration;
+        phaseRatioVec.resize(numPhases);
+        for(int i=0; i<numPhases; ++i) durationVec[i] = i%2 == 0 ? Tvariable : Tconst;
+    }else{
+        for(int i=0; i<numPhases; ++i) durationVec[i] = phaseRatioVec[i]*duration;
+    }
+    {
+        double tmp = 0;
+        for(int i=0; i<numPhases; ++i){
+            phaseInitTimeVec[i] = tmp;
+            tmp += durationVec[i];
+        }
+    }
+
+    std::vector<Matrix2d> Avec(numPhases), Bvec(numPhases);
+    for(int i=0; i<numPhases; ++i) Avec[i] << 1,durationVec[i], 0,1;
+    Bvec[0] << pow(durationVec[0],2)/6,0, durationVec[0]/2,0;
+    Bvec[1] << pow(durationVec[1],2)/2,0, durationVec[1],0;
+    Bvec[2] << pow(durationVec[2],2)/3,pow(durationVec[2],2)/6, durationVec[2]/2,durationVec[2]/2;
+    Bvec[3] << 0,pow(durationVec[3],2)/2, 0,durationVec[3];
+    Bvec[4] << 0,pow(durationVec[4],2)/3, 0,durationVec[4]/2;
+
+    Matrix2d extendedA = Bvec[4] + Avec[4]*Bvec[3] + Avec[4]*Avec[3]*Bvec[2] + Avec[4]*Avec[3]*Avec[2]*Bvec[1] + Avec[4]*Avec[3]*Avec[2]*Avec[1]*Bvec[0];
+    MatrixXd C0(2,3),C1(2,3);
+    C0.block(0,0, 2,2) = Avec[0];               C0(0,2) = pow(durationVec[0],2)/3; C0(1,2) = durationVec[0]/2;
+    C1.block(0,0, 2,2) = -Matrix2d::Identity(); C1(0,2) = pow(durationVec[1],2)/6; C1(1,2) = durationVec[1]/2;
+
+    MatrixXd constAccMat(numDimensions,2);// eg) ((ddx1, ddx3), (ddy1, ddy3), (ddz1, ddz3)) when 3dof(x,y,z)
+    MatrixXd initX(3,numDimensions);// eg) ((x0,y0,z0),(dx0,dy0,dz0),(ddx0,ddy0,ddz0))
+    initX << x0.transpose(), dx0.transpose(), ddx0.transpose();// vstack of vectors
+    MatrixXd terminalX(3,numDimensions);
+    terminalX << x1.transpose(), dx1.transpose(), ddx1.transpose();// vstack of vectors
+    constAccMat = - (extendedA.inverse() * (Avec[4]*Avec[3]*Avec[2]*Avec[1]*C0*initX + C1*terminalX)).transpose();
+
+    // eg) coefficientMatVec[i] = ((a_0x,a_1x,a_2x,a_3x),(a_0y,a_1y,a_2y,a_3y),(a_0z,a_1z,a_2z,a_3z))
+    coefficientMatVec[0] = (MatrixXd(numDimensions,polynominalDegree) << x0,dx0,                          ddx0/2,               (constAccMat.col(0)-ddx0              )/(6*durationVec[0])).finished();
+    coefficientMatVec[1] = (MatrixXd(numDimensions,polynominalDegree) << MatrixXd::Zero(numDimensions,2), constAccMat.col(0)/2, MatrixXd::Zero(numDimensions,1)).finished();
+    coefficientMatVec[2] = (MatrixXd(numDimensions,polynominalDegree) << MatrixXd::Zero(numDimensions,2), constAccMat.col(0)/2, (constAccMat.col(1)-constAccMat.col(0))/(6*durationVec[2])).finished();
+    coefficientMatVec[3] = (MatrixXd(numDimensions,polynominalDegree) << MatrixXd::Zero(numDimensions,2), constAccMat.col(1)/2, MatrixXd::Zero(numDimensions,1)).finished();
+    coefficientMatVec[4] = (MatrixXd(numDimensions,polynominalDegree) << MatrixXd::Zero(numDimensions,2), constAccMat.col(1)/2, (ddx1              -constAccMat.col(1))/(6*durationVec[4])).finished();
+    coefficientMatVec[1].block(0,0,numDimensions,2) = ( C0*initX + Bvec[0]*constAccMat.transpose() ).transpose();
+    for(int i=2; i<numPhases; ++i){
+        coefficientMatVec[i].block(0,0,numDimensions,2) = ( Avec[i-1]*coefficientMatVec[i-1].block(0,0,numDimensions,2).transpose() + Bvec[i-1]*constAccMat.transpose() ).transpose();
+    }
+
+}
+
+VectorXd AccelerationInterpolator::x(double t){
+    for(int i=0; i<numPhases; ++i){
+        if(t > phaseInitTimeVec[i]+durationVec[i]) continue;
+        MatrixXd coefficientMat = coefficientMatVec[i];
+        double T = t - phaseInitTimeVec[i];
+        return coefficientMat.col(0) + coefficientMat.col(1)*T + coefficientMat.col(2)*pow(T,2) + coefficientMat.col(3)*pow(T,3);
+    }
+}
+
+VectorXd AccelerationInterpolator::dx(double t){
+    for(int i=0; i<numPhases; ++i){
+        if(t > phaseInitTimeVec[i]+durationVec[i]) continue;
+        MatrixXd coefficientMat = coefficientMatVec[i];
+        double T = t - phaseInitTimeVec[i];
+        return coefficientMat.col(1) + 2*coefficientMat.col(2)*T + 3*coefficientMat.col(3)*pow(T,2);
+    }
+}

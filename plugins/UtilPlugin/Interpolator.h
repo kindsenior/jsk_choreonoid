@@ -35,4 +35,30 @@ public:
     VectorXd dx(double t);
 };
 
+class AccelerationInterpolator : public Interpolator
+{
+protected:
+    int numPhases;
+    int polynominalDegree;
+    std::vector<MatrixXd> coefficientMatVec;
+    std::vector<double> durationVec;
+    std::vector<double> phaseInitTimeVec;
+
+public:
+
+    AccelerationInterpolator() : Interpolator(){
+        numPhases = 5;
+        polynominalDegree = 4;
+        coefficientMatVec.resize(numPhases);
+        durationVec.resize(numPhases);
+        phaseInitTimeVec.resize(numPhases);
+    }
+
+    void calcCoefficients(const VectorXd& x0, const VectorXd& dx0, const VectorXd& ddx0, const VectorXd& x1, const VectorXd& dx1, const VectorXd& ddx1,
+                          const double duration, const double constPhaseRatio=0.2, const std::vector<double> phaseRatioVec={});
+
+    VectorXd x(double t);
+    VectorXd dx(double t);
+};
+
 }
