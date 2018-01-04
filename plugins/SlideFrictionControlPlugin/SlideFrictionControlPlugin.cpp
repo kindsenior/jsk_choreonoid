@@ -496,6 +496,8 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
     Vector3SeqPtr refPSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
 
+    Vector3d takeoffdCM, landingdCM;
+    double jumpTime;
     for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); incContactPose(frontPoseIter,poseSeq,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeq, body)) continue;
 
@@ -510,8 +512,6 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
         }
 
         PoseSeq::iterator takeoffIter,landingIter;
-        Vector3d takeoffdCM, landingdCM;
-        double jumpTime;
         CubicSplineInterpolator interpolator = CubicSplineInterpolator();// spline
         if(isTakeoff || isLanding){// takeoff and landing phases
             cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: include takeoff or landing phase\x1b[m" << endl;
