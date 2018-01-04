@@ -43,7 +43,7 @@ void cnoid::setCubicSplineInterpolation(std::vector<Vector3d>& a, const Vector3d
 void CubicSplineInterpolator::calcCoefficients(const VectorXd& x0, const VectorXd& dx0, const VectorXd& x1, const VectorXd& dx1, const double duration)
 {
     numDimensions = x0.size();
-    while(coefficientVec.size() < numDegree) coefficientVec.push_back(VectorXd::Zero(numDimensions));
+    while(coefficientVec.size() < polynominalDegree) coefficientVec.push_back(VectorXd::Zero(numDimensions));
 
     coefficientVec[0] = x0;
     coefficientVec[1] = dx0;

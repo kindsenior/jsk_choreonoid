@@ -24,10 +24,10 @@ public:
 class CubicSplineInterpolator : public Interpolator
 {
 public:
-    int numDegree;
+    int polynominalDegree;
 
     CubicSplineInterpolator() : Interpolator(){
-        numDegree = 4;
+        polynominalDegree = 4;
     }
 
     void calcCoefficients(const VectorXd& x0, const VectorXd& dx0, const VectorXd& x1, const VectorXd& dx1, const double duration);
