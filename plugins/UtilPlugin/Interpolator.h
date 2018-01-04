@@ -13,18 +13,18 @@ void setCubicSplineInterpolation(std::vector<Vector3d>& a, const Vector3d& x0, c
 class Interpolator
 {
 protected:
-
-public:
     std::vector<VectorXd> coefficientVec;
 
+public:
     Interpolator(){}
 };
 
 class CubicSplineInterpolator : public Interpolator
 {
-public:
+protected:
     int polynominalDegree;
 
+public:
     CubicSplineInterpolator() : Interpolator(){
         polynominalDegree = 4;
     }
