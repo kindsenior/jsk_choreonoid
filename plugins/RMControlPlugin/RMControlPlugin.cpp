@@ -390,11 +390,11 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
     // 目標運動量 motion loop
     for(int i = 0; i < motion->numFrames(); ++i){
         // refLSeq[i] = Vector3d::Zero();
-        refLSeqPtr->at(i) = refLSeqPtr->at(i);
+        // refLSeqPtr->at(i) = refLSeqPtr->at(i);
 
         int nextFrame = std::min( i + 1, motion->numFrames() - 1 );
         // refPSeq[i] = ( refCMSeqPtr->at(nextFrame) - refCMSeqPtr->at(i) ) / dt;
-        refPSeqPtr->at(i) = refPSeqPtr->at(i);
+        // refPSeqPtr->at(i) = refPSeqPtr->at(i);
 
         ofs << i*dt;
         ofs << " " << refCMSeqPtr->at(i).transpose();// 重心 2,3,4
@@ -404,8 +404,8 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
 
     }// end motion loop
 
-    setSubItem("refP", refPSeqPtr, motionItem);
-    setSubItem("refL", refLSeqPtr, motionItem);
+    // setSubItem("refP", refPSeqPtr, motionItem);
+    // setSubItem("refL", refLSeqPtr, motionItem);
 
     MessageView::instance()->putln(ss.str());
     ofs.close();

@@ -55,7 +55,7 @@ public:
     }
 
     void calcCoefficients(const VectorXd& x0, const VectorXd& dx0, const VectorXd& ddx0, const VectorXd& x1, const VectorXd& dx1, const VectorXd& ddx1,
-                          const double duration, const double constPhaseRatio=0.2, const std::vector<double> phaseRatioVec={});
+                          const double duration, const double constPhaseRatio=0.2, std::vector<double> phaseRatioVec={});
 
     VectorXd x(double t);
     VectorXd dx(double t);

@@ -40,7 +40,6 @@
 #include <boost/format.hpp>
 #include <set>
 
-// #include <DynamicsPlugin/DynamicsPlugin.h>
 #include <cnoid/FileUtil>
 
 #include <UtilPlugin/UtilPlugin.h>
@@ -72,7 +71,6 @@ public:
     {
         require("Body");
         require("PoseSeq");
-        // require("Dynamics");
     }
 
     virtual bool initialize();
