@@ -33,7 +33,7 @@ public:
     SpinParamWidget* inputForceWeightSpin;
     SpinParamWidget* inputMomentWeightSpin;
     SpinParamWidget* inputYawMomentWeightSpin;
-    SpinVectorParamWidget* blockSpinVec;
+    SpinVectorParamWidget<int>* blockSpinVec;
     SpinParamWidget* xDivisionNumSpin;
     SpinParamWidget* yDivisionNumSpin;
 

@@ -26,7 +26,7 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     paramNodes_->addParamNode(inputMomentWeightSpin);
     inputYawMomentWeightSpin = new SpinParamWidget();
     paramNodes_->addParamNode(inputYawMomentWeightSpin);
-    blockSpinVec = new SpinVectorParamWidget();
+    blockSpinVec = new SpinVectorParamWidget<int>();
     paramNodes_->addParamNode(blockSpinVec);
     xDivisionNumSpin = new SpinParamWidget();
     paramNodes_->addParamNode(xDivisionNumSpin);

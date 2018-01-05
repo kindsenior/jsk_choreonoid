@@ -127,6 +127,7 @@ public:
     }
 };
 
+template <class dataType>
 class SpinVectorParamWidget: public ParamWidget,
                              public std::vector<SpinBox*>
 {
@@ -136,7 +137,7 @@ protected:
     PushButton* pulseButton;
     PushButton* minusButton;
 
-    void addSpinBoxWidget(int x)
+    void addSpinBoxWidget(dataType x)
     {
         SpinBox* sb = new SpinBox();
         sb->setRange(0,maxRange);
@@ -207,18 +208,18 @@ public:
         }
     }
 
-    void setValue(std::vector<int> vec)
+    void setValue(std::vector<dataType> vec)
     {
         removeAllSpinWidet();
         std::vector<SpinBox*>::clear();
-        for(std::vector<int>::iterator iter = vec.begin(); iter != vec.end(); ++iter){
+        for(typename std::vector<dataType>::iterator iter = vec.begin(); iter != vec.end(); ++iter){
             addSpinBoxWidget(*iter);
         }
     }
 
-    std::vector<int> value()
+    std::vector<dataType> value()
     {
-        std::vector<int> ret;
+        std::vector<dataType> ret;
         for(std::vector<SpinBox*>::iterator iter = this->begin(); iter != this->end(); ++iter){
             ret.push_back((*iter)->value());
         }

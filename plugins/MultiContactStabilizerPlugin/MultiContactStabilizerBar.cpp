@@ -22,7 +22,7 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout()
     paramNodes_->addParamNode(inputForceWeightSpin);
     inputMomentWeightSpin = new SpinParamWidget();
     paramNodes_->addParamNode(inputMomentWeightSpin);
-    blockSpinVec = new SpinVectorParamWidget();
+    blockSpinVec = new SpinVectorParamWidget<int>();
     paramNodes_->addParamNode(blockSpinVec);
     dtSpin = new SpinParamWidget();
     paramNodes_->addParamNode(dtSpin);
