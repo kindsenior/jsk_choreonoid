@@ -45,15 +45,15 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout()
     errorCMWeightSpin->setArchiveName("errorCMWeight");
     errorCMWeightSpin->setValue(100);
     errorCMWeightSpin->addToLayout(hbox);
-            
-    hbox->addSpacing(8);
+
+    hbox->addSpacing(15);
     errorMomentumWeightSpin->setText("Momentum:");
     errorMomentumWeightSpin->setSaveName("P");
     errorMomentumWeightSpin->setArchiveName("errorMomentumWeight");
     errorMomentumWeightSpin->setValue(10);
     errorMomentumWeightSpin->addToLayout(hbox);
-            
-    hbox->addSpacing(8);
+
+    hbox->addSpacing(15);
     errorAngularMomentumWeightSpin->setText("AngularMomentum:");
     errorAngularMomentumWeightSpin->setSaveName("L");
     errorAngularMomentumWeightSpin->setArchiveName("errorAngularMomentumWeight");
@@ -68,7 +68,7 @@ MultiContactStabilizerSetupLayout::MultiContactStabilizerSetupLayout()
     inputForceWeightSpin->setValue(0.001);
     inputForceWeightSpin->addToLayout(hbox);
 
-    hbox->addSpacing(8);
+    hbox->addSpacing(15);
     inputMomentWeightSpin->setText("Moment:");
     inputMomentWeightSpin->setSaveName("n");
     inputMomentWeightSpin->setArchiveName("inputMomentWeight");

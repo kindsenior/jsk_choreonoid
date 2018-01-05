@@ -48,7 +48,7 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     takeoffPhaseRatioSpinArray->setValue(ratioVec);
     takeoffPhaseRatioSpinArray->addToLayout(hbox);
 
-    hbox->addSpacing(8);
+    hbox->addSpacing(15);
     landingPhaseRatioSpinArray->setText("landing phase ratio:");
     landingPhaseRatioSpinArray->setSaveName("LA");
     landingPhaseRatioSpinArray->setArchiveName("landingPhaseRatioList");
@@ -73,23 +73,22 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     errorCMWeightSpin->setArchiveName("errorCMWeight");
     errorCMWeightSpin->setValue(100);
     errorCMWeightSpin->addToLayout(hbox);
-            
-    hbox->addSpacing(8);
+
+    hbox->addSpacing(15);
     errorMomentumWeightSpin->setText("Momentum:");
     errorMomentumWeightSpin->setSaveName("P");
     errorMomentumWeightSpin->setArchiveName("errorMomentumWeight");
     errorMomentumWeightSpin->setValue(10);
     errorMomentumWeightSpin->addToLayout(hbox);
-            
-    hbox->addSpacing(8);
+
+    hbox->addSpacing(15);
     errorAngularMomentumWeightSpin->setText("AngularMomentum:");
     errorAngularMomentumWeightSpin->setSaveName("L");
     errorAngularMomentumWeightSpin->setArchiveName("errorAngularMomentumWeight");
     errorAngularMomentumWeightSpin->setValue(1000);
     errorAngularMomentumWeightSpin->addToLayout(hbox);
-    hbox->addStretch();
 
-    hbox->addSpacing(8);
+    hbox->addSpacing(15);
     errorYawAngularMomentumWeightSpin->setText("YawAngularMomentum:");
     errorYawAngularMomentumWeightSpin->setSaveName("Lz");
     errorYawAngularMomentumWeightSpin->setArchiveName("errorYawAngularMomentumWeight");
@@ -104,15 +103,14 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     inputForceWeightSpin->setValue(0.001);
     inputForceWeightSpin->addToLayout(hbox);
 
-    hbox->addSpacing(8);
+    hbox->addSpacing(15);
     inputMomentWeightSpin->setText("Moment:");
     inputMomentWeightSpin->setSaveName("n");
     inputMomentWeightSpin->setArchiveName("inputMomentWeight");
     inputMomentWeightSpin->setValue(10);
     inputMomentWeightSpin->addToLayout(hbox);
-    hbox->addStretch();
 
-    hbox->addSpacing(8);
+    hbox->addSpacing(15);
     inputYawMomentWeightSpin->setText("Yaw Moment:");
     inputYawMomentWeightSpin->setSaveName("nz");
     inputYawMomentWeightSpin->setArchiveName("inputYawMomentWeight");
@@ -139,7 +137,7 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     xDivisionNumSpin->setSingleStep(1);
     xDivisionNumSpin->addToLayout(hbox);
 
-    hbox->addSpacing(8);
+    hbox->addSpacing(15);
     yDivisionNumSpin->setText("y Division Number:");
     yDivisionNumSpin->setSaveName("y");
     yDivisionNumSpin->setArchiveName("yDivisionNum");
