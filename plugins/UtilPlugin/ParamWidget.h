@@ -229,4 +229,22 @@ public:
     }
 };
 
+// Array is fixed length version of Vector
+template <class dataType>
+class SpinArrayParamWidget : public SpinVectorParamWidget<dataType>{
+public:
+    SpinArrayParamWidget(size_t length) :
+        SpinVectorParamWidget<dataType>()
+    {
+        this->std::vector<SpinBox*>::resize(length);
+    }
+
+    void addToLayout(QBoxLayout* layout)
+    {
+        SpinVectorParamWidget<dataType>::addToLayout(layout);
+        this->localLayout->removeWidget(this->pulseButton);
+        this->localLayout->removeWidget(this->minusButton);
+    }
+};
+
 }
