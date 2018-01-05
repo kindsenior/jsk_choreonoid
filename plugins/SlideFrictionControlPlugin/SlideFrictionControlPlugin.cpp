@@ -722,22 +722,24 @@ void SlideFrictionControlPlugin::execControl()
     std::set<Link*> contactLinkCandidateSet;
     calcContactLinkCandidateSet(contactLinkCandidateSet, body, poseSeqPtr);
 
+    SlideFrictionControlSetupLayout* layout = mBar->dialog->layout();
+
     // 垂直方向の軌道生成
     generateVerticalTrajectory(body, poseSeqItemPtr, contactLinkCandidateSet);
 
     sfc = new SlideFrictionControl();
     sfc->m = body->mass();
     sfc->dt = dt;
-    sfc->setBlockVector((mBar->dialog->layout())->blockSpinVec->value());
-    sfc->errorCMWeight = (mBar->dialog->layout())->errorCMWeightSpin->value();
-    sfc->errorMomentumWeight = (mBar->dialog->layout())->errorMomentumWeightSpin->value();
-    sfc->errorAngularMomentumWeight = (mBar->dialog->layout())->errorAngularMomentumWeightSpin->value();
-    sfc->errorYawAngularMomentumWeight = (mBar->dialog->layout())->errorYawAngularMomentumWeightSpin->value();
-    sfc->inputForceWeight = (mBar->dialog->layout())->inputForceWeightSpin->value();
-    sfc->inputMomentWeight = (mBar->dialog->layout())->inputMomentWeightSpin->value();
-    sfc->inputYawMomentWeight = (mBar->dialog->layout())->inputYawMomentWeightSpin->value();
-    sfc->numXDivisions = (mBar->dialog->layout())->xDivisionNumSpin->value();
-    sfc->numYDivisions = (mBar->dialog->layout())->yDivisionNumSpin->value();
+    sfc->setBlockVector(layout->blockSpinVec->value());
+    sfc->errorCMWeight = layout->errorCMWeightSpin->value();
+    sfc->errorMomentumWeight = layout->errorMomentumWeightSpin->value();
+    sfc->errorAngularMomentumWeight = layout->errorAngularMomentumWeightSpin->value();
+    sfc->errorYawAngularMomentumWeight = layout->errorYawAngularMomentumWeightSpin->value();
+    sfc->inputForceWeight = layout->inputForceWeightSpin->value();
+    sfc->inputMomentWeight = layout->inputMomentWeightSpin->value();
+    sfc->inputYawMomentWeight = layout->inputYawMomentWeightSpin->value();
+    sfc->numXDivisions = layout->xDivisionNumSpin->value();
+    sfc->numYDivisions = layout->yDivisionNumSpin->value();
 
     generatePreModelPredictiveControlParamDeque(sfc, body, poseSeqItemPtr, contactLinkCandidateSet);
 
