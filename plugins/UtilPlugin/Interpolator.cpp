@@ -79,7 +79,9 @@ void AccelerationInterpolator::calcCoefficients(const VectorXd& x0, const Vector
         phaseRatioVec.resize(numPhases);
         for(int i=0; i<numPhases; ++i) durationVec[i] = i%2 == 0 ? Tvariable : Tconst;
     }else{
-        for(int i=0; i<numPhases; ++i) durationVec[i] = phaseRatioVec[i]*duration;
+        double sumPhaseRatio = 0;
+        for(int i=0; i<numPhases; ++i) sumPhaseRatio += phaseRatioVec[i];
+        for(int i=0; i<numPhases; ++i) durationVec[i] = phaseRatioVec[i]/sumPhaseRatio*duration;
     }
     {
         double tmp = 0;
