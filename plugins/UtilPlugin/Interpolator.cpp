@@ -100,7 +100,7 @@ void AccelerationInterpolator::calcCoefficients(const VectorXd& x0, const Vector
     Matrix2d extendedA = Bvec[4] + Avec[4]*Bvec[3] + Avec[4]*Avec[3]*Bvec[2] + Avec[4]*Avec[3]*Avec[2]*Bvec[1] + Avec[4]*Avec[3]*Avec[2]*Avec[1]*Bvec[0];
     MatrixXd C0(2,3),C1(2,3);
     C0.block(0,0, 2,2) = Avec[0];               C0(0,2) = pow(durationVec[0],2)/3; C0(1,2) = durationVec[0]/2;
-    C1.block(0,0, 2,2) = -Matrix2d::Identity(); C1(0,2) = pow(durationVec[1],2)/6; C1(1,2) = durationVec[1]/2;
+    C1.block(0,0, 2,2) = -Matrix2d::Identity(); C1(0,2) = pow(durationVec[4],2)/6; C1(1,2) = durationVec[4]/2;
 
     MatrixXd constAccMat(numDimensions,2);// eg) ((ddx1, ddx3), (ddy1, ddy3), (ddz1, ddz3)) when 3dof(x,y,z)
     MatrixXd initX(3,numDimensions);// eg) ((x0,y0,z0),(dx0,dy0,dz0),(ddx0,ddy0,ddz0))
