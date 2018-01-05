@@ -133,7 +133,7 @@ class SpinVectorParamWidget: public ParamWidget,
 {
 protected:
     int maxRange;
-    QBoxLayout* parentLayout;
+    QHBoxLayout* localLayout;
     PushButton* pulseButton;
     PushButton* minusButton;
 
@@ -143,7 +143,7 @@ protected:
         sb->setRange(0,maxRange);
         sb->setValue(x);
         this->push_back(sb);
-        if(parentLayout != NULL) parentLayout->addWidget(sb);
+        localLayout->addWidget(sb);
     }
 
     void removeSpinBoxWidget()
@@ -166,24 +166,26 @@ public:
          std::vector<SpinBox*>()
     {
         maxRange = 1000;
-        parentLayout = NULL;
+
+        localLayout = new QHBoxLayout();
+        localLayout->setSpacing(2);
+        // localLayout->setContentsMargins(2, 2, 2, 2);
 
         pulseButton = new PushButton("+");
         pulseButton->sigClicked().connect(boost::bind(&SpinVectorParamWidget::addSpinBoxWidget, this, 1));
         pulseButton->setFixedWidth(20);
+        localLayout->addWidget((PushButton*) pulseButton);
 
         minusButton = new PushButton("-");
         minusButton->sigClicked().connect(boost::bind(&SpinVectorParamWidget::removeSpinBoxWidget, this));
         minusButton->setFixedWidth(20);
+        localLayout->addWidget((QPushButton*) minusButton);
     }
 
     void addToLayout(QBoxLayout* layout)
     {
-        parentLayout = layout;
         ParamWidget::addToLayout(layout);
-        parentLayout->addWidget((PushButton*) pulseButton);
-        parentLayout->addWidget((QPushButton*) minusButton);
-        for(std::vector<SpinBox*>::iterator iter = this->begin(); iter != this->end(); ++iter) parentLayout->addWidget((SpinBox*) *iter);
+        layout->addLayout(localLayout);
     }
 
     std::string getParam()
