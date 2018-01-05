@@ -28,7 +28,7 @@
 
 namespace cnoid{
     void generatePreModelPredictiveControlParamDeque(hrp::SlideFrictionControl* sfc, BodyPtr body, const PoseSeqItemPtr& poseSeqItemPtr, const std::set<Link*>& contactLinkCandidateSet);
-    void generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*> contactLinkCandidateSet);
+    void generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*> contactLinkCandidateSet, const std::vector<double>& takeoffPhaseRatioVec, const std::vector<double>& landingPhaseRatioVec);
     void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
     void loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
 

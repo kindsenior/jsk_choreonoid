@@ -12,6 +12,10 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     paramNodes_->setArchiveName("SFC");
 
     // in order for saving param to file name
+    takeoffPhaseRatioSpinArray = new SpinArrayParamWidget<double>(5);
+    paramNodes_->addParamNode(takeoffPhaseRatioSpinArray);
+    landingPhaseRatioSpinArray = new SpinArrayParamWidget<double>(5);
+    paramNodes_->addParamNode(landingPhaseRatioSpinArray);
     errorCMWeightSpin = new SpinParamWidget();
     paramNodes_->addParamNode(errorCMWeightSpin);
     errorMomentumWeightSpin = new SpinParamWidget();
@@ -37,6 +41,22 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
 
     // in order of param setup dialog
     QHBoxLayout* hbox = newRow();
+    takeoffPhaseRatioSpinArray->setText("takeff phase ratio:");
+    takeoffPhaseRatioSpinArray->setSaveName("TO");
+    takeoffPhaseRatioSpinArray->setArchiveName("takeoffPhaseRatioList");
+    std::vector<double> ratioVec{1,2,1,2,1};
+    takeoffPhaseRatioSpinArray->setValue(ratioVec);
+    takeoffPhaseRatioSpinArray->addToLayout(hbox);
+
+    hbox->addSpacing(8);
+    landingPhaseRatioSpinArray->setText("landing phase ratio:");
+    landingPhaseRatioSpinArray->setSaveName("LA");
+    landingPhaseRatioSpinArray->setArchiveName("landingPhaseRatioList");
+    landingPhaseRatioSpinArray->setValue(ratioVec);
+    landingPhaseRatioSpinArray->addToLayout(hbox);
+    hbox->addStretch();
+
+    hbox = newRow();
     dtSpin->setRange(0.001,1);
     dtSpin->setText("dt [sec]:");
     dtSpin->setSaveName("dt");

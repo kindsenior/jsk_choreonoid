@@ -475,7 +475,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
 
 }
 
-void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*> contactLinkCandidateSet)
+void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*> contactLinkCandidateSet, const std::vector<double>& takeoffPhaseRatioVec, const std::vector<double>& landingPhaseRatioVec)
 {
     cout << "generateVerticalTrajectory()" << endl;
 
@@ -539,7 +539,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
                 // interpolator.calcCoefficients(startCM,startP/m, endCM,takeoffdCM, endTime - startTime);// spline
-                interpolator.calcCoefficients(startCM,startP/m,Vector3d::Zero(), endCM,takeoffdCM,Vector3(0,0,-g), endTime - startTime);// acc
+                interpolator.calcCoefficients(startCM,startP/m,Vector3d::Zero(), endCM,takeoffdCM,Vector3(0,0,-g), endTime - startTime, 0,takeoffPhaseRatioVec);// acc
                 cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff phase\x1b[m" << endl;
                 cout << "  startCM: " << startCM.transpose() << endl << "  startdCM:   " << startP.transpose()/m << endl;
                 cout << "  endCM:   " << endCM.transpose()   << endl << "  takeoffdCM: " << takeoffdCM.transpose() << endl;
@@ -553,7 +553,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
                 // interpolator.calcCoefficients(startCM,landingdCM, endCM,endP/m, endTime - startTime);// spline
-                interpolator.calcCoefficients(startCM,landingdCM,Vector3(0,0,-g), endCM,endP/m,Vector3d::Zero(), endTime - startTime);// acc
+                interpolator.calcCoefficients(startCM,landingdCM,Vector3(0,0,-g), endCM,endP/m,Vector3d::Zero(), endTime - startTime, 0,landingPhaseRatioVec);// acc
                 cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: landing phase\x1b[m" << endl;
                 cout << "  startCM: " << startCM.transpose() << endl << "  landingdCM: " << landingdCM.transpose() << endl;
                 cout << "  endCM:   " << endCM.transpose()   << endl << "  enddCM:     " << endP.transpose()/m << endl;
@@ -725,7 +725,7 @@ void SlideFrictionControlPlugin::execControl()
     SlideFrictionControlSetupLayout* layout = mBar->dialog->layout();
 
     // 垂直方向の軌道生成
-    generateVerticalTrajectory(body, poseSeqItemPtr, contactLinkCandidateSet);
+    generateVerticalTrajectory(body, poseSeqItemPtr, contactLinkCandidateSet, layout->takeoffPhaseRatioSpinArray->value(),layout->landingPhaseRatioSpinArray->value());
 
     sfc = new SlideFrictionControl();
     sfc->m = body->mass();

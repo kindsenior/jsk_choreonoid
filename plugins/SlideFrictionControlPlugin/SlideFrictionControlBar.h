@@ -37,6 +37,9 @@ public:
     SpinParamWidget* xDivisionNumSpin;
     SpinParamWidget* yDivisionNumSpin;
 
+    SpinArrayParamWidget<double>* takeoffPhaseRatioSpinArray;
+    SpinArrayParamWidget<double>* landingPhaseRatioSpinArray;
+
     SlideFrictionControlSetupLayout();
 };
 
