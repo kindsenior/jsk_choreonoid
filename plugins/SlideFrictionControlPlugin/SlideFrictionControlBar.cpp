@@ -44,7 +44,7 @@ SlideFrictionControlSetupLayout::SlideFrictionControlSetupLayout()
     takeoffPhaseRatioSpinArray->setText("takeff phase ratio:");
     takeoffPhaseRatioSpinArray->setSaveName("TO");
     takeoffPhaseRatioSpinArray->setArchiveName("takeoffPhaseRatioList");
-    std::vector<double> ratioVec{1,2,1,2,1};
+    std::vector<double> ratioVec{1,1,1,1,1};
     takeoffPhaseRatioSpinArray->setValue(ratioVec);
     takeoffPhaseRatioSpinArray->addToLayout(hbox);
 
