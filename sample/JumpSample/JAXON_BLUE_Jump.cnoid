@@ -344,6 +344,10 @@ toolbars:
   "SlideFrictionControlBar": 
     saveParameterInFileName: false
     SFC: 
+      takeoffPhaseRatioList: 1,1,1,1,1
+      takeoffPhaseRatioListCheck: true
+      landingPhaseRatioList: 1,1,1,1,1
+      landingPhaseRatioListCheck: true
       errorCMWeight: 100
       errorCMWeightCheck: true
       errorMomentumWeight: 10
@@ -392,6 +396,10 @@ toolbars:
     CC: 
       - 
         SFC: 
+          takeoffPhaseRatioList: 1,2,1,2,1
+          takeoffPhaseRatioListCheck: true
+          landingPhaseRatioList: 1,2,1,2,1
+          landingPhaseRatioListCheck: true
           errorCMWeight: 100
           errorCMWeightCheck: true
           errorMomentumWeight: 10
@@ -416,6 +424,10 @@ toolbars:
           dtCheck: true
       - 
         SFC: 
+          takeoffPhaseRatioList: 1,1,1,1,1
+          takeoffPhaseRatioListCheck: true
+          landingPhaseRatioList: 1,1,1,1,1
+          landingPhaseRatioListCheck: true
           errorCMWeight: 100
           errorCMWeightCheck: true
           errorMomentumWeight: 20000
