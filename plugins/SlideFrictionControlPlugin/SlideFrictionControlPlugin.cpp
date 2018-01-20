@@ -229,7 +229,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             END:
                 ;
             }
-            zmp /= Fz;
+            zmp /= thresh(Fz,1e-5);
             refZmpSeqPtr->at(motionIdx) = zmp;
             contactOfs << endl;
             wrenchOfs << endl;
