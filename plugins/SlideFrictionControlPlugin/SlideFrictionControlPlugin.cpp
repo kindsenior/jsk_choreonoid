@@ -511,6 +511,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             if(getPrevContactState(backPoseIter,  poseSeq, linkIdx) != 3) isLanding &= false;
         }
 
+        int jumpFrameOffset = 1;
         PoseSeq::iterator takeoffIter,landingIter;
         // CubicSplineInterpolator interpolator = CubicSplineInterpolator();// spline
         AccelerationInterpolator interpolator = AccelerationInterpolator();// acc
@@ -521,11 +522,13 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             double startTime, endTime;
             int startFrame, endFrame;
             Vector3d startCM, endCM, startP, endP; // use simple model momentum calculated by UtilPlugin
+            double backPoseOffsetTime;
             if(isTakeoff){// takeoff phase is necessary and must be first in if branching for setting takeoffdCM
+                backPoseOffsetTime = 0;
                 takeoffIter = frontPoseIter;
                 landingIter = frontPoseIter; incContactPose(landingIter,poseSeq,body);
-                jumpTime = landingIter->time() - takeoffIter->time();
-                Vector3d takeoffCM = initCMSeqPtr->at(takeoffIter->time()*frameRate), landingCM = initCMSeqPtr->at(landingIter->time()*frameRate);
+                jumpTime = landingIter->time() - takeoffIter->time() + jumpFrameOffset*dt;// add jumpFrameOffset
+                Vector3d takeoffCM = initCMSeqPtr->at(takeoffIter->time()*frameRate), landingCM = initCMSeqPtr->at(landingIter->time()*frameRate + jumpFrameOffset);// add jumpFrameOffset
                 takeoffdCM = (landingCM - takeoffCM) / jumpTime;
                 landingdCM = takeoffdCM;
                 takeoffdCM.z() = 0.5 * g * jumpTime + (landingCM.z() - takeoffCM.z()) / jumpTime;
@@ -544,10 +547,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 cout << "  startCM: " << startCM.transpose() << endl << "  startdCM:   " << startP.transpose()/m << endl;
                 cout << "  endCM:   " << endCM.transpose()   << endl << "  takeoffdCM: " << takeoffdCM.transpose() << endl;
             }else{// landing phase
+                backPoseOffsetTime = jumpFrameOffset*dt;// add jumpFrameOffset for fz differential or delay
                 int delayOffset = 2;// forward-difference delay + median-filter delay = 1 + 1 = 2
                 startPoseIter = backPoseIter;
                 endPoseIter = backPoseIter; ++endPoseIter;
-                startTime = startPoseIter->time(); endTime = endPoseIter->time() + delayOffset*dt; // add delay
+                startTime = startPoseIter->time() + backPoseOffsetTime; endTime = endPoseIter->time() + delayOffset*dt;// add jumpFrameOffset for fz differential or delay
                 startFrame = startTime*frameRate; endFrame = min((int)(endTime*frameRate), numFrames-1); // add delay
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
@@ -559,13 +563,15 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 cout << "  endCM:   " << endCM.transpose()   << endl << "  enddCM:     " << endP.transpose()/m << endl;
             }
 
-            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            // for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            for(int i=(backPoseIter->time()+backPoseOffsetTime)*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
             }
             // for(int i=startPoseIter->time()*frameRate; i < endPoseIter->time()*frameRate; ++i){
-            for(int i=startPoseIter->time()*frameRate; i < endFrame; ++i){ // use endFrame including delay
+            // for(int i=startPoseIter->time()*frameRate; i < endFrame; ++i){ // use endFrame including delay
+            for(int i=startFrame; i < endFrame; ++i){ // use startFrame and endFrame including delay
                 Vector3d CM, P;
                 // cubic-spline
                 CM = interpolator.x(i*dt - startTime); // overwrite
@@ -580,13 +586,15 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 refLSeqPtr->at(i) = Vector3d(0,0,0);
             }
         }else if(isJumping){// jumping phases
-            cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: jumping phase\x1b[m" << endl;
-            double startTime = backPoseIter->time(), endTime = frontPoseIter->time();
+            // cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: jumping phase\x1b[m" << endl;
+            double startTime = backPoseIter->time(), endTime = frontPoseIter->time() + jumpFrameOffset*dt;// add  jumpFrameOffset for fz differential
             int startFrame = startTime*frameRate, endFrame = endTime*frameRate;
             Vector3d startCM = initCMSeqPtr->at(startFrame), endCM = initCMSeqPtr->at(endFrame);
             Vector3d startP = initPSeqPtr->at(startFrame),   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
             double jumptime = endTime - startTime;
-            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: jumping phase\x1b[m" << endl;
+            // for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            for(int i=startFrame; i < endFrame; ++i){
                 double t = i*dt;
                 Vector3d CM = initCMSeqPtr->at(i), P = initPSeqPtr->at(i);
                 refCMSeqPtr->at(i) = startCM + (endCM - startCM) * (t - startTime) /jumptime; // xy
