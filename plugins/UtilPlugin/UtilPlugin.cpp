@@ -325,7 +325,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
             MultiValueSeq::Frame frame = optionalDataSeqPtr->frame(i);
             for(int j=0; j<linkNum; ++j){
                 frame[j] = contactStateVec[j];
-                frame[j+linkNum] = 5;
+                frame[j+linkNum] = frontPoseIter->time() - i/(double)frameRate;
             }
         }
         cout << endl;
