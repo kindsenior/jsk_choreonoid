@@ -771,7 +771,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             // RootLink位置更新
             (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *mBody;
             mBody->rootLink()->p() += xib.block(0,0, 3,1) * dt;
-            Vector3d omega = xib.block(3,0, 3,1);
+            Vector3d omega = mBody->rootLink()->R().transpose() * xib.block(3,0, 3,1);// w is in world frame, omega is in body frame
             if(omega.norm() != 0) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
             else cout << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
 
