@@ -428,10 +428,11 @@ void cnoid::calcDifferential(const BodyMotionPtr& motion, const int currentFrame
     SE3 nextWaistSE3 = motion->linkPosSeq()->frame(nextFrame)[0];
     v = nextWaistSE3.translation() - currentWaistSE3.translation();
     v /= dt;
-    // Matrix3d R = nextWaistSE3.rotation().toRotationMatrix() * nextWaistSE3.rotation().toRotationMatrix().inverse();//間違い?
-    Matrix3d R = nextWaistSE3.rotation().toRotationMatrix() * currentWaistSE3.rotation().toRotationMatrix().inverse();
+    // Matrix3d R = nextWaistSE3.rotation().toRotationMatrix() * currentWaistSE3.rotation().toRotationMatrix().inverse(); // old and wrong
+    Matrix3d R = currentWaistSE3.rotation().toRotationMatrix().inverse() * nextWaistSE3.rotation().toRotationMatrix();// R(t)^T * R(t+dt)
     AngleAxis aa = AngleAxis(R);
-    w = aa.axis() * aa.angle()/dt;
+    // w = aa.axis() * aa.angle()/dt; // old and wrongx
+    w = currentWaistSE3.rotation().toRotationMatrix() * aa.axis() * aa.angle()/dt;// w is in world frame
 }
 
 void cnoid::calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& Iw, const VectorXd& dq)
