@@ -98,8 +98,10 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, Ma
     int idx = 0;
     for(int i = 0; i < jointConstraintVec.size(); ++i){
         if(jointConstraintVec[i] == Free){
-            Mfree.col(idx) = M.col(i);
-            Hfree.col(idx) = H.col(i);
+            // Mfree.col(idx) = M.col(i);
+            // Hfree.col(idx) = H.col(i);
+            Mfree.col(idx) = MatrixXd::Zero(6,1);
+            Hfree.col(idx) = MatrixXd::Zero(6,1);
             ++idx;
         }
     }
