@@ -511,7 +511,7 @@ void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const
     }
 }
 
-void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItem, const std::set<Link*>& contactLinkCandidateSet)
+void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItem, const std::vector<Link*>& endEffectorLinkVec)
 {
     BodyMotionPtr motion = bodyMotionItem->motion();
 
@@ -534,8 +534,17 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
         fnamess.str("");
         fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_PL_" << motion->frameRate() << "fps_" << i << ".dat";
         ofstream ofs( fnamess.str().c_str() );
-        if(!ofs){ cerr << "File Open Error" << endl; return;}
+        if(!ofs){ cerr << "File Open Error: " << fnamess << endl; return;}
         ofs << "time CMx CMy CMz Px Py Pz Lx Ly Lz" << endl;
+
+        fnamess.str("");
+        fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_EE_" << motion->frameRate() << "fps_" << i << ".dat";
+        ofstream eeOfs( fnamess.str().c_str() );
+        if(!eeOfs){ cerr << "File Open Error: " << fnamess << endl; return;}
+        eeOfs << "time";
+        std::vector<string> columnHeadKeyVec={"px","py","pz", "vx","vy","vz", "wx","wy","wz"};
+        for(auto link : endEffectorLinkVec) for(auto columnHeadKey : columnHeadKeyVec) eeOfs << " " << link->name() << columnHeadKey;
+        eeOfs << endl;
 
         double dt = 1.0/motion->frameRate();
 
@@ -601,6 +610,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
         for(int currentFrame = 0; currentFrame < motion->numFrames(); ++currentFrame){
 
             ofs << currentFrame * dt;
+            eeOfs << currentFrame * dt;
             // ss << "###########################################################" << endl;
             // cout << "time " << currentFrame * dt << endl;
 
@@ -814,6 +824,15 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 ofs << " "  << mBody->calcCenterOfMass().transpose();// 重心 2,3,4
                 ofs << " " << P.transpose() << " " << L.transpose();// 運動量 5,6,7 角運動量 8,9,10
                 ofs << endl;
+
+                for(auto link : endEffectorLinkVec){
+                    // eeOfs << " " << link->p().transpose() << " " << link->v().transpose() << " " << link->w().transpose();
+                    eeOfs << " " << link->p().transpose();
+                    if( link->name().find("LLEG") != std::string::npos ) eeOfs << " " << lv.transpose() << " " << lw.transpose();
+                    else if ( link->name().find("RLEG") != std::string::npos ) eeOfs << " " << rv.transpose() << " " << rw.transpose();
+                    else eeOfs << " " << link->v().transpose() << " " << link->w().transpose();
+                }
+                eeOfs << endl;
             }
 
         }// end motion loop
@@ -905,7 +924,7 @@ void RMControlPlugin::execControl()
     // 跳躍期間のrootLinkを目標重心軌道に合わせて修正
     // modifyJumpingTrajectory(poseSeqItem, contactLinkCandidateSet);
 
-    sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, contactLinkCandidateSet);// ParamString is not gotten from ParamSetupLayout and is empty
+    sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, endEffectorLinkVec);// ParamString is not gotten from ParamSetupLayout and is empty
 
     cout << "\x1b[31m" << "Finished RMControl" << "\x1b[m" << endl;
 }

@@ -94,7 +94,7 @@ public:
 
     void modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet);
 
-    void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
+    void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::vector<Link*>& endEffectorLinkVec);
 
     // 分解運動量制御
     void execControl();
