@@ -87,9 +87,6 @@ void setSubItem(std::string seqName, const MultiValueSeqPtr& seqPtr, BodyMotionI
 double thresh(double x, double thresh, double target = 0);
 VectorXd thresh(VectorXd x, double thresh, VectorXd target = VectorXd::Zero(3));
 
-template <typename t_matrix>
-t_matrix PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6);
-
 class UtilPlugin : public Plugin
 {
 public:

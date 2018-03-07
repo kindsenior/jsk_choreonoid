@@ -5,6 +5,7 @@ set(TARGET Cnoid${PLUGIN_NAME})
 set(headers
   UtilPlugin.h
   Interpolator.h
+  InverseKinematics.h
   Filter.h
   ParamNode.h
   ParamWidget.h
@@ -12,7 +13,7 @@ set(headers
   ParamSetupDialog.h
   SetupToolBar.h)
 
-add_library(${TARGET} SHARED UtilPlugin Interpolator)
+add_library(${TARGET} SHARED UtilPlugin Interpolator InverseKinematics)
 
 # -l
 target_link_libraries(${TARGET} CnoidPoseSeqPlugin)
