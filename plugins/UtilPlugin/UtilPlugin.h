@@ -69,7 +69,7 @@ void generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemp
 
 void generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const std::vector<Link*>& linkVec);
 
-bool getEndEffectorLinkVector(std::vector<Link*>& endEfectorLinkVector, BodyPtr& body);
+bool getEndEffectorLinkVector(std::vector<Link*>& endEffectorLinkVector, BodyPtr& body);
 
 void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame, const std::set<Link*>& linkSet=std::set<Link*>());
 

@@ -336,14 +336,14 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
     setSubItem("optionaldata", optionalDataSeqPtr, bodyMotionItemPtr);
 }
 
-bool cnoid::getEndEffectorLinkVector(std::vector<Link*>& endEfectorLinkVec, BodyPtr& body)
+bool cnoid::getEndEffectorLinkVector(std::vector<Link*>& endEffectorLinkVec, BodyPtr& body)
 {
     cout << endl << "generateEndEffectorLinkVector( " << body->name() << " )" << endl;
     const Listing& endEffectorNodes = *body->info()->findListing("endEffectors");
     if(endEffectorNodes.isValid() && endEffectorNodes.size() != 0){
         cout << " End effector link vector contains";
         for(int i=0; i<endEffectorNodes.size(); ++i){
-            endEfectorLinkVec.push_back(body->link(endEffectorNodes[i].toString()));
+            endEffectorLinkVec.push_back(body->link(endEffectorNodes[i].toString()));
             cout << " " << endEffectorNodes[i].toString();
         }cout << " in this order" << endl;
         return true;
