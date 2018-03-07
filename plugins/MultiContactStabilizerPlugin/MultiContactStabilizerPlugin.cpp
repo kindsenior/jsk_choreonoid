@@ -196,7 +196,8 @@ void MultiContactStabilizerPlugin::execControl()
     dt = 1.0/frameRate;
     numFrames = motion->numFrames();
 
-    generateInitSeq(body, poseSeqItemPtr);
+    std::vector<Link*> dummyVec;
+    generateInitSeq(body, poseSeqItemPtr, dummyVec);
 
     // 接触候補セットの作成
     std::set<Link*> contactLinkCandidateSet;

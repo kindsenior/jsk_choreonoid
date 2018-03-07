@@ -83,7 +83,7 @@ Vector3d getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId
 }
 
 // calc COM, Momentum, Angular Momentum
-void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
+void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::vector<Link*>& endEffectorLinkVec)
 {
     cout << "generateInitSeq()" << endl;
 
@@ -98,6 +98,14 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
     ss << poseSeqPath.stem().string() << "_initCM_" << frameRate << "fps.dat";
     ofstream ofs( ((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str() );
     ofs << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
+
+    ss.str("");
+    ss << poseSeqPath.stem().string() << "_initEE_" << frameRate << "fps.dat";
+    ofstream eeOfs( ((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str() );
+    eeOfs << "time";
+    std::vector<string> columnHeadKeyVec={"px","py","pz", "vx","vy","vz", "wx","wy","wz"};
+    for(auto link : endEffectorLinkVec) for(auto columnHeadKey : columnHeadKeyVec) eeOfs << " " << link->name() << columnHeadKey;
+    eeOfs << endl;
 
     Vector3SeqPtr initCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM");
     Vector3SeqPtr initPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
@@ -123,12 +131,18 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr)
         initLSeqPtr->at(i) = L;
 
         ofs << i*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
+        eeOfs << i*dt;
+        for(auto link : endEffectorLinkVec){
+            eeOfs << " " << link->p().transpose() << " " << link->v().transpose() << " " << link->w().transpose();
+        }
+        eeOfs << endl;
     }
     setSubItem("initCM", initCMSeqPtr, bodyMotionItemPtr);
     setSubItem("initP", initPSeqPtr, bodyMotionItemPtr);
     setSubItem("initL", initLSeqPtr, bodyMotionItemPtr);
 
     ofs.close();
+    eeOfs.close();
 }
 
 void cnoid::calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet, BodyPtr body, const PoseSeqPtr& poseSeqPtr)

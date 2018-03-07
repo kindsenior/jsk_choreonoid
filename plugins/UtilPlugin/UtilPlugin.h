@@ -42,7 +42,7 @@ struct SubMass
     }
 };
 
-void generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr);
+void generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::vector<Link*>& endEffectorLinkVector);
 
 void calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet, BodyPtr body, const PoseSeqPtr& poseSeqPtr);
 

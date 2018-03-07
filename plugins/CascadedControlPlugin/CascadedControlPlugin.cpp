@@ -110,7 +110,7 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     dt = 1.0/frameRate;
     numFrames = motion->numFrames();
 
-    generateInitSeq(body, poseSeqItemPtr);
+    generateInitSeq(body, poseSeqItemPtr, endEffectorLinkVec);
 
     // 接触候補セットの作成
     std::set<Link*> contactLinkCandidateSet;
