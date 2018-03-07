@@ -79,10 +79,10 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, Ma
     // JointPathPtr mJpl = getCustomJointPath(mBody, rootLink, lFoot);
     // JointPathPtr mJpr = getCustomJointPath(mBody, rootLink, rFoot);
     mJpl->calcJacobian(Jl); mJpr->calcJacobian(Jr);// 脚・腰間ヤコビアン
-    Ml = M.block(0,mBody->link("LLEG_JOINT0")->jointId(), 3,mJpl->numJoints()) * Jl.inverse();
-    Mr = M.block(0,mBody->link("RLEG_JOINT0")->jointId(), 3,mJpr->numJoints()) * Jr.inverse();
-    Hl = H.block(0,mBody->link("LLEG_JOINT0")->jointId(), 3,mJpl->numJoints()) * Jl.inverse();
-    Hr = H.block(0,mBody->link("RLEG_JOINT0")->jointId(), 3,mJpr->numJoints()) * Jr.inverse();
+    Ml = M.block(0,mBody->link("LLEG_JOINT0")->jointId(), 3,mJpl->numJoints()) * inverseJacobian(mJpl);
+    Mr = M.block(0,mBody->link("RLEG_JOINT0")->jointId(), 3,mJpr->numJoints()) * inverseJacobian(mJpr);
+    Hl = H.block(0,mBody->link("LLEG_JOINT0")->jointId(), 3,mJpl->numJoints()) * inverseJacobian(mJpl);
+    Hr = H.block(0,mBody->link("RLEG_JOINT0")->jointId(), 3,mJpr->numJoints()) * inverseJacobian(mJpr);
 
     // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
     // Hrleg = H.block(0,mBody->link("RLEG_JOINT0")->jointId, 3,mJpr->numJoints());
@@ -742,8 +742,9 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             // cout << " step5";
             VectorXd dql((mBody->numJoints() - dof) / 2);
             VectorXd dqr((mBody->numJoints() - dof) / 2);
-            dql = Jl.inverse() * (xil - Fl * xib);
-            dqr = Jr.inverse() * (xir - Fr * xib);
+            dql = inverseJacobian(mJpl) * (xil - Fl * xib);
+            dqr = inverseJacobian(mJpr) * (xir - Fr * xib);
+
 
             // cout << " Finished Step 5" << endl;
 

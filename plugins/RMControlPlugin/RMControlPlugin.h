@@ -44,6 +44,7 @@
 
 #include <UtilPlugin/UtilPlugin.h>
 #include <UtilPlugin/Interpolator.h>
+#include <UtilPlugin/InverseKinematics.h>
 
 #include "RMControlBar.h"
 
