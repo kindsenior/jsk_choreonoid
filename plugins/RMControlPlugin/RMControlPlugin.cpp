@@ -56,9 +56,7 @@ void minjerkInterpolation(Vector3d& a0, Vector3d& a1, Vector3d& a2, Vector3d& a3
 
 // ロボットモデル依存の部分あり
 // 各種行列を計算
-void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, MatrixXd& Fl, MatrixXd& Fr,
-                                    MatrixXd& M, MatrixXd& H, MatrixXd& Mb, MatrixXd& Mfree, MatrixXd& Hb, MatrixXd& Hfree,
-                                    MatrixXd& Ml, MatrixXd& Mr, MatrixXd& Hl, MatrixXd& Hr, vector<Constraint>& jointConstraintVec)
+void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
 {
     stringstream ss;
 
@@ -67,22 +65,20 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, Ma
 
     // Ml Mr Hl Hr作成
     // MatrixXd M,H;
-    MatrixXd M_( 3, mBody->numJoints()+6 );
-    MatrixXd H_( 3, mBody->numJoints()+6 );
-    calcCMJacobian(mBody,NULL,M_);
-    calcAngularMomentumJacobian(mBody, NULL, H_);// 運動量ヤコビアン、角運動量ヤコビアン
-    M = mBody->mass() * M_.block( 0,0, 3, mBody->numJoints() );
-    H = H_.block( 0,0, 3, mBody->numJoints() );
+    calcCMJacobian(mBody,NULL,M);
+    calcAngularMomentumJacobian(mBody, NULL, H);
+    M = mBody->mass() * M;
+    H.block(0,mBody->numJoints(), 3,3) = MatrixXd::Zero(3,3);
+    H.block(0,mBody->numJoints()+3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw;
 
-    Link* rootLink = mBody->rootLink();
+    // Link* rootLink = mBody->rootLink();
     // Link* lFoot = mBody->link("RLEG_JOINT5"); Link* rFoot = mBody->link("LLEG_JOINT5");
     // JointPathPtr mJpl = getCustomJointPath(mBody, rootLink, lFoot);
     // JointPathPtr mJpr = getCustomJointPath(mBody, rootLink, rFoot);
-    mJpl->calcJacobian(Jl); mJpr->calcJacobian(Jr);// 脚・腰間ヤコビアン
-    Ml = M.block(0,mBody->link("LLEG_JOINT0")->jointId(), 3,mJpl->numJoints()) * inverseJacobian(mJpl);
-    Mr = M.block(0,mBody->link("RLEG_JOINT0")->jointId(), 3,mJpr->numJoints()) * inverseJacobian(mJpr);
-    Hl = H.block(0,mBody->link("LLEG_JOINT0")->jointId(), 3,mJpl->numJoints()) * inverseJacobian(mJpl);
-    Hr = H.block(0,mBody->link("RLEG_JOINT0")->jointId(), 3,mJpr->numJoints()) * inverseJacobian(mJpr);
+    MatrixXd Ml = extractMatrix(M, wholeBodyConstraintPtr->constraintJointPathVec[0]->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) wholeBodyConstraintPtr->constraintJointPathVec[0]);
+    MatrixXd Mr = extractMatrix(M, wholeBodyConstraintPtr->constraintJointPathVec[1]->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) wholeBodyConstraintPtr->constraintJointPathVec[1]);
+    MatrixXd Hl = extractMatrix(H, wholeBodyConstraintPtr->constraintJointPathVec[0]->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) wholeBodyConstraintPtr->constraintJointPathVec[0]);
+    MatrixXd Hr = extractMatrix(H, wholeBodyConstraintPtr->constraintJointPathVec[1]->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) wholeBodyConstraintPtr->constraintJointPathVec[1]);
 
     // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
     // Hrleg = H.block(0,mBody->link("RLEG_JOINT0")->jointId, 3,mJpr->numJoints());
@@ -90,57 +86,29 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& Jl, MatrixXd& Jr, Ma
     // Mfree, Hfree作成
     // freeジョイントがない場合の処理にはおそらく未対応
     // free関節かどうか
-    for(int i = 0; i < mBody->numJoints(); ++i) jointConstraintVec.push_back(Free);
-    for(int i = 0; i < mJpl->numJoints(); ++i) jointConstraintVec[ mBody->link("LLEG_JOINT0")->jointId() + i ] = LLEG;
-    for(int i = 0; i < mJpr->numJoints(); ++i) jointConstraintVec[ mBody->link("RLEG_JOINT0")->jointId() + i ] = RLEG;
-    Mfree = MatrixXd(3, mBody->numJoints() - mJpl->numJoints() - mJpr->numJoints() );
-    Hfree = MatrixXd(3, mBody->numJoints() - mJpl->numJoints() - mJpr->numJoints() );
-    int idx = 0;
-    for(int i = 0; i < jointConstraintVec.size(); ++i){
-        if(jointConstraintVec[i] == Free){
-            // Mfree.col(idx) = M.col(i);
-            // Hfree.col(idx) = H.col(i);
-            Mfree.col(idx) = MatrixXd::Zero(6,1);
-            Hfree.col(idx) = MatrixXd::Zero(6,1);
-            ++idx;
-        }
-    }
+    MatrixXd Mfree = extractMatrix(M, wholeBodyConstraintPtr->freeJointIdSet());
+    MatrixXd Hfree = extractMatrix(H, wholeBodyConstraintPtr->freeJointIdSet());
 
     // Fl,Fr作成
-    Vector3d rl = mLFootLink->p() - rootLink->p();
-    Fl = MatrixXd(6,6);
-    Fl.block(0,0, 6,6).setIdentity();
-    for(int i = 0; i < 3; ++i)Fl.block(0,3+i, 3,1) = Matrix3::Identity().col(i).cross(rl);
 
-    Vector3d rr = mRFootLink->p() - rootLink->p();
-    Fr = MatrixXd(6,6);
-    Fr.block(0,0, 6,6).setIdentity();
-    for(int i = 0; i < 3; ++i)Fr.block(0,3+i, 3,1) = Matrix3::Identity().col(i).cross(rr);
+    MatrixXd Fl = extractMatrix(wholeBodyConstraintPtr->constraintJointPathVec[0]->jacobianWholeBody(), wholeBodyConstraintPtr->constraintJointPathVec[0]->commonJointIdSet());
+    MatrixXd Fr = extractMatrix(wholeBodyConstraintPtr->constraintJointPathVec[1]->jacobianWholeBody(), wholeBodyConstraintPtr->constraintJointPathVec[1]->commonJointIdSet());
 
     // Mb,Hb作成
-    Mb = MatrixXd(3,6);
-    Vector3d rc = currentCM - rootLink->p();
-    Mb.block(0,0, 3,3).setIdentity();
-    for(int i = 0; i < 3; ++i)Mb.block(0,3+i, 3,1) = Matrix3::Identity().col(i).cross(rc);
-    Mb *= mBody->mass();
-
-    Hb = MatrixXd(3,6);
-    Hb.block(0,0, 3,3) = MatrixXd::Zero(3,3);
-    // Hb.block(0,3, 3,3) = mBody->rootLink()->subIw;
-    // vector<SubMassInertia> subMassInertias(mBody->numLinks()); calcSubMassInertia( mBody->rootLink(), subMassInertias_);
-    // Matrix3 I_ = subMassInertias_[mBody->rootLink()->index()].Iw;
-    Hb.block(0,3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw;// こっちであってる?
-    // Hb.block(0,3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw + mBody->mass() * D( mBody->centerOfMass() - mBody->rootLink()->p() );
+    MatrixXd Mb = MatrixXd(3,6);
+    MatrixXd Hb = MatrixXd(3,6);
+    Mb = extractMatrix(M, wholeBodyConstraintPtr->complementJointIdSet()).block(0,wholeBodyConstraintPtr->freeJointIdSet().size(), M.rows(),6);
+    Hb = extractMatrix(H, wholeBodyConstraintPtr->complementJointIdSet()).block(0,wholeBodyConstraintPtr->freeJointIdSet().size(), H.rows(),6);
 
     Mb = Mb - Ml * Fl - Mr * Fr;// 脚は左右とも動かない
     Hb = Hb - Hl * Fl - Hr * Fr;
 
     // A_を計算
     A_ = MatrixXd(6, Mb.cols()+Mfree.cols() );
-    A_.block(0,0, Mb.rows(),Mb.cols()) = Mb;
-    A_.block(0,Mb.cols(), Mfree.rows(),Mfree.cols()) = Mfree;
-    A_.block(Mb.rows(),0, Hb.rows(),Hb.cols()) = Hb;
-    A_.block(Mb.rows(),Mb.cols(), Hfree.rows(),Hfree.cols()) = Hfree;
+    A_.block(0,0,                       Mfree.rows(),Mfree.cols()) = Mfree;
+    A_.block(0,Mfree.cols(),            Mb.rows(),   Mb.cols())    = Mb;
+    A_.block(Mfree.rows(),0,            Hfree.rows(),Hfree.cols()) = Hfree;
+    A_.block(Mfree.rows(),Mfree.cols(), Hb.rows(),Hb.cols())       = Hb;
 
     // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
     // Hrleg = H.block(0,mBody->link("RLEG_JOINT0")->jointId, 3,mJpr->numJoints());
@@ -633,26 +601,29 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
 
             // 足先速度調査
-            Vector3d lv,lw,rv,rw, lp, rp;
-            Matrix3d lR,rR;
             (BodyMotion::ConstFrame) motion->frame(nextFrame) >> *mBody;
             mBody->calcForwardKinematics();
-            lp = mLFootLink->p(); rp = mRFootLink->p();
-            lR = mLFootLink->R(); rR = mRFootLink->R();
+            for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
+                Link* link = jointPathPtr->endLink();
+                jointPathPtr->se3.translation() = link->p();
+                jointPathPtr->se3.rotation() = link->R();
+            }
             (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *mBody;
             mBody->calcForwardKinematics();
-            lv = ( lp - mLFootLink->p() ) /dt;
-            rv = ( rp - mRFootLink->p() ) /dt;
-            AngleAxis laa  = AngleAxis( lR * mLFootLink->R().inverse() );
-            AngleAxis raa  = AngleAxis( rR * mRFootLink->R().inverse() );
-            lw = laa.axis() * laa.angle()/dt;
-            rw = raa.axis() * raa.angle()/dt;
+            for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
+                Link* link = jointPathPtr->endLink();
+                jointPathPtr->twist.segment(0,3) = ( jointPathPtr->se3.translation() - link->p() ) /dt;
+                AngleAxis aa  = AngleAxis( link->R().inverse() * jointPathPtr->se3.rotation().toRotationMatrix() );
+                jointPathPtr->twist.segment(3,3) = link->R() * aa.axis()*aa.angle()/dt;
+            }
 
             // q,dq,ddq,rootLink p,R,v,w更新
             updateBodyState(mBody, motion, currentFrame);
 
             mBody->calcForwardKinematics(true,true);// 状態更新
             calcSubMass(mBody->rootLink(), mSubMasses);
+
+            wholeBodyConstraintPtr->update();
 
             VectorXd xib(6);// xib
             xib.block(0,0, 3,1) = mBody->rootLink()->v();
@@ -669,61 +640,55 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             // step 2
             // cout << " step2";
-            MatrixXd A,A_,Jl,Jr,Fl,Fr,M,H,Mb,Mfree,Hb,Hfree,Ml,Mr,Hl,Hr;
-            vector<Constraint> jointConstraintVec;
-            calcMatrixies( A_, Jl, Jr, Fl, Fr,M,H,Mb,Mfree,Hb,Hfree, Ml, Mr, Hl, Hr, jointConstraintVec);
+            MatrixXd A,A_,M,H;
+            calcMatrixies(A_, M,H);
             A = S * A_;
 
-            int dof = 0;// free関節の数
-            for(int i = 0; i < jointConstraintVec.size(); ++i)if(jointConstraintVec[i] == Free)++dof;
+            int dof = wholeBodyConstraintPtr->freeJointIdSet().size();
 
             // cout << " Finished Step 2" << endl;
 
             // step 3 y計算
             // cout << " step3";
             // 目標足先速度
-            VectorXd xil(6);// xil
-            xil.block(0,0, 3,1) = lv;
-            xil.block(3,0, 3,1) = lw;
-            VectorXd xir(6);// xir
-            xir.block(0,0, 3,1) = rv;
-            xir.block(3,0, 3,1) = rw;
 
             VectorXd refM(6);
             refM.block(0,0, 3,1) = refPSeqPtr->at(currentFrame);
             refM.block(3,0, 3,1) = refLSeqPtr->at(currentFrame);
-            MatrixXd MHl(6,6);
-            MHl.block(0,0, 3,6) = Ml; MHl.block(3,0, 3,6) = Hl;
-            MatrixXd MHr(6,6);
-            MHr.block(0,0, 3,6) = Mr; MHr.block(3,0, 3,6) = Hr;
             VectorXd y(numSelects);
-            y = S * (refM  - MHl * xil - MHr * xir);
+            y = refM;
+            for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
+                MatrixXd MH(6,6);
+                MH.block(0,0, 3,6) = extractMatrix(M, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
+                MH.block(3,0, 3,6) = extractMatrix(H, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
+                y -= MH * jointPathPtr->twist;
+            }
+            y = S*y;
 
             // cout << " Finished Step 3" << endl;
 
             // step 4 腰座標速度,free関節角速度計算 目標量から制御量の算出
             // cout << " step4";
             VectorXd dqfree(dof); // dqfree
-            int idx = 0;
-            for(int i = 0; i < mBody->numJoints(); ++i){
-                if(jointConstraintVec[i] == Free){
-                    dqfree[idx] = mBody->joint(i)->dq();// 目標free関節速度
-                    ++idx;
-                }
-            }
+            VectorXd currentDq(mBody->numJoints());
+            for(int i=0; i<mBody->numJoints(); ++i) currentDq(i) = mBody->joint(i)->dq();
+            dqfree = wholeBodyConstraintPtr->jointExtendMatrix().block(0,0, mBody->numJoints(),wholeBodyConstraintPtr->freeJointIdSet().size()).transpose() * currentDq;
             // ss << "ref dqfree " << dqfree.transpose() << endl << endl;
 
             VectorXd valVec( 6 + dof );
-            valVec.block(0,0, 6,1) = xib;
-            valVec.block(6,0, dof,1) = dqfree;
+            valVec.head(dof) = dqfree;
+            valVec.tail(6) = xib;
 
             // ss << "ref valVec " << valVec.transpose() << endl;
+
+            VectorXd dq = VectorXd::Zero(mBody->numJoints()+6);
 
             MatrixXd Ainv;
             Ainv = PseudoInverse(A);// 正方行列でない場合inverseは使えない
             valVec = Ainv * y + ( MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A ) * valVec;
-            xib = valVec.block(0,0, 6,1);
-            dqfree = valVec.block(6,0, dof,1);
+            xib = valVec.tail(6);
+
+            dq += wholeBodyConstraintPtr->jointExtendMatrix() * valVec;
 
             // cout << endl;
             // cout << "S " << endl << S << endl;
@@ -750,34 +715,15 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             // step 5 脚関節角速度計算
             // cout << " step5";
-            VectorXd dql((mBody->numJoints() - dof) / 2);
-            VectorXd dqr((mBody->numJoints() - dof) / 2);
-            dql = inverseJacobian(mJpl) * (xil - Fl * xib);
-            dqr = inverseJacobian(mJpr) * (xir - Fr * xib);
-
+            for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
+                MatrixXd F = extractMatrix(jointPathPtr->jacobianWholeBody(), jointPathPtr->commonJointIdSet());
+                dq += jointPathPtr->jointExtendMatrix() * inverseJacobian((JointPathPtr&) jointPathPtr) * (jointPathPtr->twist - F * xib);
+            }
 
             // cout << " Finished Step 5" << endl;
 
             // step 6 関節角速度計算
             // cout << " step6";
-            VectorXd dq(mBody->numJoints());
-            int freeIdx = 0,llegIdx = 0,rlegIdx = 0;
-            for(int i = 0; i < mBody->numJoints(); ++i){
-                switch (jointConstraintVec[i]){
-                case Free:
-                    dq[i] = dqfree[freeIdx]; ++freeIdx;
-                    break;
-                case LLEG:
-                    dq[i] = dql[llegIdx]; ++llegIdx;
-                    break;
-                case RLEG:
-                    dq[i] = dqr[rlegIdx]; ++rlegIdx;
-                    break;
-                default:
-                    MessageView::instance()->putln("register the type of constraint");
-                    break;
-                }
-            }
             // ss << "dqfree " << dqfree.transpose() << endl;
             // cout << "dq " << dq.transpose() << endl;
 
@@ -788,7 +734,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             if(omega.norm() != 0) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
             else cout << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
 
-
             // // BaseLink更新
             // mBody->link(BASE_LINK)->p += mBody->link(BASE_LINK)->v() * dt;
             // Vector3d omega = mBody->link(BASE_LINK)->w();
@@ -796,7 +741,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             // q更新
             for(int i = 0; i < mBody->numJoints(); ++i){
-                mBody->joint(i)->q() += dq[i] * dt;
+                mBody->joint(i)->q() += dq[mBody->joint(i)->jointId()] * dt;
             }
             mBody->calcForwardKinematics();// 状態更新
             // bodyItems[0]->calcForwardKinematics();// 状態更新
@@ -828,8 +773,8 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 for(auto link : endEffectorLinkVec){
                     // eeOfs << " " << link->p().transpose() << " " << link->v().transpose() << " " << link->w().transpose();
                     eeOfs << " " << link->p().transpose();
-                    if( link->name().find("LLEG") != std::string::npos ) eeOfs << " " << lv.transpose() << " " << lw.transpose();
-                    else if ( link->name().find("RLEG") != std::string::npos ) eeOfs << " " << rv.transpose() << " " << rw.transpose();
+                    if( link->name().find("LLEG") != std::string::npos ) eeOfs << " " << wholeBodyConstraintPtr->constraintJointPathVec[0]->twist.transpose();
+                    else if ( link->name().find("RLEG") != std::string::npos ) eeOfs << " " << wholeBodyConstraintPtr->constraintJointPathVec[1]->twist.transpose();
                     else eeOfs << " " << link->v().transpose() << " " << link->w().transpose();
                 }
                 eeOfs << endl;
@@ -877,10 +822,11 @@ void RMControlPlugin::execControl()
     mLFootLink = mBody->link( (*footLinkInfos[1].toMapping())["link"].toString() );
     cout << " Finished setting foot links" << endl;
 
-
     // 左右足Pathを設定
-    mJpl = getCustomJointPath( mBody, mBody->rootLink(), mLFootLink );
-    mJpr = getCustomJointPath( mBody, mBody->rootLink(), mRFootLink );
+    wholeBodyConstraintPtr = std::make_shared<WholeBodyConstraint>(mBody);
+    wholeBodyConstraintPtr->constraintJointPathVec.push_back(std::make_shared<ConstraintJointPath>(mBody->rootLink(), mLFootLink));
+    wholeBodyConstraintPtr->constraintJointPathVec.push_back(std::make_shared<ConstraintJointPath>(mBody->rootLink(), mRFootLink));
+
 
     BodyItemPtr bodyItem;
     PoseSeqItemPtr poseSeqItem;
