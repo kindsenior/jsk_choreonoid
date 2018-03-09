@@ -91,10 +91,13 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
 
 
     // A_を計算
-    A_ = MatrixXd(MH.cols(), wholeBodyConstraintPtr->complementJointIdSet().size());
-    A_ = extractMatrix(MH, wholeBodyConstraintPtr->complementJointIdSet());
+    // A_ = MatrixXd(MH.cols(), wholeBodyConstraintPtr->complementJointIdSet().size());
+    // A_ = extractMatrix(MH, wholeBodyConstraintPtr->complementJointIdSet());
+    A_ = MatrixXd(MH.cols(), mBody->numJoints()+6);
+    A_ = MH * wholeBodyConstraintPtr->complementJointWeightMatrix();
     for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec){
-        A_ -= extractMatrix(MH, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr) * extractMatrix(jointPathPtr->jacobianWholeBody(), wholeBodyConstraintPtr->complementJointIdSet());
+        // A_ -= extractMatrix(MH, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr) * extractMatrix(jointPathPtr->jacobianWholeBody(), wholeBodyConstraintPtr->complementJointIdSet());
+        A_ -= MH * jointPathPtr->exclusiveJointWeightMatrix() * PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix())) * jointPathPtr->jacobianWholeBody()*jointPathPtr->complementJointWeightMatrix();
     }
 
     // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
@@ -629,7 +632,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             calcMatrixies(A_, M,H);
             A = S * A_;
 
-            int dof = wholeBodyConstraintPtr->freeJointIdSet().size();
+            // int dof = wholeBodyConstraintPtr->freeJointIdSet().size();
 
             // cout << " Finished Step 2" << endl;
 
@@ -644,8 +647,10 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             y = refM;
             for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
                 MatrixXd MH(6,6);
-                MH.block(0,0, 3,6) = extractMatrix(M, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
-                MH.block(3,0, 3,6) = extractMatrix(H, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
+                // MH.block(0,0, 3,6) = extractMatrix(M, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
+                // MH.block(3,0, 3,6) = extractMatrix(H, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
+                MH.block(0,0, 3,6) = M * jointPathPtr->exclusiveJointWeightMatrix() * PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix()));
+                MH.block(3,0, 3,6) = H * jointPathPtr->exclusiveJointWeightMatrix() * PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix()));
                 y -= MH * jointPathPtr->twist;
             }
             y = S*y;
@@ -654,14 +659,19 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             // step 4 腰座標速度,free関節角速度計算 目標量から制御量の算出
             // cout << " step4";
-            VectorXd currentDq(mBody->numJoints());
-            for(int i=0; i<mBody->numJoints(); ++i) currentDq(i) = mBody->joint(i)->dq();
+            VectorXd refdq(mBody->numJoints()+6);
+            for(int i=0; i<mBody->numJoints(); ++i) refdq(i) = mBody->joint(i)->dq();
+            refdq.segment(mBody->numJoints(),3) = mBody->rootLink()->v();
+            refdq.segment(mBody->numJoints()+3,3) = mBody->rootLink()->w();
+            // VectorXd currentDq(mBody->numJoints());
+            // for(int i=0; i<mBody->numJoints(); ++i) currentDq(i) = mBody->joint(i)->dq();
             // ss << "ref dqfree " << dqfree.transpose() << endl << endl;
 
-            VectorXd valVec( 6 + dof );
-            valVec.head(dof) = wholeBodyConstraintPtr->jointExtendMatrix().block(0,0, mBody->numJoints(),wholeBodyConstraintPtr->freeJointIdSet().size()).transpose() * currentDq;
-            valVec.segment(dof,3) = mBody->rootLink()->v();
-            valVec.segment(dof+3,3) = mBody->rootLink()->w();
+            // VectorXd valVec( 6 + dof );
+            // valVec.head(dof) = wholeBodyConstraintPtr->jointExtendMatrix().block(0,0, mBody->numJoints(),wholeBodyConstraintPtr->freeJointIdSet().size()).transpose() * currentDq;
+            // valVec.segment(dof,3) = mBody->rootLink()->v();
+            // valVec.segment(dof+3,3) = mBody->rootLink()->w();
+            VectorXd valVec = wholeBodyConstraintPtr->complementJointWeightMatrix() * refdq;
 
             // ss << "ref valVec " << valVec.transpose() << endl;
 
@@ -669,9 +679,9 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             MatrixXd Ainv;
             Ainv = PseudoInverse(A);// 正方行列でない場合inverseは使えない
-            valVec = Ainv * y + ( MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A ) * valVec;
-
-            dq += wholeBodyConstraintPtr->jointExtendMatrix() * valVec;
+            // valVec = Ainv * y + ( MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A ) * valVec;
+            dq = Ainv * y + ( MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A ) * valVec;
+            // dq += wholeBodyConstraintPtr->jointExtendMatrix() * valVec;
 
             // cout << endl;
             // cout << "S " << endl << S << endl;
@@ -699,8 +709,10 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             // step 5 脚関節角速度計算
             // cout << " step5";
             for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
-                MatrixXd F = extractMatrix(jointPathPtr->jacobianWholeBody(), jointPathPtr->commonJointIdSet());
-                dq += jointPathPtr->jointExtendMatrix() * inverseJacobian((JointPathPtr&) jointPathPtr) * (jointPathPtr->twist - F * dq.segment(mBody->numJoints(),6));
+                // MatrixXd F = extractMatrix(jointPathPtr->jacobianWholeBody(), jointPathPtr->commonJointIdSet());
+                // dq += jointPathPtr->jointExtendMatrix() * inverseJacobian((JointPathPtr&) jointPathPtr) * (jointPathPtr->twist - F * dq.segment(mBody->numJoints(),6));
+                MatrixXd F = jointPathPtr->jacobianWholeBody() * jointPathPtr->complementJointWeightMatrix();
+                dq += PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix())) * (jointPathPtr->twist - F * dq);
             }
 
             // cout << " Finished Step 5" << endl;
