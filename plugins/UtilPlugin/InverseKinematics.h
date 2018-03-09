@@ -116,10 +116,9 @@ public:
         complementJointIdSet_ = freeJointIdSet_;
         for(int i=0; i<numVirtualBaseJoints_; ++i) complementJointIdSet_.insert(numBodyJoints_+i);
 
-        jointExtendMat_ = MatrixXd::Zero(numTotalJoints_, freeJointIdSet_.size()+numVirtualBaseJoints_);
-        std::set<int>::iterator iter = freeJointIdSet_.begin();
-        for(int i=0; i<freeJointIdSet_.size(); ++i,++iter) jointExtendMat_(*iter,i) = 1;
-        for(int i=0; i<numVirtualBaseJoints_; ++i) jointExtendMat_(numBodyJoints_+i,freeJointIdSet_.size()+i) = 1;
+        jointExtendMat_ = MatrixXd::Zero(numTotalJoints_, complementJointIdSet_.size());
+        std::set<int>::iterator iter = complementJointIdSet_.begin();
+        for(int i=0; i<complementJointIdSet_.size(); ++i,++iter) jointExtendMat_(*iter,i) = 1;
 
     }
 
