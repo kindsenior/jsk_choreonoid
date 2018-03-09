@@ -61,7 +61,7 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
     stringstream ss;
 
     // 重心
-    const Vector3d currentCM = mBody->calcCenterOfMass();
+    // const Vector3d currentCM = mBody->calcCenterOfMass();
 
     // Ml Mr Hl Hr作成
     // MatrixXd M,H;
@@ -608,6 +608,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             updateBodyState(mBody, motion, currentFrame);
 
             mBody->calcForwardKinematics(true,true);// 状態更新
+            mBody->calcCenterOfMass(); // update wc
             calcSubMass(mBody->rootLink(), mSubMasses);
 
             wholeBodyConstraintPtr->update();
@@ -745,10 +746,11 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 mBody->rootLink()->v() = dq.segment(mBody->numJoints(),3);
                 mBody->rootLink()->w() = dq.segment(mBody->numJoints()+3,3);
                 Vector3d P,L;
+                mBody->calcCenterOfMass();// update wc
                 calcSubMass(mBody->rootLink(), mSubMasses);// リンク先重心・慣性行列更新
                 calcTotalMomentum(P, L, mBody, mSubMasses[mBody->rootLink()->index()].Iw, dq);
 
-                ofs << " "  << mBody->calcCenterOfMass().transpose();// 重心 2,3,4
+                ofs << " "  << mBody->centerOfMass().transpose();// 重心 2,3,4
                 ofs << " " << P.transpose() << " " << L.transpose();// 運動量 5,6,7 角運動量 8,9,10
                 ofs << endl;
 
