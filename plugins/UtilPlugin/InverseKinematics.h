@@ -20,7 +20,7 @@ Eigen::MatrixXd SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weight_mat,
 
 Eigen::MatrixXd inverseJacobian(JointPathPtr& jp);
 
-MatrixXd extractMatrix(const MatrixXd& m, const std::set<int>& jointIdSet);
+MatrixXd extractMatrixColumn(const MatrixXd& m, const std::set<int>& jointIdSet);
 
 class ConstraintJointPath : public JointPath
 {

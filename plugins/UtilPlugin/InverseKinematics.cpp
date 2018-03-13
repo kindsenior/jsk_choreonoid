@@ -57,7 +57,7 @@ Eigen::MatrixXd cnoid::inverseJacobian(JointPathPtr& jp)
     return SRInverse(J, weight_mat);
 }
 
-MatrixXd cnoid::extractMatrix(const MatrixXd& m, const std::set<int>& jointIndexSet) {
+MatrixXd cnoid::extractMatrixColumn(const MatrixXd& m, const std::set<int>& jointIndexSet) {
     double numJoints = jointIndexSet.size();
     MatrixXd ret;
     ret.resize(m.rows(),numJoints);
