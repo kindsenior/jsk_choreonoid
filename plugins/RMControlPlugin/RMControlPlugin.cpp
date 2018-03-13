@@ -96,8 +96,8 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
     A_ = MatrixXd(MH.cols(), mBody->numJoints()+6);
     A_ = MH * wholeBodyConstraintPtr->complementJointWeightMatrix();
     for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec){
-        // A_ -= extractMatrixColumn(MH, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr) * extractMatrixColumn(jointPathPtr->jacobianWholeBody(), wholeBodyConstraintPtr->complementJointIdSet());
-        A_ -= MH * jointPathPtr->exclusiveJointWeightMatrix() * PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix())) * jointPathPtr->jacobianWholeBody()*jointPathPtr->complementJointWeightMatrix();
+        // A_ -= extractMatrixColumn(MH, jointPathPtr->exclusiveJointIdSet()) * jointPathPtr->inverseJacobian() * extractMatrixColumn(jointPathPtr->jacobianWholeBody(), wholeBodyConstraintPtr->complementJointIdSet());
+        A_ -= MH * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix()*jointPathPtr->inverseJacobian() * jointPathPtr->jacobianWholeBody()*jointPathPtr->complementJointWeightMatrix();
     }
 
     // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
@@ -647,10 +647,10 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             y = refM;
             for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
                 MatrixXd MH(6,6);
-                // MH.block(0,0, 3,6) = extractMatrixColumn(M, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
-                // MH.block(3,0, 3,6) = extractMatrixColumn(H, jointPathPtr->exclusiveJointIdSet()) * inverseJacobian((JointPathPtr&) jointPathPtr);
-                MH.block(0,0, 3,6) = M * jointPathPtr->exclusiveJointWeightMatrix() * PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix()));
-                MH.block(3,0, 3,6) = H * jointPathPtr->exclusiveJointWeightMatrix() * PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix()));
+                // MH.block(0,0, 3,6) = extractMatrixColumn(M, jointPathPtr->exclusiveJointIdSet()) * jointPathPtr->inverseJacobian();
+                // MH.block(3,0, 3,6) = extractMatrixColumn(H, jointPathPtr->exclusiveJointIdSet()) * jointPathPtr->inverseJacobian();
+                MH.block(0,0, 3,6) = M * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix() * jointPathPtr->inverseJacobian();
+                MH.block(3,0, 3,6) = H * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix() * jointPathPtr->inverseJacobian();
                 y -= MH * jointPathPtr->twist;
             }
             y = S*y;
@@ -710,9 +710,9 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             // cout << " step5";
             for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
                 // MatrixXd F = extractMatrixColumn(jointPathPtr->jacobianWholeBody(), jointPathPtr->commonJointIdSet());
-                // dq += jointPathPtr->jointExtendMatrix() * inverseJacobian((JointPathPtr&) jointPathPtr) * (jointPathPtr->twist - F * dq.segment(mBody->numJoints(),6));
+                // dq += jointPathPtr->jointExtendMatrix() * jointPathPtr->inverseJacobian() * (jointPathPtr->twist - F * dq.segment(mBody->numJoints(),6));
                 MatrixXd F = jointPathPtr->jacobianWholeBody() * jointPathPtr->complementJointWeightMatrix();
-                dq += PseudoInverse((MatrixXd) (jointPathPtr->jacobianWholeBody()*jointPathPtr->exclusiveJointWeightMatrix())) * (jointPathPtr->twist - F * dq);
+                dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix()*jointPathPtr->inverseJacobian() * (jointPathPtr->twist - F * dq);
             }
 
             // cout << " Finished Step 5" << endl;

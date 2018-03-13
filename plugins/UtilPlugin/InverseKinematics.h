@@ -32,6 +32,7 @@ public:
         numTotalJoints_ = numBodyJoints_ + numVirtualBaseJoints_;
 
         jacobianWholeBody_ = MatrixXd::Zero(6,numTotalJoints_);
+        inverseJacobian_.resize(numJoints(),6);
 
         exclusiveJointIdSet_.clear();
         for(int i=0; i<numJoints(); ++i) exclusiveJointIdSet_.insert(this->joint(i)->jointId());
@@ -58,17 +59,8 @@ public:
     }
 
     void update() {
-        // jacobianWholeBody;
-        MatrixXd J;
-        J.resize(6,numJoints()); this->calcJacobian(J);
-        for(int i=0; i<this->numJoints(); ++i) jacobianWholeBody_.col(this->joint(i)->jointId()) = J.col(i);
-
-        J.resize(6,commonJointPathPtr->numJoints()); commonJointPathPtr->calcJacobian(J);
-        for(int i=0; i<commonJointPathPtr->numJoints(); ++i) jacobianWholeBody_.col(commonJointPathPtr->joint(i)->jointId()) = J.col(i);
-
-        jacobianWholeBody_.block(0,numBodyJoints_, 6,numVirtualBaseJoints_) = MatrixXd::Identity(6,numVirtualBaseJoints_);
-        Vector3d vec = this->endLink()->p() - baseLink()->body()->rootLink()->p();
-        for(int i=0; i<3; ++i) jacobianWholeBody_.block(0,numBodyJoints_+3+i, 3,1) = Matrix3::Identity().col(i).cross(vec);
+        // update jacobian
+        updateJacobian();
 
         // update weight
         updateWeight();
@@ -79,6 +71,7 @@ public:
 
     MatrixXd& jointExtendMatrix() { return jointExtendMat_; }
     MatrixXd& jacobianWholeBody() { return jacobianWholeBody_; }
+    MatrixXd& inverseJacobian() { return inverseJacobian_; }
     MatrixXd& exclusiveJointWeightMatrix() { return exclusiveJointWeightMat_; }
     MatrixXd& complementJointWeightMatrix() { return complementJointWeightMat_; }
 
@@ -98,10 +91,29 @@ protected:
     std::set<int> commonJointIdSet_;
 
     MatrixXd jacobianWholeBody_;
+    MatrixXd inverseJacobian_;
     MatrixXd jointExtendMat_;
     VectorXd defaultJointWeightVec_;
     VectorXd jointWeightRatioVec_;// 0:free 1:constraint
     MatrixXd exclusiveJointWeightMat_, complementJointWeightMat_;
+
+    void updateJacobian() {
+        // jacobianWholeBody
+        MatrixXd J;
+        J.resize(6,numJoints()); this->calcJacobian(J);
+        for(int i=0; i<this->numJoints(); ++i) jacobianWholeBody_.col(this->joint(i)->jointId()) = J.col(i);
+
+        MatrixXd Jcommon;
+        Jcommon.resize(6,commonJointPathPtr->numJoints()); commonJointPathPtr->calcJacobian(Jcommon);
+        for(int i=0; i<commonJointPathPtr->numJoints(); ++i) jacobianWholeBody_.col(commonJointPathPtr->joint(i)->jointId()) = Jcommon.col(i);
+
+        jacobianWholeBody_.block(0,numBodyJoints_, 6,numVirtualBaseJoints_) = MatrixXd::Identity(6,numVirtualBaseJoints_);
+        Vector3d vec = this->endLink()->p() - baseLink()->body()->rootLink()->p();
+        for(int i=0; i<3; ++i) jacobianWholeBody_.block(0,numBodyJoints_+3+i, 3,1) = Matrix3::Identity().col(i).cross(vec);
+
+        // inverseJacobian
+        inverseJacobian_ = SRInverse(J);
+    }
 
     void updateWeight() {
         exclusiveJointWeightMat_ = ((VectorXd) (jointExtendMat_ * (jointWeightRatioVec_.asDiagonal())*defaultJointWeightVec_)).asDiagonal();
