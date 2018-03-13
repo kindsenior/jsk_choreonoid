@@ -65,3 +65,12 @@ MatrixXd cnoid::extractMatrixColumn(const MatrixXd& m, const std::set<int>& join
     for(int i=0; i<numJoints; ++i,++iter) ret.col(i) = m.col(*iter);
     return ret;
 }
+
+MatrixXd cnoid::extractMatrixRow(const MatrixXd& m, const std::set<int>& rowIndexSet) {
+    double numRows = rowIndexSet.size();
+    MatrixXd ret;
+    ret.resize(numRows,m.cols());
+    std::set<int>::iterator iter = rowIndexSet.begin();
+    for(int i=0; i<numRows; ++i,++iter) ret.row(i) = m.row(*iter);
+    return ret;
+}

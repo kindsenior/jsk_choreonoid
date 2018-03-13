@@ -21,6 +21,7 @@ Eigen::MatrixXd SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weight_mat,
 Eigen::MatrixXd inverseJacobian(JointPathPtr& jp);
 
 MatrixXd extractMatrixColumn(const MatrixXd& m, const std::set<int>& jointIdSet);
+MatrixXd extractMatrixRow(const MatrixXd& m, const std::set<int>& rowIndexSet);
 
 class ConstraintJointPath : public JointPath
 {
@@ -112,7 +113,28 @@ protected:
         for(int i=0; i<3; ++i) jacobianWholeBody_.block(0,numBodyJoints_+3+i, 3,1) = Matrix3::Identity().col(i).cross(vec);
 
         // inverseJacobian
-        inverseJacobian_ = SRInverse(J);
+        std::set<int> priorRowIndexSet{0,1,3,4,5};
+        std::set<int> nonPriorRowIndexSet;
+        for(int i=0; i<6; ++i) if( priorRowIndexSet.find(i) == priorRowIndexSet.end() ) nonPriorRowIndexSet.insert(i);
+        MatrixXd J1 = extractMatrixRow(J, priorRowIndexSet);
+        MatrixXd J2 = extractMatrixRow(J, nonPriorRowIndexSet);
+
+        MatrixXd E = MatrixXd::Identity(this->numJoints(),this->numJoints());
+        MatrixXd pseudoJ1 = PseudoInverse(J1);
+        MatrixXd nullJ1 = E - pseudoJ1*J1;
+
+        MatrixXd J2_ = J2*nullJ1;
+        MatrixXd srInvJ2_ = SRInverse(J2_);
+
+        MatrixXd invJ1 = pseudoJ1 - nullJ1*srInvJ2_*J2*pseudoJ1;
+        MatrixXd invJ2 = nullJ1*srInvJ2_;
+
+        std::set<int>::iterator iter = priorRowIndexSet.begin();
+        for(int i=0; i<priorRowIndexSet.size(); ++i,++iter) inverseJacobian_.col(*iter) = invJ1.col(i);
+        iter = nonPriorRowIndexSet.begin();
+        for(int i=0; i<nonPriorRowIndexSet.size(); ++i,++iter) inverseJacobian_.col(*iter) = invJ2.col(i);
+
+        // inverseJacobian_ = SRInverse(J);
     }
 
     void updateWeight() {
