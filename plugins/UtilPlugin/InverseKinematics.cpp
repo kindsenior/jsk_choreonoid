@@ -29,13 +29,13 @@ t_matrix cnoid::PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6)
 template Eigen::MatrixXd cnoid::PseudoInverse(const Eigen::MatrixXd&, const double&);
 
 // cannot call default argument by reference so have to overload function
-Eigen::MatrixXd cnoid::SRInverse(const Eigen::MatrixXd& m, const double weight, const double manipulability_const)
+Eigen::MatrixXd cnoid::SRInverse(const Eigen::MatrixXd& m, const double weight, const double manipulability_thresh)
 {
     Eigen::MatrixXd w;
-    return SRInverse(m, w, weight, manipulability_const);
+    return SRInverse(m, w, weight, manipulability_thresh);
 }
 
-Eigen::MatrixXd cnoid::SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weight_mat, const double weight, const double manipulability_const)
+Eigen::MatrixXd cnoid::SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weight_mat, const double weight, const double manipulability_thresh)
 {
     const int numCols = m.cols();
     if ( weight_mat.cols() != numCols || weight_mat.rows() != numCols ) {
@@ -43,7 +43,7 @@ Eigen::MatrixXd cnoid::SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weig
     }
 
     double manipulability = sqrt((m*m.transpose()).determinant());
-    return weight_mat*m.transpose() * ((m*weight_mat*m.transpose() + weight*exp(-manipulability/manipulability_const) * Eigen::MatrixXd::Identity(m.rows(),m.rows())).inverse());
+    return weight_mat*m.transpose() * ((m*weight_mat*m.transpose() + (manipulability < manipulability_thresh ? weight*pow(1-manipulability/manipulability_thresh,2) : 0) * Eigen::MatrixXd::Identity(m.rows(),m.rows())).inverse());
 }
 
 // Eigen::MatrixXd cnoid::calcInverseJacobian(const Eigen::MatrixXd& m)
