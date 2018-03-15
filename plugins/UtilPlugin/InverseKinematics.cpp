@@ -6,6 +6,8 @@
 
 using namespace cnoid;
 
+double cnoid::calcManipulability(const MatrixXd& m) { return sqrt((m*m.transpose()).determinant()); }
+
 template <typename t_matrix>
 t_matrix cnoid::PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6)
 {
@@ -42,7 +44,7 @@ Eigen::MatrixXd cnoid::SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weig
         weight_mat = Eigen::MatrixXd::Identity(numCols, numCols);
     }
 
-    double manipulability = sqrt((m*m.transpose()).determinant());
+    double manipulability = calcManipulability(m);
     return weight_mat*m.transpose() * ((m*weight_mat*m.transpose() + (manipulability < manipulability_thresh ? weight*pow(1-manipulability/manipulability_thresh,2) : 0) * Eigen::MatrixXd::Identity(m.rows(),m.rows())).inverse());
 }
 

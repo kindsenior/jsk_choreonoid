@@ -573,7 +573,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             ofs << currentFrame * dt;
             eeOfs << currentFrame * dt;
             // ss << "###########################################################" << endl;
-            // cout << "time " << currentFrame * dt << endl;
+            cout << "\x1b[34m" << "time " << currentFrame * dt << "\x1b[m" << endl;
 
             // prevFrame,nextFrame設定
             int prevFrame = std::max(currentFrame - 1, 0);
