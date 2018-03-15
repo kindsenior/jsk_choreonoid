@@ -97,7 +97,8 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
     A_ = MH * wholeBodyConstraintPtr->complementJointWeightMatrix();
     for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec){
         // A_ -= extractMatrixColumn(MH, jointPathPtr->exclusiveJointIdSet()) * jointPathPtr->inverseJacobian() * extractMatrixColumn(jointPathPtr->jacobianWholeBody(), wholeBodyConstraintPtr->complementJointIdSet());
-        A_ -= MH * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix()*jointPathPtr->inverseJacobian() * jointPathPtr->jacobianWholeBody()*jointPathPtr->complementJointWeightMatrix();
+        A_ -= MH * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix() * jointPathPtr->inverseJacobian() * jointPathPtr->jacobianWholeBody()*jointPathPtr->complementJointWeightMatrix();// disable null-space or use direct refdq
+        // A_ += MH * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix() * jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose());// use modified refdq of null-space
     }
 
     // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
@@ -663,7 +664,8 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 // MH.block(3,0, 3,numJoints) = extractMatrixColumn(H, jointPathPtr->exclusiveJointIdSet());
                 MH.block(0,0, 3,numJoints) = M * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
                 MH.block(3,0, 3,numJoints) = H * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
-                y -= MH  * jointPathPtr->inverseJacobian() * jointPathPtr->twist;
+                y -= MH  * jointPathPtr->inverseJacobian() * jointPathPtr->twist;// use modified refdq or disable refdq of constraint null-space
+                // y -= MH  * (jointPathPtr->inverseJacobian()*jointPathPtr->twist  + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*refdq);// use direct refdq
             }
             y = S*y;
 
@@ -675,7 +677,8 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             // valVec.head(dof) = wholeBodyConstraintPtr->jointExtendMatrix().block(0,0, mBody->numJoints(),wholeBodyConstraintPtr->freeJointIdSet().size()).transpose() * currentDq;
             // valVec.segment(dof,3) = mBody->rootLink()->v();
             // valVec.segment(dof+3,3) = mBody->rootLink()->w();
-            VectorXd valVec = wholeBodyConstraintPtr->complementJointWeightMatrix() * refdq;
+            // VectorXd valVec = wholeBodyConstraintPtr->complementJointWeightMatrix() * refdq;// disable refdq of constraint null-space
+            VectorXd valVec = refdq;// enable refdq of constraint joints
 
             // ss << "ref valVec " << valVec.transpose() << endl;
 
@@ -718,7 +721,9 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 // MatrixXd F = extractMatrixColumn(jointPathPtr->jacobianWholeBody(), jointPathPtr->commonJointIdSet());
                 // dq += jointPathPtr->jointExtendMatrix() * jointPathPtr->inverseJacobian() * (jointPathPtr->twist - F * dq.segment(mBody->numJoints(),6));
                 MatrixXd F = jointPathPtr->jacobianWholeBody() * jointPathPtr->complementJointWeightMatrix();
-                dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix()*jointPathPtr->inverseJacobian() * (jointPathPtr->twist - F * dq);
+                dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix()*jointPathPtr->inverseJacobian() * (jointPathPtr->twist - F * dq);// disable dq of constraint null-space
+                // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix() * (jointPathPtr->inverseJacobian()*(jointPathPtr->twist-F*dq) + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*refdq);// use direct refdq
+                // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix() * (jointPathPtr->inverseJacobian()*(jointPathPtr->twist-F*dq) + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*valVec);// use modified refdq
             }
 
             // cout << " Finished Step 5" << endl;

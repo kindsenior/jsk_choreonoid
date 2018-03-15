@@ -35,6 +35,7 @@ public:
         numTotalJoints_ = numBodyJoints_ + numVirtualBaseJoints_;
 
         jacobianWholeBody_ = MatrixXd::Zero(6,numTotalJoints_);
+        jacobianNullSpace_.resize(numJoints(),numJoints());
         inverseJacobian_.resize(numJoints(),6);
 
         exclusiveJointIdSet_.clear();
@@ -74,6 +75,7 @@ public:
 
     MatrixXd& jointExtendMatrix() { return jointExtendMat_; }
     MatrixXd& jacobianWholeBody() { return jacobianWholeBody_; }
+    MatrixXd& jacobianNullSpace() { return jacobianNullSpace_; }
     MatrixXd& inverseJacobian() { return inverseJacobian_; }
     MatrixXd& exclusiveJointWeightMatrix() { return exclusiveJointWeightMat_; }
     MatrixXd& complementJointWeightMatrix() { return complementJointWeightMat_; }
@@ -94,6 +96,7 @@ protected:
     std::set<int> commonJointIdSet_;
 
     MatrixXd jacobianWholeBody_;
+    MatrixXd jacobianNullSpace_;
     MatrixXd inverseJacobian_;
     MatrixXd jointExtendMat_;
     VectorXd defaultJointWeightVec_;
@@ -130,6 +133,9 @@ protected:
 
         MatrixXd invJ1 = pseudoJ1 - nullJ1*srInvJ2_*J2*pseudoJ1;
         MatrixXd invJ2 = nullJ1*srInvJ2_;
+
+        jacobianNullSpace_ = threshMatrix(nullJ1*threshMatrix(E - srInvJ2_*J2_));
+        // jacobianNullSpace_ = MatrixXd::Zero(this->numJoints(),this->numJoints());// disable null-space
 
         std::set<int>::iterator iter = priorRowIndexSet.begin();
         for(int i=0; i<priorRowIndexSet.size(); ++i,++iter) inverseJacobian_.col(*iter) = invJ1.col(i);
