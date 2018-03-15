@@ -209,6 +209,8 @@ protected:
             exclusiveJointWeightMat_ += jointPathPtr->exclusiveJointWeightMatrix(); // not overlap because ConstraintJointPath is exclusive, so just adding
         }
         complementJointWeightMat_ = MatrixXd::Identity(numTotalJoints_,numTotalJoints_) - exclusiveJointWeightMat_;
+        // complementJointWeightMat_.block(0,0, numBodyJoints_,numBodyJoints_) = MatrixXd::Zero(numBodyJoints_,numBodyJoints_);// disable free joint (including half gain constraint joints)
+        for(auto idx : freeJointIdSet_) complementJointWeightMat_(idx,idx) = 0;// disable chest (or arm) joint
     }
 };
 
