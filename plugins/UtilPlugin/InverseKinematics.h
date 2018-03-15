@@ -17,8 +17,8 @@ MatrixXd threshMatrix(const MatrixXd& m, double thresh = 1e-4);
 template <typename t_matrix>
 t_matrix PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6);
 
-Eigen::MatrixXd SRInverse(const Eigen::MatrixXd& m, const double weight = 1, const double manipulability_thresh = 0.05);
-Eigen::MatrixXd SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weight_mat, const double weight = 1, const double manipulability_thresh = 0.05);
+Eigen::MatrixXd SRInverse(const Eigen::MatrixXd& m, const double weight = 1, const double manipulability_thresh = 0.07);
+Eigen::MatrixXd SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weight_mat, const double weight = 1, const double manipulability_thresh = 0.07);
 
 Eigen::MatrixXd inverseJacobian(JointPathPtr& jp);
 
