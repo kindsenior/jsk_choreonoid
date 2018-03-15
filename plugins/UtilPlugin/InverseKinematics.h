@@ -12,6 +12,8 @@
 
 namespace cnoid {
 
+MatrixXd threshMatrix(const MatrixXd& m, double thresh = 1e-4);
+
 template <typename t_matrix>
 t_matrix PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6);
 
@@ -121,7 +123,7 @@ protected:
 
         MatrixXd E = MatrixXd::Identity(this->numJoints(),this->numJoints());
         MatrixXd pseudoJ1 = PseudoInverse(J1);
-        MatrixXd nullJ1 = E - pseudoJ1*J1;
+        MatrixXd nullJ1 = threshMatrix(E - pseudoJ1*J1);
 
         MatrixXd J2_ = J2*nullJ1;
         MatrixXd srInvJ2_ = SRInverse(J2_);

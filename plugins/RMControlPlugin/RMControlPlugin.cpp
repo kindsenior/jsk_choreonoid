@@ -681,7 +681,9 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             MatrixXd Ainv;
             Ainv = PseudoInverse(A);// 正方行列でない場合inverseは使えない
             // valVec = Ainv * y + ( MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A ) * valVec;
-            dq = Ainv * y + ( MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A ) * valVec;
+            MatrixXd AnullSpace = MatrixXd::Identity(valVec.rows(),valVec.rows()) - Ainv * A;
+            AnullSpace = threshMatrix(AnullSpace);
+            dq = Ainv * y + AnullSpace * wholeBodyConstraintPtr->complementJointWeightMatrix() * valVec;// disable dq of constraint joints
             // dq += wholeBodyConstraintPtr->jointExtendMatrix() * valVec;
 
             // cout << endl;

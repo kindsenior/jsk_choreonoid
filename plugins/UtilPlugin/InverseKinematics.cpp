@@ -57,6 +57,18 @@ Eigen::MatrixXd cnoid::inverseJacobian(JointPathPtr& jp)
     return SRInverse(J, weight_mat);
 }
 
+MatrixXd cnoid::threshMatrix(const MatrixXd& m, double thresh) {
+    MatrixXd ret;
+    int numRows = m.rows(), numCols = m.cols();
+    ret.resize(numRows,numCols);
+    for(int i=0; i<numRows; ++i){
+        for(int j=0; j<numCols; ++j) {
+            ret(i,j) = fabs(m(i,j)) > thresh ? m(i,j) : 0;
+        }
+    }
+    return ret;
+}
+
 MatrixXd cnoid::extractMatrixColumn(const MatrixXd& m, const std::set<int>& jointIndexSet) {
     double numJoints = jointIndexSet.size();
     MatrixXd ret;
