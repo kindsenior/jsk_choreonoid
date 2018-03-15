@@ -130,13 +130,14 @@ protected:
         for(int i=0; i<3; ++i) jacobianWholeBody_.block(0,numBodyJoints_+3+i, 3,1) = Matrix3::Identity().col(i).cross(vec);
 
         // inverseJacobian
+        MatrixXd E = MatrixXd::Identity(this->numJoints(),this->numJoints());
+        // priority IK
         std::set<int> priorRowIndexSet{0,1,3,4,5};
         std::set<int> nonPriorRowIndexSet;
         for(int i=0; i<6; ++i) if( priorRowIndexSet.find(i) == priorRowIndexSet.end() ) nonPriorRowIndexSet.insert(i);
         MatrixXd J1 = extractMatrixRow(J, priorRowIndexSet);
         MatrixXd J2 = extractMatrixRow(J, nonPriorRowIndexSet);
 
-        MatrixXd E = MatrixXd::Identity(this->numJoints(),this->numJoints());
         MatrixXd pseudoJ1 = PseudoInverse(J1);
         MatrixXd nullJ1 = threshMatrix(E - pseudoJ1*J1);
 
@@ -154,7 +155,9 @@ protected:
         iter = nonPriorRowIndexSet.begin();
         for(int i=0; i<nonPriorRowIndexSet.size(); ++i,++iter) inverseJacobian_.col(*iter) = invJ2.col(i);
 
+        // SRinverse
         // inverseJacobian_ = SRInverse(J);
+        // jacobianNullSpace_ = threshMatrix(E-inverseJacobian_*J);
     }
 
     void updateWeight() {
