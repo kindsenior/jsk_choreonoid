@@ -475,6 +475,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
     Vector3SeqPtr refPSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("refP")->seq();
     Vector3SeqPtr refLSeqPtr = bodyMotionItem->findSubItem<Vector3SeqItem>("refL")->seq();
+    MultiValueSeqPtr initdqSeqPtr = bodyMotionItem->findSubItem<MultiValueSeqItem>("initdq")->seq();
 
     stringstream ss,fnamess;
 
@@ -638,7 +639,17 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             // step 3 y計算
             // cout << " step3";
-            // 目標足先速度
+            // 目標関節・足先速度
+            VectorXd refdq(mBody->numJoints()+6);
+            // for(int i=0; i<mBody->numJoints(); ++i) refdq(i) = mBody->joint(i)->dq();
+            MultiValueSeq::Frame frame = initdqSeqPtr->frame(currentFrame);
+            for(int i=0; i<mBody->numJoints(); ++i){
+                refdq[i] = frame[mBody->joint(i)->index()];
+            }
+            refdq.segment(mBody->numJoints(),3) = mBody->rootLink()->v();
+            refdq.segment(mBody->numJoints()+3,3) = mBody->rootLink()->w();
+            // VectorXd currentDq(mBody->numJoints());
+            // for(int i=0; i<mBody->numJoints(); ++i) currentDq(i) = refdq(i);
 
             VectorXd refM(6);
             refM.block(0,0, 3,1) = refPSeqPtr->at(currentFrame);
@@ -660,14 +671,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             // step 4 腰座標速度,free関節角速度計算 目標量から制御量の算出
             // cout << " step4";
-            VectorXd refdq(mBody->numJoints()+6);
-            for(int i=0; i<mBody->numJoints(); ++i) refdq(i) = mBody->joint(i)->dq();
-            refdq.segment(mBody->numJoints(),3) = mBody->rootLink()->v();
-            refdq.segment(mBody->numJoints()+3,3) = mBody->rootLink()->w();
-            // VectorXd currentDq(mBody->numJoints());
-            // for(int i=0; i<mBody->numJoints(); ++i) currentDq(i) = mBody->joint(i)->dq();
-            // ss << "ref dqfree " << dqfree.transpose() << endl << endl;
-
             // VectorXd valVec( 6 + dof );
             // valVec.head(dof) = wholeBodyConstraintPtr->jointExtendMatrix().block(0,0, mBody->numJoints(),wholeBodyConstraintPtr->freeJointIdSet().size()).transpose() * currentDq;
             // valVec.segment(dof,3) = mBody->rootLink()->v();

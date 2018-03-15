@@ -93,6 +93,7 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
     const int frameRate = motion->frameRate();
     const double dt = 1.0/frameRate;
     const double m = body->mass();
+    const int numJoints = body->numJoints();
 
     stringstream ss;
     ss << poseSeqPath.stem().string() << "_initCM_" << frameRate << "fps.dat";
@@ -110,6 +111,8 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
     Vector3SeqPtr initCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM");
     Vector3SeqPtr initPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initP");
     Vector3SeqPtr initLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initL");
+    MultiValueSeqPtr initdqSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("initdq");
+    initdqSeqPtr->setNumParts(numJoints,true);
     int numFrames = motion->numFrames();
 
     cout << " numFrames: " << numFrames << endl;
@@ -130,6 +133,9 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
         initPSeqPtr->at(i) = P;
         initLSeqPtr->at(i) = L;
 
+        MultiValueSeq::Frame frame = initdqSeqPtr->frame(i);
+        for(int j=0; j<numJoints; ++j) frame[j] = body->link(j)->dq();
+
         ofs << i*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
         eeOfs << i*dt;
         for(auto link : endEffectorLinkVec){
@@ -140,6 +146,7 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
     setSubItem("initCM", initCMSeqPtr, bodyMotionItemPtr);
     setSubItem("initP", initPSeqPtr, bodyMotionItemPtr);
     setSubItem("initL", initLSeqPtr, bodyMotionItemPtr);
+    setSubItem("initdq", initdqSeqPtr, bodyMotionItemPtr);
 
     ofs.close();
     eeOfs.close();
