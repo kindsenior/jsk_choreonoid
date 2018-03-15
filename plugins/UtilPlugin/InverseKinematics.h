@@ -10,6 +10,8 @@
 #include <cnoid/JointPath>
 #include <cnoid/Body>
 
+#include "Filter.h"
+
 namespace cnoid {
 
 MatrixXd threshMatrix(const MatrixXd& m, double thresh = 1e-4);
@@ -28,7 +30,10 @@ MatrixXd extractMatrixRow(const MatrixXd& m, const std::set<int>& rowIndexSet);
 class ConstraintJointPath : public JointPath
 {
 public:
-    ConstraintJointPath(Link* baseLink, Link* targetLink) : JointPath(baseLink, targetLink) {
+    ConstraintJointPath(Link* baseLink, Link* targetLink) : JointPath(baseLink, targetLink),
+                                                            // twistFilter_(8.8, 0.002, VectorXd::Zero(6))
+                                                            twistFilter_(10, VectorXd::Zero(6))
+    {
         numVirtualBaseJoints_ = 6;
 
         numBodyJoints_ = baseLink->body()->numJoints();
@@ -70,6 +75,10 @@ public:
         updateWeight();
     }
 
+    VectorXd passTwistFilter(const VectorXd& input) {
+        return twistFilter_.passFilter(input);
+    }
+
     std::set<int>& exclusiveJointIdSet() { return exclusiveJointIdSet_; }
     std::set<int>& commonJointIdSet() { return commonJointIdSet_; }
 
@@ -79,6 +88,7 @@ public:
     MatrixXd& inverseJacobian() { return inverseJacobian_; }
     MatrixXd& exclusiveJointWeightMatrix() { return exclusiveJointWeightMat_; }
     MatrixXd& complementJointWeightMatrix() { return complementJointWeightMat_; }
+    // void setCutOffFreq(const double f) { twistFilter_.setCutOffFreq(f); }
 
     void setJointWeightRatio(double ratio) { jointWeightRatioVec_  = VectorXd::Constant(numJoints(),ratio);  }
 
@@ -102,6 +112,8 @@ protected:
     VectorXd defaultJointWeightVec_;
     VectorXd jointWeightRatioVec_;// 0:free 1:constraint
     MatrixXd exclusiveJointWeightMat_, complementJointWeightMat_;
+    // FirstOrderLowPassFilter<VectorXd> twistFilter_;
+    MovingAverageFilter<VectorXd> twistFilter_;
 
     void updateJacobian() {
         // jacobianWholeBody

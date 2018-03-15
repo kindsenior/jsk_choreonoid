@@ -51,10 +51,13 @@ Eigen::MatrixXd cnoid::inverseJacobian(JointPathPtr& jp)
 {
     MatrixXd J;
     jp->calcJacobian(J);
-    const int numJoints = jp->numJoints();
-    Eigen::MatrixXd weight_mat = Eigen::MatrixXd::Identity(numJoints, numJoints);
+    // const int numJoints = jp->numJoints();
+    // Eigen::MatrixXd weight_mat = Eigen::MatrixXd::Identity(numJoints, numJoints);
 
-    return SRInverse(J, weight_mat);
+    // return PseudoInverse(m);
+    // return SRInverse(J, weight_mat);
+    // return SRInverse(J);
+    return J.inverse();
 }
 
 MatrixXd cnoid::threshMatrix(const MatrixXd& m, double thresh) {

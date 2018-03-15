@@ -540,6 +540,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
         cout << "correct L " << L_world.transpose() << endl;
         cout << "my L " << (mBody->centerOfMass().cross(P_g) + L_g).transpose() << endl << endl;// 原点回りに変換
 
+        // VectorXd prevXib = VectorXd::Zero(6);;
 
         // // 脚のヤコビアンが正しいかどうかの確認
         // motion->frame(0) >> *body;// 腰座標、q更新 body更新
@@ -618,6 +619,23 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             wholeBodyConstraintPtr->update();
 
+            // overwrite EE velocity
+            // for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
+            //     MatrixXd Jb = MatrixXd::Identity(6,6);
+            //     Vector3d vec = jointPathPtr->endLink()->p() - jointPathPtr->baseLink()->body()->rootLink()->p();
+            //     for(int i=0; i<3; ++i) Jb.block(0,3+i, 3,1) = Matrix3::Identity().col(i).cross(vec);
+
+            //     VectorXd refRelTwist = jointPathPtr->twist - Jb*prevXib;
+            //     MatrixXd J;
+            //     jointPathPtr->calcJacobian(J);
+            //     VectorXd modifRelTwist = J * jointPathPtr->inverseJacobian() * refRelTwist;
+            //     VectorXd modifTwist = modifRelTwist + Jb*prevXib;
+
+            //     VectorXd diffTwist = VectorXd::Zero(6);
+            //     diffTwist(2) = modifTwist(2) - jointPathPtr->twist(2);// overwrite only z
+            //     diffTwist = jointPathPtr->passTwistFilter(diffTwist);
+            //     jointPathPtr->twist(2) = max(jointPathPtr->twist(2)+diffTwist(2), jointPathPtr->twist(2));
+            // }
 
             // ss << "root v after << " << mBody->rootLink()->v().transpose() << endl;
             // ss << "root w" << endl << mBody->rootLink()->w() << endl;
@@ -724,6 +742,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix()*jointPathPtr->inverseJacobian() * (jointPathPtr->twist - F * dq);// disable dq of constraint null-space
                 // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix() * (jointPathPtr->inverseJacobian()*(jointPathPtr->twist-F*dq) + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*refdq);// use direct refdq
                 // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix() * (jointPathPtr->inverseJacobian()*(jointPathPtr->twist-F*dq) + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*valVec);// use modified refdq
+                // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix()*inverseJacobian((JointPathPtr&)jointPathPtr) * (jointPathPtr->twist - F * dq);// disable dq of constraint null-space and use normal IK
             }
 
             // cout << " Finished Step 5" << endl;
@@ -739,6 +758,9 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             Vector3d omega = mBody->rootLink()->R().transpose() * dq.segment(mBody->numJoints()+3,3);// w is in world frame, omega is in body frame
             if(omega.norm() != 0) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
             else cout << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
+
+            // prevXib.head(3) = dq.segment(mBody->numJoints(),3);
+            // prevXib.tail(3) = dq.segment(mBody->numJoints()+3,3);
 
             // // BaseLink更新
             // mBody->link(BASE_LINK)->p += mBody->link(BASE_LINK)->v() * dt;
