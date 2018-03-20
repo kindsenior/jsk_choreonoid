@@ -63,6 +63,19 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
         }
     }
 
+    {
+        int finalDivisibleIdx = ((int) numFrames/cycle)*cycle;
+        cout << "Remainder frame is from " << finalDivisibleIdx << " (" << finalDivisibleIdx*dt << "[sec]) to " << numFrames << " (" << numFrames*dt << "[sec])" << endl;
+        MultiValueSeq::Frame lastWrenchFrame = refWrenchesSeqPtr->frame(finalDivisibleIdx);
+        for(int i=finalDivisibleIdx+1; i<numFrames; ++i){
+            refZmpSeqPtr->at(i) = refZmpSeqPtr->at(finalDivisibleIdx);
+            refCMSeqPtr->at(i) = refCMSeqPtr->at(finalDivisibleIdx);
+            refPSeqPtr->at(i) = refPSeqPtr->at(finalDivisibleIdx);
+            refLSeqPtr->at(i) = refLSeqPtr->at(finalDivisibleIdx);
+            for(int k=0; k<lastWrenchFrame.size(); ++k) refWrenchesSeqPtr->frame(i)[k] = lastWrenchFrame[k];
+        }
+    }
+
     // remove nan during jumping phase
     Vector3d prevZmp;
     int prevIdx;
