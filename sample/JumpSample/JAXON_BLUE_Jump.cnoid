@@ -145,8 +145,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_jump-400msec.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 14
+              name: "jump-420msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-420msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 14
+          id: 15
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -180,8 +189,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 13 ]
-      checked: [ 2, 14 ]
+      selected: [ 14 ]
+      checked: [ 2, 15 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -290,7 +299,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 13
+      currentPoseSeqItem: 14
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -488,7 +497,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 14
+        bodyItem: 15
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
