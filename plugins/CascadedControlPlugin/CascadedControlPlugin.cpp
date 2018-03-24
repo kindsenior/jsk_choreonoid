@@ -36,6 +36,10 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refP")->seq();
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refL")->seq();
     MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq();
+    MultiValueSeqPtr optionalDataSeqPtr = bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("optionaldata")->seq();
+
+    const double wrenchDim = 6;
+    const int numContacts = refWrenchesSeqPtr->frame(0).size()/wrenchDim;
     for(int i=0; i<numFrames-cycle; i+=cycle){
         Vector3d frontZmp = refZmpSeqPtr->at(i);
         Vector3d diffZmp = refZmpSeqPtr->at(i+cycle) - frontZmp;
@@ -45,8 +49,6 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
         Vector3d diffP = refPSeqPtr->at(i+cycle) - frontP;
         Vector3d frontL = refLSeqPtr->at(i);
         Vector3d diffL = refLSeqPtr->at(i+cycle) - frontL;
-        MultiValueSeq::Frame frontWrenches = refWrenchesSeqPtr->frame(i);
-        MultiValueSeq::Frame nextWrenches = refWrenchesSeqPtr->frame(i+cycle);
         for(int j=1; j<cycle; ++j){
             double r = ((double)j/cycle);
             refZmpSeqPtr->at(i+j) = frontZmp + r*diffZmp;
@@ -57,8 +59,46 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             P.z() = refPSeqPtr->at(i+j).z(); // keep z coodinates
             refPSeqPtr->at(i+j) = P;
             refLSeqPtr->at(i+j) = frontL + r*diffL;
-            for(int k=0; k<frontWrenches.size(); ++k){
-                refWrenchesSeqPtr->frame(i+j)[k] = (1-r)*frontWrenches[k] + r*nextWrenches[k];
+        }
+
+        MultiValueSeq::Frame frontWrenches = refWrenchesSeqPtr->frame(i);
+        MultiValueSeq::Frame nextWrenches = refWrenchesSeqPtr->frame(i+cycle);
+        std::vector<VectorXd> frontWrenchVec, nextWrenchVec;
+        std::vector<int> frontIdxVec, nextIdxVec;
+        for(int k=0; k<numContacts; ++k){// find front wrench
+            frontWrenchVec.push_back(VectorXd::Zero(wrenchDim));
+            for(int ii=0; ii<wrenchDim; ++ii) frontWrenchVec[k](ii) = frontWrenches[k*wrenchDim+ii];
+            frontIdxVec.push_back(0);
+            if(!optionalDataSeqPtr->frame(i+0)[k]){
+                for(int j=1; j<cycle; ++j){
+                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeqPtr->frame(i+j);
+                    if(!optionalDataFrame[k]){
+                        frontWrenchVec[k] = VectorXd::Zero(wrenchDim);
+                        frontIdxVec[k] = j;
+                    }
+                }
+            }
+        }
+        for(int k=0; k<numContacts; ++k){// find next wrench
+            nextWrenchVec.push_back(VectorXd::Zero(wrenchDim));
+            for(int ii=0; ii<wrenchDim; ++ii) nextWrenchVec[k](ii) = nextWrenches[k*wrenchDim+ii];
+            nextIdxVec.push_back(cycle);
+            if(!optionalDataSeqPtr->frame(i+cycle)[k]){
+                for(int j=cycle; j>1; --j){
+                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeqPtr->frame(i+j);
+                    if(!optionalDataFrame[k]){
+                        nextWrenchVec[k] = VectorXd::Zero(wrenchDim);
+                        nextIdxVec[k] = j;
+                    }
+                }
+            }
+        }
+        for(int k=0; k<numContacts; ++k){// interpolate wrench
+            for(int j=frontIdxVec[k]+1; j<nextIdxVec[k]; ++j){
+                double r= ((double)(j-frontIdxVec[k])/(nextIdxVec[k]-frontIdxVec[k]));
+                for(int ii=0; ii<wrenchDim; ++ii){
+                    refWrenchesSeqPtr->frame(i+j)[k*wrenchDim+ii] = (1-r)*frontWrenchVec[k](ii) + r*nextWrenchVec[k](ii);
+                }
             }
         }
     }
