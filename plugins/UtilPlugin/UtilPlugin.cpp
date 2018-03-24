@@ -352,6 +352,12 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
         cout << endl;
         backPoseIter = frontPoseIter;
     }
+    // final frame is the same with the previous frame
+    {
+        MultiValueSeq::Frame finalFrame = optionalDataSeqPtr->frame(motion->numFrames()-1);
+        MultiValueSeq::Frame preFinalFrame = optionalDataSeqPtr->frame(motion->numFrames()-2);
+        for(int j=0; j<linkNum*2; ++j) finalFrame[j] = preFinalFrame[j];
+    }
     cout << endl << endl;
 
     setSubItem("optionaldata", optionalDataSeqPtr, bodyMotionItemPtr);
