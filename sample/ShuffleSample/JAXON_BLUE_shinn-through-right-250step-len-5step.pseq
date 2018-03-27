@@ -1,0 +1,6 @@
+# Body pose sequence format version 1.0 defined by cnoid-Robotics
+
+type: PoseSeq
+name: "shinn-through-right-250step-len-5step"
+targetBody: "JAXON_BLUE"
+refs: 

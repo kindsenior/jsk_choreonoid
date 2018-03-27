@@ -55,8 +55,26 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_lf-rb-toe-turn.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 4
+              name: "slide-forward-250step-len-5step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slide-forward-250step-len-5step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 5
+              name: "shinn-through-right-250step-len-5step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_shinn-through-right-250step-len-5step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 4
+          id: 6
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -79,7 +97,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 5
+          id: 7
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -110,7 +128,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 6
+              id: 8
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -129,7 +147,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 7
+              id: 9
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -148,7 +166,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 8
+              id: 10
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -184,8 +202,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 3 ]
-      checked: [ 1, 2, 4, 5, 6, 7, 8 ]
+      selected: [ 4 ]
+      checked: [ 1, 2, 6, 7, 8, 9, 10 ]
       expanded: [ 1, 2 ]
   - 
     id: 3
@@ -236,9 +254,9 @@ views:
           fieldOfView: 0.6978
           near: 0.01
           far: 100
-          eye: [ 2.02938782, 2.23648117, 1.27656064 ]
-          direction: [ -0.654414152, -0.744941009, -0.129634141 ]
-          up: [ -0.0855563501, -0.0973915884, 0.991561894 ]
+          eye: [ 1.93578487, 2.5570782, 1.39758168 ]
+          direction: [ -0.446267705, -0.87680873, -0.179029571 ]
+          up: [ -0.0812071228, -0.159552469, 0.983843693 ]
         - 
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -289,9 +307,9 @@ views:
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 31 ]
+          selectedLinks: [ 0 ]
         - 
-          id: 4
+          id: 6
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -304,7 +322,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 3
+      currentPoseSeqItem: 4
       defaultTransitionTime: 0
       updateAll: false
       autoUpdate: false
@@ -313,7 +331,7 @@ views:
       bodyItems: 
         - 
           id: 2
-          expandedParts: [ "LEGS", "LOWER-BODY", "UPPER-BODY", "Whole Body" ]
+          expandedParts: [ "LEGS", "LOWER-BODY", "Whole Body" ]
       timeLength: 11
       showLipSync: false
       gridInterval: 1
@@ -502,7 +520,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 4
+        bodyItem: 6
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
