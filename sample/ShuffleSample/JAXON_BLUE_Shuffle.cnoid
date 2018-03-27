@@ -1,0 +1,585 @@
+items: 
+  id: 0
+  name: "Root"
+  plugin: Base
+  class: RootItem
+  children: 
+    - 
+      id: 1
+      name: "World"
+      plugin: Body
+      class: WorldItem
+      data: 
+        collisionDetection: true
+        collisionDetector: AISTCollisionDetector
+      children: 
+        - 
+          id: 2
+          name: "JAXON_BLUE"
+          plugin: Body
+          class: BodyItem
+          data: 
+            modelFile: "/home/k-kojima/catkin_ws/jaxon_tutorials/src/jsk_choreonoid/share/model/JAXON_BLUE/jaxon_blue.yaml"
+            currentBaseLink: "WAIST"
+            rootPosition: [ 0, 0, 0.9775 ]
+            rootAttitude: [ 
+              1, 3.50329129e-14, 1.09523501e-13, 
+              -3.50329129e-14, 1, 5.97252824e-14, 
+              -1.09523501e-13, -5.97252824e-14, 1 ]
+            jointPositions: [ 
+               0.000000,  0.000000, -0.449128,  0.612327, -0.163199, -0.000000, -0.000000,  0.000000, -0.179412,  0.612333, 
+              -0.432922, -0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.698132, -0.349066, -0.087266, 
+              -1.396263,  0.000000,  0.000000,  0.000000,  0.698132,  0.349066,  0.087266, -1.396263,  0.000000,  0.000000, 
+               0.000000 ]
+            initialRootPosition: [ 0, 0, 1.0185 ]
+            initialRootAttitude: [ 
+              2.22044605e-16, -1, 0, 
+              1, 2.22044605e-16, 0, 
+              0, 0, 1 ]
+            initialJointPositions: [ 
+               0.000054, -0.003093, -0.262419,  0.681091, -0.418672,  0.003093,  0.000054, -0.003093, -0.262401,  0.681084, 
+              -0.418684,  0.003093,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.523599, -0.349066, 
+              -0.087266, -1.396263,  0.000000,  0.000000, -0.349066,  0.000000,  0.523599,  0.349066,  0.087266, -1.396263, 
+               0.000000 ]
+            zmp: [ 0.0450004218, 3.18699996e-07, 0 ]
+            collisionDetection: true
+            selfCollisionDetection: false
+            isEditable: true
+          children: 
+            - 
+              id: 3
+              name: "lf-rb-toe-turn"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_lf-rb-toe-turn.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+        - 
+          id: 4
+          name: "floor"
+          plugin: Body
+          class: BodyItem
+          data: 
+            modelFile: "${SHARE}/model/misc/floor.wrl"
+            currentBaseLink: ""
+            rootPosition: [ 0, 0, -0.1 ]
+            rootAttitude: [ 
+              1, 0, 0, 
+              0, 1, 0, 
+              0, 0, 1 ]
+            jointPositions: [  ]
+            initialRootPosition: [ 0, 0, -0.1 ]
+            initialRootAttitude: [ 
+              1, 0, 0, 
+              0, 1, 0, 
+              0, 0, 1 ]
+            zmp: [ 0, 0, 0 ]
+            collisionDetection: true
+            selfCollisionDetection: false
+            isEditable: true
+        - 
+          id: 5
+          name: "AISTSimulator"
+          plugin: Body
+          class: AISTSimulatorItem
+          data: 
+            realtimeSync: true
+            recording: "full"
+            timeRangeMode: "Active control period"
+            timeLength: 12000
+            allLinkPositionOutputMode: false
+            deviceStateOutput: true
+            selfCollision: false
+            controllerThreads: true
+            recordCollisionData: false
+            controllerOptions: ""
+            dynamicsMode: "Forward dynamics"
+            integrationMode: "Runge Kutta"
+            gravity: [ 0, 0, -9.80665 ]
+            staticFriction: 1
+            dynamicFriction: 1
+            cullingThresh: 0.005
+            contactCullingDepth: 0.03
+            errorCriterion: 0.001
+            maxNumIterations: 1000
+            contactCorrectionDepth: 0.0001
+            contactCorrectionVelocityRatio: 1
+            kinematicWalking: false
+            2Dmode: false
+            oldAccelSensorMode: false
+          children: 
+            - 
+              id: 6
+              name: "GLVisionSimulator"
+              plugin: Body
+              class: GLVisionSimulatorItem
+              data: 
+                enabled: true
+                targetBodies: [ JAXON_BLUE ]
+                targetSensors: [ HEAD_LEFT_CAMERA ]
+                maxFrameRate: 1000
+                maxLatency: 1
+                recordVisionData: false
+                useThreadsForSensors: true
+                bestEffort: false
+                allSceneObjects: false
+                rangeSensorPrecisionRatio: 2
+                depthError: 0
+                enableHeadLight: true
+                enableAdditionalLights: true
+            - 
+              id: 7
+              name: "GLVisionSimulator"
+              plugin: Body
+              class: GLVisionSimulatorItem
+              data: 
+                enabled: true
+                targetBodies: [ JAXON_BLUE ]
+                targetSensors: [ HEAD_RIGHT_CAMERA ]
+                maxFrameRate: 1000
+                maxLatency: 1
+                recordVisionData: false
+                useThreadsForSensors: true
+                bestEffort: false
+                allSceneObjects: false
+                rangeSensorPrecisionRatio: 2
+                depthError: 0
+                enableHeadLight: true
+                enableAdditionalLights: true
+            - 
+              id: 8
+              name: "GLVisionSimulator"
+              plugin: Body
+              class: GLVisionSimulatorItem
+              data: 
+                enabled: true
+                targetBodies: [ JAXON_BLUE ]
+                targetSensors: [ HEAD_RANGE ]
+                maxFrameRate: 1000
+                maxLatency: 1
+                recordVisionData: false
+                useThreadsForSensors: true
+                bestEffort: false
+                allSceneObjects: false
+                rangeSensorPrecisionRatio: 2
+                depthError: 0
+                enableHeadLight: true
+                enableAdditionalLights: true
+views: 
+  - 
+    id: 0
+    name: "CameraImage"
+    plugin: Base
+    class: ImageView
+    mounted: true
+  - 
+    id: 1
+    plugin: Base
+    class: ItemPropertyView
+    mounted: true
+  - 
+    id: 2
+    plugin: Base
+    class: ItemTreeView
+    mounted: true
+    state: 
+      selected: [ 3 ]
+      checked: [ 1, 2, 4, 5, 6, 7, 8 ]
+      expanded: [ 1, 2 ]
+  - 
+    id: 3
+    plugin: Base
+    class: MessageView
+    mounted: true
+  - 
+    id: 4
+    plugin: Base
+    class: SceneView
+    mounted: true
+    state: 
+      editMode: true
+      viewpointControlMode: thirdPerson
+      collisionLines: false
+      polygonMode: fill
+      defaultHeadLight: true
+      defaultHeadLightIntensity: 0.75
+      headLightLightingFromBack: false
+      worldLight: true
+      worldLightIntensity: 0.5
+      worldLightAmbient: 0.3
+      additionalLights: true
+      fog: true
+      floorGrid: true
+      floorGridSpan: 10
+      floorGridInterval: 0.5
+      xzGridSpan: 10
+      xzGridInterval: 0.5
+      xzGrid: false
+      yzGridSpan: 10
+      yzGridInterval: 0.5
+      texture: true
+      lineWidth: 1
+      pointSize: 1
+      normalVisualization: false
+      normalLength: 0.01
+      coordinateAxes: true
+      fpsTestIteration: 1
+      showFPS: false
+      enableNewDisplayListDoubleRendering: false
+      useBufferForPicking: true
+      upsideDown: false
+      cameras: 
+        - 
+          camera: [ System, Perspective ]
+          isCurrent: true
+          fieldOfView: 0.6978
+          near: 0.01
+          far: 100
+          eye: [ 2.02938782, 2.23648117, 1.27656064 ]
+          direction: [ -0.654414152, -0.744941009, -0.129634141 ]
+          up: [ -0.0855563501, -0.0973915884, 0.991561894 ]
+        - 
+          camera: [ System, Orthographic ]
+          orthoHeight: 20
+          near: 0.01
+          far: 100
+      backgroundColor: [ 0.100000001, 0.100000001, 0.300000012 ]
+      gridColor: [ 0.899999976, 0.899999976, 0.899999976, 1 ]
+      xzgridColor: [ 0.899999976, 0.899999976, 0.899999976, 1 ]
+      yzgridColor: [ 0.899999976, 0.899999976, 0.899999976, 1 ]
+      dedicatedItemTreeViewChecks: false
+  - 
+    id: 5
+    name: "Task"
+    plugin: Base
+    class: TaskView
+    state: 
+      layoutMode: horizontal
+      isAutoMode: false
+  - 
+    id: 6
+    plugin: Body
+    class: BodyLinkView
+    mounted: true
+    state: 
+      showRotationMatrix: false
+  - 
+    id: 7
+    plugin: Body
+    class: JointSliderView
+    mounted: true
+    state: 
+      showAllJoints: true
+      jointId: true
+      name: true
+      numColumns: 1
+      spinBox: true
+      slider: true
+      labelOnLeft: true
+      currentBodyItem: 2
+  - 
+    id: 8
+    plugin: Body
+    class: LinkSelectionView
+    mounted: true
+    state: 
+      listingMode: "Link List"
+      currentBodyItem: 2
+      bodyItems: 
+        - 
+          id: 2
+          selectedLinks: [ 31 ]
+        - 
+          id: 4
+          selectedLinks: [ 0 ]
+  - 
+    id: 9
+    plugin: OpenRTM
+    class: RTSNameServerView
+  - 
+    id: 10
+    name: "Pose Roll"
+    plugin: PoseSeq
+    class: PoseRollView
+    mounted: true
+    state: 
+      currentPoseSeqItem: 3
+      defaultTransitionTime: 0
+      updateAll: false
+      autoUpdate: false
+      timeSync: true
+      listingMode: "Part Tree"
+      bodyItems: 
+        - 
+          id: 2
+          expandedParts: [ "LEGS", "LOWER-BODY", "UPPER-BODY", "Whole Body" ]
+      timeLength: 11
+      showLipSync: false
+      gridInterval: 1
+  - 
+    id: 11
+    plugin: Python
+    class: PythonConsoleView
+    mounted: true
+toolbars: 
+  "TimeBar": 
+    minTime: 0
+    maxTime: 12000
+    frameRate: 500
+    playbackFrameRate: 50
+    idleLoopDrivenMode: false
+    currentTime: 0
+    speedScale: 1
+    syncToOngoingUpdates: true
+    autoExpansion: true
+  "KinematicsBar": 
+    mode: AUTO
+    enablePositionDragger: true
+    penetrationBlock: true
+    collisionLinkHighlight: false
+    snapDistance: 0.025
+    penetrationBlockDepth: 0.0005
+    lazyCollisionDetectionMode: true
+  "BodyBar": 
+    current: 2
+  "LeggedBodyBar": 
+    stanceWidth: 0.15
+  "BodyMotionGenerationBar": 
+    autoGenerationForNewBody: true
+    balancer: false
+    autoGeneration: false
+    timeScaleRatio: 1
+    preInitialDuration: 0
+    postFinalDuration: 0
+    onlyTimeBarRange: false
+    makeNewBodyItem: true
+    stealthyStepMode: true
+    stealthyHeightRatioThresh: 2
+    flatLiftingHeight: 0.005
+    flatLandingHeight: 0.005
+    impactReductionHeight: 0.005
+    impactReductionTime: 0.04
+    autoZmp: true
+    minZmpTransitionTime: 0.3
+    zmpCenteringTimeThresh: 0.03
+    zmpTimeMarginBeforeLiftingSpin: 0
+    zmpMaxDistanceFromCenter: 0.02
+    allLinkPositions: false
+    lipSyncMix: false
+    timeToStartBalancer: 0
+    balancerIterations: 2
+    plainBalancerMode: false
+    boundaryConditionType: position
+    boundarySmootherType: quintic
+    boundarySmootherTime: 0.5
+    boundaryCmAdjustment: false
+    boundaryCmAdjustmentTime: 1
+    waistHeightRelaxation: false
+    gravity: 9.8
+    dynamicsTimeRatio: 1
+  "RMControlBar": 
+    initialTrajectory: Load
+    initialTrajectoryCheck: false
+    saveParameterInFileName: false
+  "SlideFrictionControlBar": 
+    saveParameterInFileName: false
+    SFC: 
+      takeoffPhaseRatioList: 1,1,1,1,1
+      takeoffPhaseRatioListCheck: true
+      landingPhaseRatioList: 1,1,1,1,1
+      landingPhaseRatioListCheck: true
+      errorCMWeight: 1000
+      errorCMWeightCheck: true
+      errorMomentumWeight: 1
+      errorMomentumWeightCheck: true
+      errorAngularMomentumWeight: 200
+      errorAngularMomentumWeightCheck: true
+      errorYawAngularMomentumWeight: 1
+      errorYawAngularMomentumWeightCheck: true
+      inputForceWeight: 10
+      inputForceWeightCheck: true
+      inputMomentWeight: 20
+      inputMomentWeightCheck: true
+      inputYawMomentWeight: 100
+      inputYawMomentWeightCheck: true
+      blockingList: 1,1,1,1,1,1,1
+      blockingListCheck: true
+      xDivisionNum: 2
+      xDivisionNumCheck: true
+      yDivisionNum: 2
+      yDivisionNumCheck: true
+      dt: 0.1
+      dtCheck: true
+  "MultiContactStabilizerBar": 
+    saveParameterInFileName: false
+    MCS: 
+      errorCMWeight: 1000
+      errorCMWeightCheck: true
+      errorMomentumWeight: 0.0001
+      errorMomentumWeightCheck: true
+      errorAngularMomentumWeight: 200
+      errorAngularMomentumWeightCheck: true
+      inputForceWeight: 10
+      inputForceWeightCheck: true
+      inputMomentWeight: 20
+      inputMomentWeightCheck: true
+      blockingList: 1,1,1,1,1,1,1
+      blockingListCheck: true
+      dt: 0.1
+      dtCheck: true
+  "PreviewControl": 
+    controlMode: DynamicsFilter
+    controlModeCheck: true
+    saveParameterInFileName: true
+  "CascadedControlBar": 
+    saveParameterInFileName: false
+    CC: 
+      - 
+        SFC: 
+          takeoffPhaseRatioList: 1,1,1,1,1
+          takeoffPhaseRatioListCheck: true
+          landingPhaseRatioList: 1,1,1,1,1
+          landingPhaseRatioListCheck: true
+          errorCMWeight: 1e+08
+          errorCMWeightCheck: true
+          errorMomentumWeight: 1
+          errorMomentumWeightCheck: true
+          errorAngularMomentumWeight: 200
+          errorAngularMomentumWeightCheck: true
+          errorYawAngularMomentumWeight: 1
+          errorYawAngularMomentumWeightCheck: true
+          inputForceWeight: 10
+          inputForceWeightCheck: true
+          inputMomentWeight: 20
+          inputMomentWeightCheck: true
+          inputYawMomentWeight: 1
+          inputYawMomentWeightCheck: true
+          blockingList: 1,1,1,1,1
+          blockingListCheck: true
+          xDivisionNum: 2
+          xDivisionNumCheck: true
+          yDivisionNum: 2
+          yDivisionNumCheck: true
+          dt: 0.002
+          dtCheck: true
+      - 
+        SFC: 
+          takeoffPhaseRatioList: 1,1,1,1,1
+          takeoffPhaseRatioListCheck: true
+          landingPhaseRatioList: 1,1,1,1,1
+          landingPhaseRatioListCheck: true
+          errorCMWeight: 10000
+          errorCMWeightCheck: true
+          errorMomentumWeight: 1
+          errorMomentumWeightCheck: true
+          errorAngularMomentumWeight: 200
+          errorAngularMomentumWeightCheck: true
+          errorYawAngularMomentumWeight: 1
+          errorYawAngularMomentumWeightCheck: true
+          inputForceWeight: 10
+          inputForceWeightCheck: true
+          inputMomentWeight: 20
+          inputMomentWeightCheck: true
+          inputYawMomentWeight: 200
+          inputYawMomentWeightCheck: true
+          blockingList: 1,1,1,1,1,1,1,1,1,1
+          blockingListCheck: true
+          xDivisionNum: 2
+          xDivisionNumCheck: true
+          yDivisionNum: 2
+          yDivisionNumCheck: true
+          dt: 0.05
+          dtCheck: true
+Body: 
+  "BodyMotionEngine": 
+    updateJointVelocities: false
+  "EditableSceneBody": 
+    editableSceneBodies: 
+      - 
+        bodyItem: 2
+        showCenterOfMass: false
+        showPpcom: false
+        showZmp: true
+      - 
+        bodyItem: 4
+        showCenterOfMass: false
+        showPpcom: false
+        showZmp: false
+    staticModelEditing: false
+  "KinematicFaultChecker": 
+    checkJointPositions: true
+    angleMargin: 0
+    translationMargin: 0
+    checkJointVelocities: true
+    velocityLimitRatio: 100
+    targetJoints: all
+    checkSelfCollisions: true
+    onlyTimeBarRange: false
+OpenRTM: 
+  "deleteUnmanagedRTCsOnStartingSimulation": false
+viewAreas: 
+  - 
+    type: embedded
+    tabs: true
+    contents: 
+      type: splitter
+      orientation: horizontal
+      sizes: [ 426, 2079 ]
+      children: 
+        - 
+          type: splitter
+          orientation: vertical
+          sizes: [ 750, 750 ]
+          children: 
+            - 
+              type: pane
+              views: [ 2 ]
+              current: 2
+            - 
+              type: pane
+              views: [ 1, 8 ]
+              current: 1
+        - 
+          type: splitter
+          orientation: vertical
+          sizes: [ 1071, 429 ]
+          children: 
+            - 
+              type: splitter
+              orientation: horizontal
+              sizes: [ 901, 1172 ]
+              children: 
+                - 
+                  type: pane
+                  views: [ 6, 7, 0 ]
+                  current: 6
+                - 
+                  type: pane
+                  views: [ 4 ]
+                  current: 4
+            - 
+              type: pane
+              views: [ 3, 11, 10 ]
+              current: 10
+layoutOfToolBars: 
+  rows: 
+    - 
+      - { name: "FileBar", x: 0, priority: 0 }
+      - { name: "ScriptBar", x: 47, priority: 0 }
+      - { name: "TimeBar", x: 94, priority: 0 }
+      - { name: "SceneBar", x: 1010, priority: 0 }
+      - { name: "GraphBar", x: 1310, priority: 0 }
+      - { name: "SimulationBar", x: 1417, priority: 0 }
+      - { name: "BodyBar", x: 1614, priority: 0 }
+      - { name: "KinematicsBar", x: 1874, priority: 0 }
+      - { name: "BodyMotionGenerationBar", x: 2108, priority: 0 }
+      - { name: "RMControlBar", x: 2245, priority: 0 }
+      - { name: "SlideFrictionControlBar", x: 2337, priority: 0 }
+      - { name: "MultiContactStabilizerBar", x: 2422, priority: 0 }
+    - 
+      - { name: "PreviewControl", x: 0, priority: 0 }
+      - { name: "CascadedControlBar", x: 164, priority: 0 }
+      - { name: "LeggedBodyBar", x: 284, priority: 0 }
+      - { name: "HrpsysSequenceFileExportPlugin", x: 589, priority: 0 }
+      - { name: "Sandbox", x: 664, priority: 0 }
