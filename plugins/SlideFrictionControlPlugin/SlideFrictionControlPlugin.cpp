@@ -346,10 +346,16 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
             // vertex << 0.13,-0.065; vertexVec.push_back(vertex);
             // vertex << -0.1,0.065; vertexVec.push_back(vertex);
             // vertex << -0.1,-0.065; vertexVec.push_back(vertex);
-            vertex << 0.12,0.06; vertexVec.push_back(vertex);
-            vertex << 0.12,-0.06; vertexVec.push_back(vertex);
-            vertex << -0.09,0.06; vertexVec.push_back(vertex);
-            vertex << -0.09,-0.06; vertexVec.push_back(vertex);
+            // vertex << 0.12,0.06; vertexVec.push_back(vertex);
+            // vertex << 0.12,-0.06; vertexVec.push_back(vertex);
+            // vertex << -0.09,0.06; vertexVec.push_back(vertex);
+            // vertex << -0.09,-0.06; vertexVec.push_back(vertex);
+
+            // for JAXON_BLUE
+            vertex << 0.16,0.05; vertexVec.push_back(vertex);
+            vertex << 0.16,-0.05; vertexVec.push_back(vertex);
+            vertex << -0.07,0.05; vertexVec.push_back(vertex);
+            vertex << -0.07,-0.05; vertexVec.push_back(vertex);
 
             std::vector<hrp::Vector2> smallVertexVec;
             vertex << 0.08,0.03; smallVertexVec.push_back(vertex);
