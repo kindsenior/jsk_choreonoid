@@ -149,13 +149,25 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream contactOfs;
     contactOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
-    contactOfs << "time lpx lpy lpz lvx lvy lvz lwx lwy lwz rpx rpy rpz rvx rvy rvz rwx rwy rwz" << endl;
+    // contactOfs << "time lpx lpy lpz lvx lvy lvz lwx lwy lwz rpx rpy rpz rvx rvy rvz rwx rwy rwz" << endl;
+    contactOfs << "time";
+    std::vector<string> contactStringVec{"px","py","pz", "vx","vy","vz", "wx","wy","wz"};
+    for(auto link : contactLinkCandidateSet){
+        string linkName = link->name();
+        for(auto str :contactStringVec) contactOfs << " " << linkName << str;
+    }
 
     fnamess.str("");
     fnamess << poseSeqPath.stem().string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream wrenchOfs;
     wrenchOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
-    wrenchOfs << "time lfx lfy lfz lnx lny lnz rfx rfy rfz rnx rny rnz" << endl;
+    // wrenchOfs << "time lfx lfy lfz lnx lny lnz rfx rfy rfz rnx rny rnz" << endl;
+    std::vector<string> wrenchStringVec{"fx","fy","fz", "nx","ny","nz"};
+    wrenchOfs << "time";
+    for(auto link : contactLinkCandidateSet){
+        string linkName = link->name();
+        for(auto str :wrenchStringVec) wrenchOfs << " " << linkName << str;
+    }
 
     fnamess.str("");
     fnamess << poseSeqPath.stem().string() << "_SFC_inputPL_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
