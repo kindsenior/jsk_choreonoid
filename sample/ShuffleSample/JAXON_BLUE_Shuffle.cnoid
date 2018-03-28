@@ -497,7 +497,7 @@ toolbars:
           errorYawAngularMomentumWeightCheck: true
           inputForceWeight: 10
           inputForceWeightCheck: true
-          inputMomentWeight: 20
+          inputMomentWeight: 100
           inputMomentWeightCheck: true
           inputYawMomentWeight: 200
           inputYawMomentWeightCheck: true
