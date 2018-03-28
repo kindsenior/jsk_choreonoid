@@ -498,7 +498,7 @@ toolbars:
           landingPhaseRatioListCheck: true
           errorCMWeight: 10000
           errorCMWeightCheck: true
-          errorMomentumWeight: 1
+          errorMomentumWeight: 5000
           errorMomentumWeightCheck: true
           errorAngularMomentumWeight: 200
           errorAngularMomentumWeightCheck: true
