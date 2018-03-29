@@ -131,11 +131,21 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         // omega_cross1 = (R2 -R1) * R1.inverse() / dt;
         // omega_cross1 = (omega_cross1 - omega_cross0) / dt;
         // body->rootLink()->dw.x() = omega_cross1(2,1); body->rootLink()->dw.y() = omega_cross1(0,2); body->rootLink()->dw.z() = omega_cross1(1,0);
-        AngleAxis aa  = AngleAxis( R2 * R0.inverse() );
-        body->rootLink()->w() = aa.axis() * aa.angle() / (2*dt);
-        AngleAxis aa0 = AngleAxis( R1 * R0.inverse() );
-        AngleAxis aa1 = AngleAxis( R2 * R1.inverse() );
-        body->rootLink()->dw() = ( aa1.axis()*aa1.angle() - aa0.axis()*aa0.angle() ) / (dt*dt);
+
+        // AngleAxis aa  = AngleAxis( R2 * R0.inverse() );
+        // body->rootLink()->w() = aa.axis() * aa.angle() / (2*dt);
+        // AngleAxis aa0 = AngleAxis( R1 * R0.inverse() );
+        // AngleAxis aa1 = AngleAxis( R2 * R1.inverse() );
+        // body->rootLink()->dw() = ( aa1.axis()*aa1.angle() - aa0.axis()*aa0.angle() ) / (dt*dt);
+
+        // AngleAxis aa  = AngleAxis( R0.inverse() * R2  );
+        // body->rootLink()->w() = R0*aa.axis() * aa.angle() / (2*dt);
+        AngleAxis aa  = AngleAxis( R0.inverse() * R1  );
+        body->rootLink()->w() = R0*aa.axis() * aa.angle() / dt;
+        AngleAxis aa0 = AngleAxis( R0.inverse()*R1 );
+        AngleAxis aa1 = AngleAxis( R1.inverse()*R2 );
+        body->rootLink()->dw() = ( R1*aa1.axis()*aa1.angle() - R0*aa0.axis()*aa0.angle() ) / (dt*dt);
+
 
         // AngleAxis aa2 = AngleAxis(  ( R2*R1.inverse() )*(( R1*R0.inverse() ).inverse()) );
         // Vector3d dw_ = aa2.axis()*aa2.angle() / (dt*dt);x
