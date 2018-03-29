@@ -220,7 +220,8 @@ void PreviewControlPlugin::execControl()
             if(modeStr == dfMode){
                 Vector3d diffCM = outputCMSeqPtr->at(i);
                 diffCM.z() = 0;
-                body->rootLink()->p() += 0.5*diffCM;// 腰位置修正 ゲインを掛けるだけでは微妙
+                // body->rootLink()->p() += 0.5*diffCM;// 腰位置修正 ゲインを掛けるだけでは微妙
+                body->rootLink()->p() += 1.0*diffCM;// for HRP2 and JAXON_BLUE
             }else if(modeStr == tpMode){
                 Vector3d CM =  outputCMSeqPtr->at(i);
                 Vector3d CM2RootLink =  body->rootLink()->p() - body->calcCenterOfMass();
