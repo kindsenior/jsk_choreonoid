@@ -75,6 +75,15 @@ items:
                 barLength: 1
             - 
               id: 6
+              name: "slide-forward-250step-len-3step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slide-forward-250step-len-3step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 7
               name: "shinn-through-right-250step-len-5step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -82,8 +91,53 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_shinn-through-right-250step-len-5step.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 8
+              name: "slip-through-right-250step-len-1step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slip-through-right-250step-len-1step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 9
+              name: "slip-through-right-200step-len-1step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slip-through-right-200step-len-1step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 10
+              name: "slip-through-right-200step-len-2step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slip-through-right-200step-len-2step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 11
+              name: "slip-through-right-200step-len-4step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slip-through-right-200step-len-4step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 12
+              name: "slip-through-right-200step-len-8step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slip-through-right-200step-len-8step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 7
+          id: 13
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -106,7 +160,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 8
+          id: 14
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -137,7 +191,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 9
+              id: 15
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -156,7 +210,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 10
+              id: 16
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -175,7 +229,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 11
+              id: 17
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -318,7 +372,7 @@ views:
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 7
+          id: 13
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -331,7 +385,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 5
+      currentPoseSeqItem: 12
       defaultTransitionTime: 0
       updateAll: false
       autoUpdate: false
@@ -529,7 +583,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 7
+        bodyItem: 13
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
