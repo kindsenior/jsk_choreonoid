@@ -414,7 +414,7 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
     cout << endl << endl;
 }
 
-void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d CM, Vector3d P, Vector3d F, BodyPtr& body, std::vector<ContactConstraintParam*>& ccParamVec, std::vector<ContactConstraintParam*>& prevCcParamVec, double dt)
+void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d CM, Vector3d P, Vector3d L, Vector3d F, BodyPtr& body, std::vector<ContactConstraintParam*>& ccParamVec, std::vector<ContactConstraintParam*>& prevCcParamVec, double dt)
 {
 
     static Vector3 g;
@@ -422,7 +422,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
 
     // CM,P,L
     // Vector3d CM,P,L,F;
-    Vector3d L;
+    // Vector3d L;
     // CM = body->calcCenterOfMass();
     // body->calcTotalMomentum(P,L);
     // P << 0,0,0;// overwrite P impossible in jumping motion
@@ -435,8 +435,8 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
     // sfcParam->CM += CM;
     sfcParam->P = P;
     // sfcParam->P << 0,0,P.z();// overwrite only xy coordinates
-    // sfcParam->L = L;
-    sfcParam->L << 0,0,0;
+    sfcParam->L = L;
+    // sfcParam->L << 0,0,0;
     // sfcParam->F = body->mass()*g;
     sfcParam->F = F;
 
@@ -700,17 +700,18 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
 
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
             Vector3d P = refPSeqPtr->at(i);
+            Vector3d L = refLSeqPtr->at(i);
             // 動作軌道に依存するパラメータの設定
             if(i == backPoseIter->time()*frameRate){ // 接触状態の変わり目だけ別処理
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, thresh((P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
                 // forward-difference for jump
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
+                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, L, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
             }else{
                 std::vector<ContactConstraintParam*> dummyCcparamVec;
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, thresh((P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
                 // forward-difference for jump
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
+                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, L, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, dummyCcparamVec, dt);
             }
 
