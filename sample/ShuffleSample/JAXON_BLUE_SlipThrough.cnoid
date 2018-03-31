@@ -12,7 +12,6 @@ items:
       data: 
         collisionDetection: true
         collisionDetector: AISTCollisionDetector
-        materialTableFile: "${SHARE}/default/materials.yaml"
       children: 
         - 
           id: 2
@@ -85,6 +84,15 @@ items:
                 barLength: 1
             - 
               id: 7
+              name: "slip-through-right-200step-len-8step-low-waist-tilt"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slip-through-right-200step-len-8step-low-waist-tilt.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 8
               name: "slip-through-right-250step-len-1step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -93,7 +101,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 8
+              id: 9
               name: "slip-through-right-200step-len-1step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -102,7 +110,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 9
+              id: 10
               name: "slip-through-right-200step-len-2step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -111,7 +119,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 10
+              id: 11
               name: "slip-through-right-200step-len-4step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -120,7 +128,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 11
+              id: 12
               name: "slip-through-right-200step-len-8step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -129,7 +137,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 12
+          id: 13
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -152,7 +160,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 13
+          id: 14
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -163,6 +171,7 @@ items:
             timeLength: 12000
             allLinkPositionOutputMode: false
             deviceStateOutput: true
+            selfCollision: false
             controllerThreads: true
             recordCollisionData: false
             controllerOptions: ""
@@ -182,7 +191,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 14
+              id: 15
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -193,26 +202,7 @@ items:
                 maxFrameRate: 1000
                 maxLatency: 1
                 recordVisionData: false
-                threadMode: Screen
-                bestEffort: false
-                allSceneObjects: false
-                rangeSensorPrecisionRatio: 2
-                depthError: 0
-                enableHeadLight: true
-                enableAdditionalLights: true
-            - 
-              id: 15
-              name: "GLVisionSimulator"
-              plugin: Body
-              class: GLVisionSimulatorItem
-              data: 
-                enabled: true
-                targetBodies: [ JAXON_BLUE ]
-                targetSensors: [ HEAD_RIGHT_CAMERA ]
-                maxFrameRate: 1000
-                maxLatency: 1
-                recordVisionData: false
-                threadMode: Screen
+                useThreadsForSensors: true
                 bestEffort: false
                 allSceneObjects: false
                 rangeSensorPrecisionRatio: 2
@@ -227,11 +217,30 @@ items:
               data: 
                 enabled: true
                 targetBodies: [ JAXON_BLUE ]
+                targetSensors: [ HEAD_RIGHT_CAMERA ]
+                maxFrameRate: 1000
+                maxLatency: 1
+                recordVisionData: false
+                useThreadsForSensors: true
+                bestEffort: false
+                allSceneObjects: false
+                rangeSensorPrecisionRatio: 2
+                depthError: 0
+                enableHeadLight: true
+                enableAdditionalLights: true
+            - 
+              id: 17
+              name: "GLVisionSimulator"
+              plugin: Body
+              class: GLVisionSimulatorItem
+              data: 
+                enabled: true
+                targetBodies: [ JAXON_BLUE ]
                 targetSensors: [ HEAD_RANGE ]
                 maxFrameRate: 1000
                 maxLatency: 1
                 recordVisionData: false
-                threadMode: Screen
+                useThreadsForSensors: true
                 bestEffort: false
                 allSceneObjects: false
                 rangeSensorPrecisionRatio: 2
@@ -256,8 +265,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 5 ]
-      checked: [ 1, 2, 12, 13, 14, 15, 16 ]
+      selected: [ 7 ]
+      checked: [ 1, 2, 13, 14, 15, 16, 17 ]
       expanded: [ 1, 2 ]
   - 
     id: 3
@@ -363,7 +372,7 @@ views:
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 12
+          id: 13
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -376,7 +385,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 5
+      currentPoseSeqItem: 7
       defaultTransitionTime: 0
       updateAll: false
       autoUpdate: false
@@ -574,7 +583,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 12
+        bodyItem: 13
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
@@ -633,7 +642,7 @@ viewAreas:
             - 
               type: pane
               views: [ 3, 11, 10 ]
-              current: 3
+              current: 10
 layoutOfToolBars: 
   rows: 
     - 
