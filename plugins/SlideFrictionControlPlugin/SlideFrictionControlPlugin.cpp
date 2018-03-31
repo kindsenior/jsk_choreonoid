@@ -156,6 +156,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
         string linkName = link->name();
         for(auto str :contactStringVec) contactOfs << " " << linkName << str;
     }
+    contactOfs << endl;
 
     fnamess.str("");
     fnamess << poseSeqPath.stem().string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
@@ -168,6 +169,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
         string linkName = link->name();
         for(auto str :wrenchStringVec) wrenchOfs << " " << linkName << str;
     }
+    wrenchOfs << endl;
 
     fnamess.str("");
     fnamess << poseSeqPath.stem().string() << "_SFC_inputPL_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
