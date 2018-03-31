@@ -592,7 +592,8 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             for(int i=(backPoseIter->time()+backPoseOffsetTime)*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
-                refLSeqPtr->at(i) = Vector3d(0,0,0);
+                // refLSeqPtr->at(i) = Vector3d(0,0,0);
+                refLSeqPtr->at(i) = initLSeqPtr->at(i);
             }
             // for(int i=startPoseIter->time()*frameRate; i < endPoseIter->time()*frameRate; ++i){
             // for(int i=startPoseIter->time()*frameRate; i < endFrame; ++i){ // use endFrame including delay
@@ -608,7 +609,8 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
                 refCMSeqPtr->at(i) = CM;
                 refPSeqPtr->at(i) = P;
-                refLSeqPtr->at(i) = Vector3d(0,0,0);
+                // refLSeqPtr->at(i) = Vector3d(0,0,0);
+                refLSeqPtr->at(i) = initLSeqPtr->at(i);
             }
         }else if(isJumping){// jumping phases
             // cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: jumping phase\x1b[m" << endl;
@@ -627,14 +629,16 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                     + (endCM.z()* (t - startTime) - startCM.z()* (t - endTime)) / jumptime; //z
                 refPSeqPtr->at(i) = m*takeoffdCM; // xy
                 refPSeqPtr->at(i).z() = - m * g * (t - startTime) + m*takeoffdCM.z(); // z
-                refLSeqPtr->at(i) = Vector3d(0,0,0);
+                // refLSeqPtr->at(i) = Vector3d(0,0,0);
+                refLSeqPtr->at(i) = initLSeqPtr->at(i);
             }
         }else{// other phases
             cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: normal phase\x1b[m" << endl;
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
-                refLSeqPtr->at(i) = Vector3d(0,0,0);
+                // refLSeqPtr->at(i) = Vector3d(0,0,0);
+                refLSeqPtr->at(i) = initLSeqPtr->at(i);
             }
         }
 
