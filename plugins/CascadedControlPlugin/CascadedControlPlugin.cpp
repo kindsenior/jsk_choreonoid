@@ -72,7 +72,7 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             if(!optionalDataSeqPtr->frame(i+0)[k]){
                 for(int j=1; j<cycle; ++j){
                     MultiValueSeq::Frame optionalDataFrame = optionalDataSeqPtr->frame(i+j);
-                    if(!optionalDataFrame[k]){
+                    if(optionalDataFrame[k] == 0){
                         frontWrenchVec[k] = VectorXd::Zero(wrenchDim);
                         frontIdxVec[k] = j;
                     }
@@ -86,7 +86,7 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             if(!optionalDataSeqPtr->frame(i+cycle)[k]){
                 for(int j=cycle; j>1; --j){
                     MultiValueSeq::Frame optionalDataFrame = optionalDataSeqPtr->frame(i+j);
-                    if(!optionalDataFrame[k]){
+                    if(optionalDataFrame[k] == 0){
                         nextWrenchVec[k] = VectorXd::Zero(wrenchDim);
                         nextIdxVec[k] = j;
                     }
@@ -99,6 +99,12 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
                 for(int ii=0; ii<wrenchDim; ++ii){
                     refWrenchesSeqPtr->frame(i+j)[k*wrenchDim+ii] = (1-r)*frontWrenchVec[k](ii) + r*nextWrenchVec[k](ii);
                 }
+            }
+        }
+        // overwrite optionalData (slide contact -1 -> 0)
+        for(int j=0; j<cycle; ++j){
+            for(int k=0; k<numContacts; ++k){
+                if(optionalDataSeqPtr->frame(i+j)[k] == -1) optionalDataSeqPtr->frame(i+j)[k] = 0;
             }
         }
     }
