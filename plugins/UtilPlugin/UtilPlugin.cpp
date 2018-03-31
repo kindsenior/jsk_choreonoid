@@ -124,8 +124,8 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
         Vector3d P,L,CM;
         CM = body->calcCenterOfMass();
         body->calcTotalMomentum(P,L);
-        // L -= CM.cross(P);// convert to around CoM
-        L << 0,0,0; // overwrite L to 0,0,0
+        L -= CM.cross(P);// convert to around CoM
+        // L << 0,0,0; // overwrite L to 0,0,0
 
         initCMSeqPtr->at(i) = CM;
         // calculate momentum in simple model
