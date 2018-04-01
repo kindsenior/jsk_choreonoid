@@ -55,8 +55,17 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-370msec.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 4
+              name: "walk-across"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "/home/kunio/ros/indigo/src/jsk_choreonoid/sample/JumpSample/JAXON_BLUE_walk-across.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 4
+          id: 5
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -79,7 +88,7 @@ items:
             selfCollisionDetection: false
             isEditable: false
         - 
-          id: 5
+          id: 6
           name: "box500-800-500"
           plugin: Body
           class: BodyItem
@@ -102,7 +111,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 6
+          id: 7
           name: "box500-800-500"
           plugin: Body
           class: BodyItem
@@ -136,8 +145,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 3 ]
-      checked: [ 2, 4, 5, 6 ]
+      selected: [ 4 ]
+      checked: [ 2, 5, 6, 7 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -221,7 +230,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 4
+      currentBodyItem: 2
   - 
     id: 6
     plugin: Body
@@ -229,13 +238,13 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 4
+      currentBodyItem: 2
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 25 ]
+          selectedLinks: [ 0 ]
         - 
-          id: 4
+          id: 5
           selectedLinks: [ 0 ]
   - 
     id: 7
@@ -249,7 +258,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 3
+      currentPoseSeqItem: 4
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -287,7 +296,7 @@ toolbars:
     penetrationBlockDepth: 0.0005
     lazyCollisionDetectionMode: true
   "BodyBar": 
-    current: 4
+    current: 2
   "LeggedBodyBar": 
     stanceWidth: 0.15
   "BodyMotionGenerationBar": 
@@ -447,17 +456,17 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 4
-        showCenterOfMass: false
-        showPpcom: false
-        showZmp: false
-      - 
         bodyItem: 5
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
       - 
         bodyItem: 6
+        showCenterOfMass: false
+        showPpcom: false
+        showZmp: false
+      - 
+        bodyItem: 7
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
