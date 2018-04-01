@@ -56,7 +56,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 13
+          id: 4
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -90,8 +90,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 12 ]
-      checked: [ 2, 13, 14 ]
+      selected: [ 3 ]
+      checked: [ 2, 4 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -175,7 +175,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 13
+      currentBodyItem: 2
   - 
     id: 6
     plugin: Body
@@ -183,16 +183,13 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 13
+      currentBodyItem: 2
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 0 ]
+          selectedLinks: [ 25 ]
         - 
-          id: 13
-          selectedLinks: [ 0 ]
-        - 
-          id: 14
+          id: 4
           selectedLinks: [ 0 ]
   - 
     id: 7
@@ -206,7 +203,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 12
+      currentPoseSeqItem: 3
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -231,7 +228,7 @@ toolbars:
     frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
-    currentTime: 2.152
+    currentTime: 1.74
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
@@ -404,12 +401,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 13
-        showCenterOfMass: false
-        showPpcom: false
-        showZmp: false
-      - 
-        bodyItem: 14
+        bodyItem: 4
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
