@@ -118,8 +118,26 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_jump-off-420msec.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 11
+              name: "jump-off-400mm"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-off-400mm.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 12
+              name: "walk-down-400mm"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_walk-down-400mm.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 11
+          id: 13
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -142,14 +160,14 @@ items:
             selfCollisionDetection: false
             isEditable: false
         - 
-          id: 12
-          name: "box1"
+          id: 14
+          name: "box500-800-500"
           plugin: Body
           class: BodyItem
           data: 
-            modelFile: "${SHARE}/model/misc/box1.body"
+            modelFile: "${PROJECT_DIR}/../../share/model/misc/box500-800-500.body"
             currentBaseLink: "body"
-            rootPosition: [ 0.02, 0, -0.05 ]
+            rootPosition: [ -0.13, 0, 0.15 ]
             rootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
@@ -176,8 +194,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 3 ]
-      checked: [ 2, 11, 12 ]
+      selected: [ 12 ]
+      checked: [ 2, 13, 14 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -261,7 +279,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 2
+      currentBodyItem: 13
   - 
     id: 6
     plugin: Body
@@ -269,10 +287,16 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 2
+      currentBodyItem: 13
       bodyItems: 
         - 
           id: 2
+          selectedLinks: [ 0 ]
+        - 
+          id: 13
+          selectedLinks: [ 0 ]
+        - 
+          id: 14
           selectedLinks: [ 0 ]
   - 
     id: 7
@@ -286,7 +310,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 3
+      currentPoseSeqItem: 12
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -484,12 +508,12 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 11
+        bodyItem: 13
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
       - 
-        bodyItem: 12
+        bodyItem: 14
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
