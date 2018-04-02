@@ -57,6 +57,15 @@ items:
                 barLength: 1
             - 
               id: 4
+              name: "jump-across-100msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-100msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 5
               name: "walk-across"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -65,7 +74,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 5
+          id: 6
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -88,7 +97,7 @@ items:
             selfCollisionDetection: false
             isEditable: false
         - 
-          id: 6
+          id: 7
           name: "box500-800-500"
           plugin: Body
           class: BodyItem
@@ -111,7 +120,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 7
+          id: 8
           name: "box500-800-500"
           plugin: Body
           class: BodyItem
@@ -146,7 +155,7 @@ views:
     mounted: true
     state: 
       selected: [ 4 ]
-      checked: [ 2, 5, 6, 7 ]
+      checked: [ 2, 6, 7, 8 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -244,7 +253,13 @@ views:
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 5
+          id: 8
+          selectedLinks: [ 0 ]
+        - 
+          id: 7
+          selectedLinks: [ 0 ]
+        - 
+          id: 6
           selectedLinks: [ 0 ]
   - 
     id: 7
@@ -456,17 +471,17 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 5
-        showCenterOfMass: false
-        showPpcom: false
-        showZmp: false
-      - 
         bodyItem: 6
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
       - 
         bodyItem: 7
+        showCenterOfMass: false
+        showPpcom: false
+        showZmp: false
+      - 
+        bodyItem: 8
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
@@ -525,7 +540,7 @@ viewAreas:
             - 
               type: pane
               views: [ 2, 9, 8 ]
-              current: 8
+              current: 2
 layoutOfToolBars: 
   rows: 
     - 
