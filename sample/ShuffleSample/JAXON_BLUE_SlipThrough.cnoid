@@ -161,6 +161,52 @@ items:
             isEditable: true
         - 
           id: 14
+          name: "chair"
+          plugin: Body
+          class: BodyItem
+          data: 
+            modelFile: "${PROJECT_DIR}/../../share/model/misc/box400-800-400.wrl"
+            currentBaseLink: "WAIST"
+            rootPosition: [ -0.3, -0.4, 0.2 ]
+            rootAttitude: [ 
+              1, 0, 0, 
+              0, 1, 0, 
+              0, 0, 1 ]
+            jointPositions: [  ]
+            initialRootPosition: [ 0.15, 0.15, 0.3 ]
+            initialRootAttitude: [ 
+              0.980066578, 0, 0.198669331, 
+              0, 1, 0, 
+              -0.198669331, 0, 0.980066578 ]
+            zmp: [ 0, 0, 0 ]
+            collisionDetection: true
+            selfCollisionDetection: false
+            isEditable: true
+        - 
+          id: 15
+          name: "longfloor"
+          plugin: Body
+          class: BodyItem
+          data: 
+            modelFile: "${PROJECT_DIR}/../../share/model/misc/table.main.wrl"
+            currentBaseLink: "WAIST"
+            rootPosition: [ 0.4, -0.4, 0.0046 ]
+            rootAttitude: [ 
+              1, 0, 0, 
+              0, 0.000796326711, -0.999999683, 
+              0, 0.999999683, 0.000796326711 ]
+            jointPositions: [  ]
+            initialRootPosition: [ 0, 2.5, 0 ]
+            initialRootAttitude: [ 
+              1, 0, 0, 
+              0, 0.000796325897, -0.999999683, 
+              0, 0.999999683, 0.000796325897 ]
+            zmp: [ 0, 0, 0 ]
+            collisionDetection: true
+            selfCollisionDetection: false
+            isEditable: true
+        - 
+          id: 16
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -191,7 +237,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 15
+              id: 17
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -210,7 +256,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 16
+              id: 18
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -229,7 +275,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 17
+              id: 19
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -266,7 +312,7 @@ views:
     mounted: true
     state: 
       selected: [ 7 ]
-      checked: [ 1, 2, 13, 14, 15, 16, 17 ]
+      checked: [ 1, 2, 13, 14, 15, 16, 17, 18, 19 ]
       expanded: [ 1, 2 ]
   - 
     id: 3
@@ -317,9 +363,9 @@ views:
           fieldOfView: 0.6978
           near: 0.01
           far: 100
-          eye: [ 2.19187476, -0.542234888, 0.699534411 ]
-          direction: [ -0.994556447, 0.0997884922, -0.0299955011 ]
-          up: [ -0.0298456485, 0.00299455327, 0.999550034 ]
+          eye: [ 0.321993915, -3.02278977, 0.648062877 ]
+          direction: [ -0.0207907046, 0.999583813, 0.0199986647 ]
+          up: [ 0.0004158695, -0.0199943402, 0.999800007 ]
         - 
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -370,9 +416,15 @@ views:
       bodyItems: 
         - 
           id: 2
+          selectedLinks: [ 31 ]
+        - 
+          id: 15
           selectedLinks: [ 0 ]
         - 
           id: 13
+          selectedLinks: [ 0 ]
+        - 
+          id: 14
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -395,7 +447,7 @@ views:
         - 
           id: 2
           expandedParts: [ "LEGS", "LOWER-BODY", "Whole Body" ]
-      timeLength: 12
+      timeLength: 13
       showLipSync: false
       gridInterval: 1
   - 
@@ -587,6 +639,16 @@ Body:
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
+      - 
+        bodyItem: 14
+        showCenterOfMass: false
+        showPpcom: false
+        showZmp: false
+      - 
+        bodyItem: 15
+        showCenterOfMass: false
+        showPpcom: false
+        showZmp: false
     staticModelEditing: false
   "KinematicFaultChecker": 
     checkJointPositions: true
@@ -606,12 +668,12 @@ viewAreas:
     contents: 
       type: splitter
       orientation: horizontal
-      sizes: [ 444, 1425 ]
+      sizes: [ 595, 1910 ]
       children: 
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 550, 550 ]
+          sizes: [ 750, 750 ]
           children: 
             - 
               type: pane
@@ -624,12 +686,12 @@ viewAreas:
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 786, 314 ]
+          sizes: [ 1072, 428 ]
           children: 
             - 
               type: splitter
               orientation: horizontal
-              sizes: [ 617, 802 ]
+              sizes: [ 484, 1420 ]
               children: 
                 - 
                   type: pane
