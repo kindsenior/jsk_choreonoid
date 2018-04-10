@@ -247,7 +247,7 @@ refs:
           isTouching: true
           partingDirection: [ 0, 0, 1 ]
   - 
-    time: 1.694
+    time: 1.65
     refer: 
       type: Pose
       name: ""
@@ -284,7 +284,7 @@ refs:
             3.19289996e-17, 1, 3.75324856e-17, 
             -4.01307765e-10, -3.75324856e-17, 1 ]
   - 
-    time: 1.87
+    time: 1.8
     refer: 
       type: Pose
       name: ""
@@ -343,7 +343,7 @@ refs:
             3.41011941e-14, 1, 3.45140583e-14, 
             -9.99931693e-10, -3.45071194e-14, 1 ]
   - 
-    time: 2.312
+    time: 2.25
     refer: 
       type: Pose
       name: ""
