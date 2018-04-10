@@ -550,9 +550,9 @@ toolbars:
           takeoffPhaseRatioListCheck: true
           landingPhaseRatioList: 1,1,1,1,1
           landingPhaseRatioListCheck: true
-          errorCMWeight: 100
+          errorCMWeight: 500
           errorCMWeightCheck: true
-          errorMomentumWeight: 50
+          errorMomentumWeight: 100
           errorMomentumWeightCheck: true
           errorAngularMomentumWeight: 200
           errorAngularMomentumWeightCheck: true
