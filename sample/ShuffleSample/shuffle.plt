@@ -10,6 +10,7 @@ b=0.5
 c=5
 cmxscale=10
 cmyscale=10
+dcmxscale=5
 dcmyscale=5
 Lscale=10
 fzscale=100
@@ -19,7 +20,7 @@ plot contact u 1:3, contact u 1:12,input u 1:($13/1000)
 # replot contact u 1:2,contact u 1:($5+0.4),contact u 1:($10/10),  contact u 1:11,contact u 1:($14-0.4),contact u 1:($19/10)
 replot contact u 1:3,contact u 1:($6+0.4),contact u 1:($10/10),  contact u 1:12,contact u 1:($15-0.4),contact u 1:($19/10)
 replot wrench u 1:(-$6/$4)*copscale+copoffset t "lCOPx", wrench u 1:(-$12/$10)*copscale+copoffset t "rCOPx", wrench u 1:($5/$4)*copscale+copoffset t "lCOPy", wrench u 1:($11/$10)*copscale+copoffset t "rCOPy"
-replot input u 1:($2*cmxscale),ref u 1:($2*cmxscale), input u 1:($5/M) t "input dCMx",ref u 1:($5/M) t "ref dCMx"
+replot input u 1:($2*cmxscale),ref u 1:($2*cmxscale), input u 1:($5/M)*dcmxscale t "input dCMx",ref u 1:($5/M)*dcmxscale t "ref dCMx"
 replot input u 1:($3*cmyscale),ref u 1:($3*cmyscale), input u 1:($6/M)*dcmyscale t "input dCMy",ref u 1:($6/M)*dcmyscale t "ref dCMy"
 replot ref u 1:($8/Lscale),ref u 1:($9/Lscale),ref u 1:($10/100)#, ref u 1:4,ref u 1:($7/100)
 replot wrenches u 1:($8/100+1.2) t "lfx",wrenches u 1:($2/100-1.2) t "rfx",wrenches u 1:($4/fzscale) t "rfz"
