@@ -84,6 +84,24 @@ items:
                 barLength: 1
             - 
               id: 7
+              name: "slide-forward-200step-len-3step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slide-forward-200step-len-3step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 8
+              name: "slide-forward-200step-len-5step"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_slide-forward-200step-len-5step.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 9
               name: "shinn-through-right-250step-len-5step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -92,7 +110,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 8
+              id: 10
               name: "slip-through-right-250step-len-1step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -101,7 +119,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 9
+              id: 11
               name: "slip-through-right-200step-len-1step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -110,7 +128,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 10
+              id: 12
               name: "slip-through-right-200step-len-2step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -119,7 +137,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 11
+              id: 13
               name: "slip-through-right-200step-len-4step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -128,7 +146,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 12
+              id: 14
               name: "slip-through-right-200step-len-8step"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -137,7 +155,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 13
+          id: 15
           name: "floor"
           plugin: Body
           class: BodyItem
@@ -160,7 +178,7 @@ items:
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 14
+          id: 16
           name: "AISTSimulator"
           plugin: Body
           class: AISTSimulatorItem
@@ -191,7 +209,7 @@ items:
             oldAccelSensorMode: false
           children: 
             - 
-              id: 15
+              id: 17
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -210,7 +228,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 16
+              id: 18
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -229,7 +247,7 @@ items:
                 enableHeadLight: true
                 enableAdditionalLights: true
             - 
-              id: 17
+              id: 19
               name: "GLVisionSimulator"
               plugin: Body
               class: GLVisionSimulatorItem
@@ -372,7 +390,7 @@ views:
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 13
+          id: 15
           selectedLinks: [ 0 ]
   - 
     id: 9
@@ -385,7 +403,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 12
+      currentPoseSeqItem: 8
       defaultTransitionTime: 0
       updateAll: false
       autoUpdate: false
@@ -583,7 +601,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 13
+        bodyItem: 15
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
