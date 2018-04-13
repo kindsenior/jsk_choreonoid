@@ -226,6 +226,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                         zmp.x() += -n.y()+ccParam->p.x()*f.z();
                         zmp.y() +=  n.x()+ccParam->p.y()*f.z();
 
+                        Vector3 soleOffset = Vector3(0.05,0,0);
+                        n += (ccParam->R*soleOffset).cross(f);
+
                         //wrench
                         VectorXd wrench(6);
                         wrench.head(3) << f;// world
@@ -371,10 +374,15 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
             // vertex << -0.07,0.05; vertexVec.push_back(vertex);
             // vertex << -0.07,-0.05; vertexVec.push_back(vertex);
             // side mergine
-            vertex << 0.16,0.03; vertexVec.push_back(vertex);
-            vertex << 0.16,-0.03; vertexVec.push_back(vertex);
-            vertex << -0.07,0.03; vertexVec.push_back(vertex);
-            vertex << -0.07,-0.03; vertexVec.push_back(vertex);
+            hrp::Vector2 soleOffset = Vector2(0.05,0);
+            // vertex << 0.16,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
+            // vertex << 0.16,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
+            // vertex << -0.07,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
+            // vertex << -0.07,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
+            vertex << 0.14,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
+            vertex << 0.14,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
+            vertex << -0.05,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
+            vertex << -0.05,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
 
             std::vector<hrp::Vector2> smallVertexVec;
             vertex << 0.08,0.03; smallVertexVec.push_back(vertex);
@@ -456,13 +464,17 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
                 }
             }
         }
-        (*iter)->p = body->link((*iter)->linkName)->p();
+        // (*iter)->p = body->link((*iter)->linkName)->p();
+        Vector3 soleOffset = Vector3(0.05,0,0);
+        (*iter)->p = body->link((*iter)->linkName)->p()+soleOffset;
         (*iter)->R = body->link((*iter)->linkName)->R();
         // (*iter)->v = body->link((*iter)->linkName)->v();
         // (*iter)->w = body->link((*iter)->linkName)->w();
         // (*iter)->v << 0,body->link((*iter)->linkName)->v().y(),0;// overwrite x,z->0
         (*iter)->v << body->link((*iter)->linkName)->v().x(),body->link((*iter)->linkName)->v().y(),0;// overwrite z->0
         (*iter)->w << 0,0,body->link((*iter)->linkName)->w().z();// overwrite r,p->0
+        // (*iter)->w << 0,0,0;// overwrite r,p,y->0
+        (*iter)->v += (*iter)->w.cross(soleOffset);
 
         if(typeid(**iter) == typeid(SimpleContactConstraintParam)){
             sfcParam->ccParamVec.push_back(new SimpleContactConstraintParam(dynamic_cast<SimpleContactConstraintParam*>(*iter)));
