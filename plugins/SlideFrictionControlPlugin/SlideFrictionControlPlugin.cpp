@@ -18,6 +18,9 @@ bool SlideFrictionControlPlugin::initialize()
 void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
 {
     cout << "loadExtraSeq()" << endl;
+    cout << "contactLinkCandidateSet: ";
+    for(auto link : contactLinkCandidateSet) cout << " " << link->name();
+    cout << endl;
 
     stringstream fnamess;
     fnamess << poseSeqPath.stem().string() << "_SFC_refPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
