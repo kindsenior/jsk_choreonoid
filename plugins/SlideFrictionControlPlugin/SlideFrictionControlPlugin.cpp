@@ -70,13 +70,19 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
         for(auto contactLink : contactLinkCandidateSet){
             for(int j=0; j<6; ++j) wrenchSs >> wrench(j);
             p = body->link(contactLink->name())->p();
-            wrench.head(3) = body->link(contactLink->name())->R()*wrench.head(3);// world
-            wrench.tail(3) = body->link(contactLink->name())->R()*wrench.tail(3);
-            wrenchMap[contactLink->name()] = wrench;
-            Vector3d f = wrench.head(3);// wrench is world
-            Vector3d n = wrench.tail(3);
             // Vector3d f = body->link(contactLink->name())->R()*wrench.head(3);// wrench is local
             // Vector3d n = body->link(contactLink->name())->R()*wrench.tail(3);
+            Vector3d f = body->link(contactLink->name())->R()*wrench.head(3);// world
+            Vector3d n = body->link(contactLink->name())->R()*wrench.tail(3);
+
+            Vector3 soleOffset = Vector3(0.05,0,0);
+            n += (body->link(contactLink->name())->R()*soleOffset).cross(f);
+
+            wrench.head(3) << f;// world
+            wrench.tail(3) << n;
+
+            wrenchMap[contactLink->name()] = wrench;
+
             Fz += f.z();
             zmp.x() += -n.y()+p.x()*f.z();// 遊脚の場合は発散する
             zmp.y() +=  n.x()+p.y()*f.z();
@@ -466,7 +472,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
         }
         // (*iter)->p = body->link((*iter)->linkName)->p();
         Vector3 soleOffset = Vector3(0.05,0,0);
-        (*iter)->p = body->link((*iter)->linkName)->p()+soleOffset;
+        (*iter)->p = body->link((*iter)->linkName)->p()+body->link((*iter)->linkName)->R()*soleOffset;
         (*iter)->R = body->link((*iter)->linkName)->R();
         // (*iter)->v = body->link((*iter)->linkName)->v();
         // (*iter)->w = body->link((*iter)->linkName)->w();
