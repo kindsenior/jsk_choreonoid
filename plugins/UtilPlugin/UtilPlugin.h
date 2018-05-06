@@ -68,6 +68,7 @@ bool getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
 void generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemptr, const BodyMotionItemPtr& bodyMotionItemPtr);
 
 void generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const std::vector<Link*>& linkVec);
+void generateTorque(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const std::vector<Link*>& linkVec);
 
 bool getEndEffectorLinkVector(std::vector<Link*>& endEffectorLinkVector, BodyPtr& body);
 

@@ -262,6 +262,8 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     interpolateExtraSeq(mBodyMotionItemPtr, childSfc->dt);
     // sweepControl(mPoseSeqPath, parentSfcLayout->getParamString(), parentSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// parentモーション走査
 
+    generateTorque(body, poseSeqItemPtr, endEffectorLinkVec);
+
     cout << "\x1b[31m" << "Finished CascadedControl" << "\x1b[m" << endl;
 }
 
