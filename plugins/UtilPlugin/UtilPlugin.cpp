@@ -198,6 +198,27 @@ void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq
     return;
 }
 
+void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const Link* link)
+{
+    std::cout << "incContactPose(poseIter, poseSeq ,link)";
+    PoseSeq::iterator iter;
+    for(iter = (++poseIter); iter != poseSeq->end(); ++iter){// PoseSeq走査
+        PosePtr pose = iter->get<Pose>();
+        for(Pose::LinkInfoMap::iterator linkInfoIter = pose->ikLinkBegin(); linkInfoIter != pose->ikLinkEnd(); ++linkInfoIter){// LinkInfoMap走査
+            if(link->index() == linkInfoIter->first // リンク番号比較
+               && linkInfoIter->second.isTouching()){// 接触確認
+                poseIter = iter;
+                std::cout << " >>next contact pose is link:" << linkInfoIter->first << " time:" << poseIter->time() << std::endl;
+                return;
+            }
+        }
+
+    }
+    poseIter = iter;
+    std::cout << " next contact pose not found. return pose time:" << poseIter->time() << std::endl;
+    return;
+}
+
 // poseIterが最後のポーズの時は-1を返す
 int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
 {
@@ -258,6 +279,31 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
     }
 
     std::cout << " state not changing or no foot ikLink or no contact link" << std::endl;
+    return false;
+}
+
+bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, const Link* link)
+{
+    std::cout << "isContactStateChanging(" << poseIter->time() <<  "[sec], " << link->name() << ")" << std::endl;
+
+    PosePtr prevPose,curPose,nextPose;
+    PoseSeq::iterator prevIter,nextIter;
+    curPose = poseIter->get<Pose>();
+
+    for(Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter){
+        std::cout << "  linkID:" << linkInfoIter->first << " link name:" << link->name() << " isTouching:" << linkInfoIter->second.isTouching() << std::endl;
+        if(link->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
+            int prevState,nextState;
+            if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
+                std::cout << " " << link->name() << "'s state changing at " << poseIter->time() << "[sec]: " << prevState << "->" << nextState << std::endl;
+                return true;
+            }else{
+                std::cout << " " << link->name() << "'s state is not changing or not touching at " << poseIter->time() << std::endl;
+            }
+        }
+    }
+
+    std::cout << link->name() << "'s state not changing" << std::endl;
     return false;
 }
 

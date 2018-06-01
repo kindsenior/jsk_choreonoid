@@ -49,6 +49,7 @@ void calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet, BodyP
 // どちらの足でもいいので次の接触ポーズにイテレータを進める
 // end()を返すこともある
 void incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body);
+void incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const Link* link);
 
 // poseIterが最後のポーズの時は-1を返す
 int getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
@@ -60,6 +61,7 @@ void getNextTargetContactLinkSet(std::set<Link*>& linkSet, BodyPtr& body, const 
 Vector3d getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
 
 bool isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body);
+bool isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, const Link* link);
 
 bool getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
                            PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
