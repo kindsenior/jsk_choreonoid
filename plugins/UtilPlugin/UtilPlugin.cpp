@@ -381,27 +381,28 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
     int frameRate = motion->frameRate();
     MultiValueSeqPtr optionalDataSeqPtr = motion->getOrCreateExtraSeq<MultiValueSeq>("optionaldata");
     optionalDataSeqPtr->setNumParts(linkNum*2,true);
-    for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,body)){
-        if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
-        std::vector<int> contactStateVec;
-        for(auto link : linkVec){
-            // contactStateVec.push_back(getPrevContactState(frontPoseIter, poseSeqPtr, link->index()) < 2);// 0:静止接触 1:滑り接触
-            // contactStateVec.push_back(getPrevContactState(frontPoseIter, poseSeqPtr, link->index()) == 0);// 0:静止接触のみ
+
+    int j = 0;
+    for(auto link: linkVec){
+        for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,link)){
+            if(!isContactStateChanging(frontPoseIter, poseSeqPtr, link)) continue;
             int contactState = getPrevContactState(frontPoseIter, poseSeqPtr, link->index());
-            if(contactState == 0) contactStateVec.push_back(1);// 0:静止接触
-            if(contactState == 1) contactStateVec.push_back(-1);// 1:滑り接触
-            if(contactState > 1)  contactStateVec.push_back(0);
-        }
-        for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-            MultiValueSeq::Frame frame = optionalDataSeqPtr->frame(i);
-            for(int j=0; j<linkNum; ++j){
-                frame[j] = contactStateVec[j];
+            int optionalDataState;
+            if(contactState == 0) optionalDataState = 1;// 0:静止接触
+            if(contactState == 1) optionalDataState = -1;// 1:滑り接触
+            if(contactState > 1)  optionalDataState = 0;
+
+            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+                MultiValueSeq::Frame frame = optionalDataSeqPtr->frame(i);
+                frame[j] = optionalDataState;
                 frame[j+linkNum] = frontPoseIter->time() - i/(double)frameRate;
             }
+            cout << endl;
+            backPoseIter = frontPoseIter;
         }
-        cout << endl;
-        backPoseIter = frontPoseIter;
+        ++j;
     }
+
     // final frame is the same with the previous frame
     {
         MultiValueSeq::Frame finalFrame = optionalDataSeqPtr->frame(motion->numFrames()-1);
