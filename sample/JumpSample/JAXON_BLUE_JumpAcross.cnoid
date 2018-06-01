@@ -57,24 +57,51 @@ items:
                 barLength: 1
             - 
               id: 4
-              name: "jump-across-100msec"
+              name: "jump-across-100msec-0step-len"
               plugin: PoseSeq
               class: PoseSeqItem
               data: 
-                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-100msec.pseq"
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-100msec-0step-len.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
               id: 5
-              name: "walk-across"
+              name: "jump-across-100msec-500step-len"
               plugin: PoseSeq
               class: PoseSeqItem
               data: 
-                filename: "/home/kunio/ros/indigo/src/jsk_choreonoid/sample/JumpSample/JAXON_BLUE_walk-across.pseq"
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-100msec-500step-len.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 6
+              name: "jump-across-100msec-600step-len"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-100msec-600step-len.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 7
+              name: "jump-across-100msec-800step-len"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-100msec-800step-len.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 8
+              name: "jump-across-120msec-700step-len"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-across-120msec-700step-len.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 6
+          id: 9
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -97,7 +124,7 @@ items:
             selfCollisionDetection: false
             isEditable: false
         - 
-          id: 7
+          id: 10
           name: "box500-800-500"
           plugin: Body
           class: BodyItem
@@ -116,11 +143,11 @@ items:
               0, 1, 0, 
               0, 0, 1 ]
             zmp: [ 0, 0, 0 ]
-            collisionDetection: true
+            collisionDetection: false
             selfCollisionDetection: false
             isEditable: true
         - 
-          id: 8
+          id: 11
           name: "box500-800-500"
           plugin: Body
           class: BodyItem
@@ -139,7 +166,7 @@ items:
               0, 1, 0, 
               0, 0, 1 ]
             zmp: [ 0, 0, 0 ]
-            collisionDetection: true
+            collisionDetection: false
             selfCollisionDetection: false
             isEditable: true
 views: 
@@ -154,8 +181,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 4 ]
-      checked: [ 2, 6, 7, 8 ]
+      selected: [ 8 ]
+      checked: [ 2, 9 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -206,9 +233,9 @@ views:
           fieldOfView: 0.698132
           near: 0.01
           far: 100
-          eye: [ 1.84403427, -2.84452611, 0.684373097 ]
-          direction: [ -0.434965525, 0.900447107, -6.26815422e-11 ]
-          up: [ -2.72643099e-11, 5.64414134e-11, 1 ]
+          eye: [ 2.46043125, -2.41131598, 1.68156907 ]
+          direction: [ -0.547089096, 0.799677938, -0.247403954 ]
+          up: [ -0.139694778, 0.204191296, 0.968912423 ]
         - 
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -250,16 +277,16 @@ views:
       currentBodyItem: 2
       bodyItems: 
         - 
+          id: 11
+          selectedLinks: [ 0 ]
+        - 
           id: 2
           selectedLinks: [ 0 ]
         - 
-          id: 8
+          id: 10
           selectedLinks: [ 0 ]
         - 
-          id: 7
-          selectedLinks: [ 0 ]
-        - 
-          id: 6
+          id: 9
           selectedLinks: [ 0 ]
   - 
     id: 7
@@ -273,7 +300,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 4
+      currentPoseSeqItem: 8
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -294,11 +321,11 @@ views:
 toolbars: 
   "TimeBar": 
     minTime: 0
-    maxTime: 30
+    maxTime: 32
     frameRate: 500
     playbackFrameRate: 50
     idleLoopDrivenMode: false
-    currentTime: 2.54
+    currentTime: 3.42
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
@@ -471,17 +498,17 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 6
+        bodyItem: 9
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
       - 
-        bodyItem: 7
+        bodyItem: 10
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
       - 
-        bodyItem: 8
+        bodyItem: 11
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
@@ -504,12 +531,12 @@ viewAreas:
     contents: 
       type: splitter
       orientation: horizontal
-      sizes: [ 426, 2079 ]
+      sizes: [ 485, 1384 ]
       children: 
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 750, 750 ]
+          sizes: [ 550, 550 ]
           children: 
             - 
               type: pane
@@ -522,12 +549,12 @@ viewAreas:
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 1071, 429 ]
+          sizes: [ 785, 315 ]
           children: 
             - 
               type: splitter
               orientation: horizontal
-              sizes: [ 901, 1172 ]
+              sizes: [ 599, 779 ]
               children: 
                 - 
                   type: pane
@@ -540,7 +567,7 @@ viewAreas:
             - 
               type: pane
               views: [ 2, 9, 8 ]
-              current: 2
+              current: 8
 layoutOfToolBars: 
   rows: 
     - 

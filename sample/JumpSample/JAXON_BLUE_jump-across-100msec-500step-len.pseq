@@ -1,7 +1,7 @@
 # Body pose sequence format version 1.0 defined by cnoid-Robotics
 
 type: PoseSeq
-name: "jump-across-100msec"
+name: "jump-across-100msec-500step-len"
 targetBody: "JAXON_BLUE"
 refs: 
   - 
