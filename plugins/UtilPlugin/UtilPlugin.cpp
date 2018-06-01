@@ -367,6 +367,49 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
     setSubItem("optionaldata", optionalDataSeqPtr, bodyMotionItemPtr);
 }
 
+// 接触力によるトルクのみ計算 リンクの慣性力によるトルクは含まれていない
+void cnoid::generateTorque(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const std::vector<Link*>& linkVec)
+{
+    cout << endl << "generateTorque()" << endl;
+
+    PoseSeqPtr poseSeqPtr = poseSeqItemPtr->poseSeq();
+    BodyMotionItemPtr bodyMotionItemPtr = poseSeqItemPtr->bodyMotionItem();
+    BodyMotionPtr motion = bodyMotionItemPtr->motion();
+
+    MultiValueSeqPtr torqueSeqPtr = motion->getOrCreateExtraSeq<MultiValueSeq>("torque");
+    torqueSeqPtr->setNumParts(body->numJoints(),true);
+
+    MultiValueSeqPtr wrenchSeqPtr = bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq();
+
+    const int wrenchDim = 6;
+    std::vector<JointPathPtr> jointPathVec;
+    for(auto link : linkVec){
+        jointPathVec.push_back(std::make_shared<JointPath>(body->rootLink(), link));
+    }
+    for(int i=0; i<motion->numFrames(); ++i){
+        updateBodyState(body, motion, i);
+        body->calcForwardKinematics();
+
+        MultiValueSeq::Frame torqueFrame = torqueSeqPtr->frame(i);
+        MultiValueSeq::Frame wrenchFrame = wrenchSeqPtr->frame(i);
+        int idxOffset = 0;
+        for(auto jointPathPtr : jointPathVec){
+            VectorXd wrench(wrenchDim);
+            for(int j=0; j<wrenchDim; ++j) wrench(j) = wrenchFrame[j+idxOffset];
+
+            MatrixXd J;
+            jointPathPtr->calcJacobian(J);
+            VectorXd tau = -J.transpose()*wrench;
+            for(int j=0; j<jointPathPtr->numJoints(); ++j) torqueFrame[jointPathPtr->joint(j)->jointId()] += tau(j);
+
+            idxOffset += wrenchDim;
+        }
+    }
+    cout << endl << endl;
+
+    setSubItem("torque", torqueSeqPtr, bodyMotionItemPtr);
+}
+
 bool cnoid::getEndEffectorLinkVector(std::vector<Link*>& endEffectorLinkVec, BodyPtr& body)
 {
     cout << endl << "generateEndEffectorLinkVector( " << body->name() << " )" << endl;

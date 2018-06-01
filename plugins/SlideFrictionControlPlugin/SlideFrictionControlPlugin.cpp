@@ -568,9 +568,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             double startTime, endTime;
             int startFrame, endFrame;
             Vector3d startCM, endCM, startP, endP; // use simple model momentum calculated by UtilPlugin
-            double backPoseOffsetTime;
             if(isTakeoff){// takeoff phase is necessary and must be first in if branching for setting takeoffdCM
-                backPoseOffsetTime = 0;
                 takeoffIter = frontPoseIter;
                 landingIter = frontPoseIter; incContactPose(landingIter,poseSeq,body);
                 jumpTime = landingIter->time() - takeoffIter->time() + jumpFrameOffset*dt;// add jumpFrameOffset
@@ -582,35 +580,37 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
                 startPoseIter = frontPoseIter; --startPoseIter;
                 endPoseIter = frontPoseIter;
-                startTime = startPoseIter->time(); endTime = endPoseIter->time();
-                startFrame = startTime*frameRate; endFrame = endTime*frameRate;
+                startFrame = startPoseIter->time()*frameRate; endFrame = endPoseIter->time()*frameRate;
+                startTime = startFrame*dt; endTime = endFrame*dt;
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
                 // interpolator.calcCoefficients(startCM,startP/m, endCM,takeoffdCM, endTime - startTime);// spline
                 interpolator.calcCoefficients(startCM,startP/m,Vector3d::Zero(), endCM,takeoffdCM,Vector3(0,0,-g), endTime - startTime, 0,takeoffPhaseRatioVec);// acc
-                cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: takeoff phase\x1b[m" << endl;
+                cout << " \x1b[34m" << startTime << "[sec](" << startFrame << ") -> " << endTime << "[sec](" << endFrame << "): takeoff phase\x1b[m" << endl;
                 cout << "  startCM: " << startCM.transpose() << endl << "  startdCM:   " << startP.transpose()/m << endl;
                 cout << "  endCM:   " << endCM.transpose()   << endl << "  takeoffdCM: " << takeoffdCM.transpose() << endl;
+                cout << "  jumpTime: " << jumpTime << " [sec]" << endl;
             }else{// landing phase
-                backPoseOffsetTime = jumpFrameOffset*dt;// add jumpFrameOffset for fz differential or delay
                 int delayOffset = 2;// forward-difference delay + median-filter delay = 1 + 1 = 2
                 startPoseIter = backPoseIter;
                 endPoseIter = backPoseIter; ++endPoseIter;
-                startTime = startPoseIter->time() + backPoseOffsetTime; endTime = endPoseIter->time() + delayOffset*dt;// add jumpFrameOffset for fz differential or delay
-                startFrame = startTime*frameRate; endFrame = min((int)(endTime*frameRate), numFrames-1); // add delay
+                startFrame = startPoseIter->time()*frameRate + jumpFrameOffset; endFrame = min((int)(endPoseIter->time()*frameRate) + delayOffset, numFrames-1);// add jumpFrameOffset for fz differential or delay
+                startTime = startFrame*dt; endTime = endFrame*dt;// add delay
+
                 startCM = initCMSeqPtr->at(startFrame); endCM = initCMSeqPtr->at(endFrame);
                 startP = initPSeqPtr->at(startFrame);   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
                 // interpolator.calcCoefficients(startCM,landingdCM, endCM,endP/m, endTime - startTime);// spline
                 interpolator.calcCoefficients(startCM,landingdCM,Vector3(0,0,-g), endCM,endP/m,Vector3d::Zero(), endTime - startTime, 0,landingPhaseRatioVec);// acc
-                cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: landing phase\x1b[m" << endl;
+                cout << " \x1b[34m" << startTime << "[sec](" << startFrame << ") -> " << endTime << "[sec](" << endFrame << "): landing phase\x1b[m" << endl;
                 cout << "  startCM: " << startCM.transpose() << endl << "  landingdCM: " << landingdCM.transpose() << endl;
                 cout << "  endCM:   " << endCM.transpose()   << endl << "  enddCM:     " << endP.transpose()/m << endl;
             }
 
             // for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-            for(int i=(backPoseIter->time()+backPoseOffsetTime)*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            cout << "  set init value: " << backPoseIter->time()*frameRate+jumpFrameOffset << " -> " << frontPoseIter->time()*frameRate << endl;
+            for(int i=backPoseIter->time()*frameRate+jumpFrameOffset; i < frontPoseIter->time()*frameRate; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
                 // refLSeqPtr->at(i) = Vector3d(0,0,0);
@@ -635,12 +635,12 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             }
         }else if(isJumping){// jumping phases
             // cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: jumping phase\x1b[m" << endl;
-            double startTime = backPoseIter->time(), endTime = frontPoseIter->time() + jumpFrameOffset*dt;// add  jumpFrameOffset for fz differential
-            int startFrame = startTime*frameRate, endFrame = endTime*frameRate;
+            int startFrame = backPoseIter->time()*frameRate, endFrame = frontPoseIter->time()*frameRate + jumpFrameOffset;// add  jumpFrameOffset for fz differential
+            double startTime = startFrame*dt, endTime = endFrame*dt;// add delay
             Vector3d startCM = initCMSeqPtr->at(startFrame), endCM = initCMSeqPtr->at(endFrame);
             Vector3d startP = initPSeqPtr->at(startFrame),   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
             double jumptime = endTime - startTime;
-            cout << " \x1b[34m" << startTime << "[sec] -> " << endTime << "[sec]: jumping phase\x1b[m" << endl;
+            cout << " \x1b[34m" << startTime << "[sec](" << startFrame << ") -> " << endTime << "[sec](" << endFrame << "): jumping phase\x1b[m" << endl;
             // for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
             for(int i=startFrame; i < endFrame; ++i){
                 double t = i*dt;
