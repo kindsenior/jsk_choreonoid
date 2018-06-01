@@ -132,9 +132,18 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             while(std::isnan(refZmpSeqPtr->at(nextVaridIdx).x())) ++nextVaridIdx; // check x coordinate
             Vector3d diffZmp = refZmpSeqPtr->at(nextVaridIdx) - prevZmp;
             cout << "jumping phase(nan check): " << prevIdx << " -> " << nextVaridIdx << endl;
-            for(int j=prevIdx+1; j<nextVaridIdx; ++j){
-                refZmpSeqPtr->at(j) = ((double)(j - prevIdx))/(nextVaridIdx - prevIdx)*diffZmp + prevZmp;
+            int startInterpolationIdx = prevIdx + cycle;
+            int stopInterpolationIdx = nextVaridIdx - cycle;
+            for(int j=prevIdx+1; j<startInterpolationIdx; ++j){
+                refZmpSeqPtr->at(j) = prevZmp;
             }
+            for(int j=startInterpolationIdx; j<stopInterpolationIdx; ++j){
+                refZmpSeqPtr->at(j) = ((double)(j - startInterpolationIdx))/(stopInterpolationIdx - startInterpolationIdx)*diffZmp + prevZmp;
+            }
+            for(int j=stopInterpolationIdx; j<nextVaridIdx; ++j){
+                refZmpSeqPtr->at(j) = prevZmp + diffZmp;
+            }
+
             i = nextVaridIdx;
         }else{
             prevIdx = i;
