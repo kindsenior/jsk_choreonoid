@@ -216,6 +216,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             std::vector<ContactConstraintParam*> ccParamVec = sfcParam.ccParamVec;
             VectorXd u0 = sfc->u0;
             double Fz = 0;
+            int numContacts = 0;
             Vector3d zmp = Vector3d::Zero();
             std::map<string, VectorXd> wrenchMap;
             for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
@@ -224,6 +225,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                     ContactConstraintParam* ccParam = *iter;
                     int inputDim = ccParam->inputDim;
                     if((*linkIter)->name() == ccParam->linkName){
+                        ++numContacts;
                         contactOfs << " "<< ccParam->p.transpose() << " " << ccParam->v.transpose() << " " << ccParam->w.transpose();
                         VectorXd u = ccParam->inputForceConvertMat*u0.segment(colIdx,inputDim);
                         wrenchOfs << " " << u.transpose();// local
@@ -234,6 +236,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                         Fz += f.z();
                         zmp.x() += -n.y()+ccParam->p.x()*f.z();
                         zmp.y() +=  n.x()+ccParam->p.y()*f.z();
+                        zmp.z() += ccParam->p.z();
 
                         Vector3 soleOffset = Vector3(0.05,0,0);
                         n += (ccParam->R*soleOffset).cross(f);
@@ -255,7 +258,8 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
             END:
                 ;
             }
-            zmp /= thresh(Fz,1e-5);
+            zmp.segment(0,2)/= thresh(Fz,1e-5);
+            zmp(2) /= numContacts;
             refZmpSeqPtr->at(motionIdx) = zmp;
             contactOfs << endl;
             wrenchOfs << endl;
