@@ -143,7 +143,7 @@ protected:
         MatrixXd nullJ1 = threshMatrix(E - pseudoJ1*J1);
 
         MatrixXd J2_ = J2*nullJ1;
-        double manipulability_thresh = 0.07;
+        double manipulability_thresh = 0.06;
         MatrixXd srInvJ2_ = SRInverse(J2_,1,manipulability_thresh);
         double manipulability = calcManipulability(J2_);
         if( manipulability < manipulability_thresh ) std::cout << "low manipulability of J2_:" << manipulability << " < " << manipulability_thresh << std::endl;
