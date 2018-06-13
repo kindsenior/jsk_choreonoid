@@ -166,8 +166,8 @@ items:
           class: BodyItem
           data: 
             modelFile: "${PROJECT_DIR}/../../share/model/misc/box500-800-500.body"
-            currentBaseLink: "body"
-            rootPosition: [ -0.13, 0, 0.15 ]
+            currentBaseLink: ""
+            rootPosition: [ -0.13, 0, 0.13 ]
             rootAttitude: [ 
               1, 0, 0, 
               0, 1, 0, 
@@ -194,9 +194,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 12 ]
+      selected: [ 11 ]
       checked: [ 2, 13, 14 ]
-      expanded: [ 1, 2 ]
+      expanded: [ 1, 2, 11 ]
   - 
     id: 2
     plugin: Base
@@ -246,9 +246,9 @@ views:
           fieldOfView: 0.698132
           near: 0.01
           far: 100
-          eye: [ 2.77706524, -1.99464265, 1.09175696 ]
-          direction: [ -0.83629537, 0.547914325, -0.0199986662 ]
-          up: [ -0.0167281375, 0.0109597476, 0.999800007 ]
+          eye: [ 0.184159366, -2.29833312, 0.518102752 ]
+          direction: [ 0.0591572241, 0.998048334, -0.0199986662 ]
+          up: [ 0.00118330223, 0.0199636281, 0.999800007 ]
         - 
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -279,7 +279,7 @@ views:
       spinBox: true
       slider: true
       labelOnLeft: true
-      currentBodyItem: 13
+      currentBodyItem: 2
   - 
     id: 6
     plugin: Body
@@ -287,11 +287,11 @@ views:
     mounted: true
     state: 
       listingMode: "Link List"
-      currentBodyItem: 13
+      currentBodyItem: 2
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 0 ]
+          selectedLinks: [ 31 ]
         - 
           id: 13
           selectedLinks: [ 0 ]
@@ -310,7 +310,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 12
+      currentPoseSeqItem: 11
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -536,12 +536,12 @@ viewAreas:
     contents: 
       type: splitter
       orientation: horizontal
-      sizes: [ 426, 2079 ]
+      sizes: [ 318, 1551 ]
       children: 
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 750, 750 ]
+          sizes: [ 550, 550 ]
           children: 
             - 
               type: pane
@@ -554,12 +554,12 @@ viewAreas:
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 1071, 429 ]
+          sizes: [ 785, 315 ]
           children: 
             - 
               type: splitter
               orientation: horizontal
-              sizes: [ 901, 1172 ]
+              sizes: [ 672, 873 ]
               children: 
                 - 
                   type: pane
