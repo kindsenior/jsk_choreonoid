@@ -612,9 +612,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 cout << "  endCM:   " << endCM.transpose()   << endl << "  enddCM:     " << endP.transpose()/m << endl;
             }
 
+            int copyStartFrame = backPoseIter->time()*frameRate, copyEndFrame = frontPoseIter->time()*frameRate;
+            if(isLanding) copyStartFrame += jumpFrameOffset;
             // for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-            cout << "  set init value: " << backPoseIter->time()*frameRate+jumpFrameOffset << " -> " << frontPoseIter->time()*frameRate << endl;
-            for(int i=backPoseIter->time()*frameRate+jumpFrameOffset; i < frontPoseIter->time()*frameRate; ++i){
+            cout << "  set init value: " << copyStartFrame << " -> " << copyEndFrame << endl;
+            for(int i=copyStartFrame; i < copyEndFrame; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
                 // refLSeqPtr->at(i) = Vector3d(0,0,0);
