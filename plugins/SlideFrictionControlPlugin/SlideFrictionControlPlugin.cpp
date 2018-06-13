@@ -78,7 +78,7 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
             Vector3d f = body->link(contactLink->name())->R()*wrench.head(3);// world
             Vector3d n = body->link(contactLink->name())->R()*wrench.tail(3);
 
-            Vector3 soleOffset = Vector3(0.05,0,0);
+            Vector3 soleOffset = Vector3(0.05,0,0);//COP offset
             n += (body->link(contactLink->name())->R()*soleOffset).cross(f);
 
             wrench.head(3) << f;// world
@@ -238,7 +238,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                         zmp.y() +=  n.x()+ccParam->p.y()*f.z();
                         zmp.z() += ccParam->p.z();
 
-                        Vector3 soleOffset = Vector3(0.05,0,0);
+                        Vector3 soleOffset = Vector3(0.05,0,0);// COP offset
                         n += (ccParam->R*soleOffset).cross(f);
 
                         //wrench
@@ -478,7 +478,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
             }
         }
         // (*iter)->p = body->link((*iter)->linkName)->p();
-        Vector3 soleOffset = Vector3(0.05,0,0);
+        Vector3 soleOffset = Vector3(0.05,0,-0.1);
         (*iter)->p = body->link((*iter)->linkName)->p()+body->link((*iter)->linkName)->R()*soleOffset;
         (*iter)->R = body->link((*iter)->linkName)->R();
         // (*iter)->v = body->link((*iter)->linkName)->v();
