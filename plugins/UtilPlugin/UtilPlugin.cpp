@@ -55,7 +55,7 @@ int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
     int state = 0;
 
     // 滑り判定(静止0 滑り1)
-    const double deltaPos = 0.005, deltaAngle = 0.001;// 要検討 5[mm] 0.001[rad]
+    const double deltaPos = 0.005, deltaAngle = 0.02;// 要検討 5[mm] 0.02[rad]=1.15[deg]
     const Pose::LinkInfo *linkInfo1 = pose1->ikLinkInfo(linkId), *linkInfo2 = pose2->ikLinkInfo(linkId);
     if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
         cout << "  posdiff = " << (linkInfo1->p - linkInfo2->p).norm() << " > " << deltaPos << " or angle diff = " << AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() << " > " << deltaAngle << endl;
