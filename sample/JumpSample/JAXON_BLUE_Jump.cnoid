@@ -84,6 +84,15 @@ items:
                 barLength: 1
             - 
               id: 7
+              name: "jump-toe-takeoff-200msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-takeoff-200msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 8
               name: "jump-250msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -92,7 +101,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 8
+              id: 9
+              name: "jump-toe-takeoff-250msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-takeoff-250msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 10
               name: "jump-270msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -101,7 +119,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 9
+              id: 11
+              name: "jump-toe-takeoff-270msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-takeoff-270msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 12
               name: "jump-300msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -110,7 +137,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 10
+              id: 13
+              name: "jump-toe-takeoff-300msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-takeoff-300msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 14
               name: "jump-320msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -119,7 +155,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 11
+              id: 15
               name: "jump-350msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -128,7 +164,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 12
+              id: 16
               name: "jump-370msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -137,7 +173,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 13
+              id: 17
               name: "jump-400msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -146,7 +182,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 14
+              id: 18
               name: "jump-420msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -155,7 +191,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 15
+              id: 19
               name: "jump-500msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -164,7 +200,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 16
+          id: 20
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -198,8 +234,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 15 ]
-      checked: [ 2, 16 ]
+      selected: [ 13 ]
+      checked: [ 2, 20 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -308,7 +344,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 15
+      currentPoseSeqItem: 13
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -469,9 +505,9 @@ toolbars:
           dtCheck: true
       - 
         SFC: 
-          takeoffPhaseRatioList: 1,1,1,1,1
+          takeoffPhaseRatioList: 1,0,10,0,1
           takeoffPhaseRatioListCheck: true
-          landingPhaseRatioList: 1,1,1,1,1
+          landingPhaseRatioList: 1,0,10,0,1
           landingPhaseRatioListCheck: true
           errorCMWeight: 100
           errorCMWeightCheck: true
@@ -506,7 +542,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 16
+        bodyItem: 20
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
