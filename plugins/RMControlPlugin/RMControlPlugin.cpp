@@ -870,8 +870,6 @@ void RMControlPlugin::execControl()
     std::vector<Link*> endEffectorLinkVec;
     if(!getEndEffectorLinkVector(endEffectorLinkVec, mBody)) return;
 
-    generateOptionalData(mBody, poseSeqItem, endEffectorLinkVec);
-
     // BodyMotion作成
     if(motion->numFrames() == 0) generateBodyMotionFromBar(mBody, poseSeqItem, bodyMotionItem);
     else cout << "numFrames: " << motion->numFrames() << "  Need not generate motion" << endl;
@@ -886,6 +884,7 @@ void RMControlPlugin::execControl()
     string generateMode = mBar->dialog->initialTrajectoryCombo->itemText(Generate).toStdString();
     string loadMode = mBar->dialog->initialTrajectoryCombo->itemText(Load).toStdString();
     if(modeStr == generateMode){
+        generateOptionalData(mBody, poseSeqItem, endEffectorLinkVec);
         generateRefPLSeq(bodyMotionItem, poseSeqItem->poseSeq(), initDCM, endDCM, initL, endL);
         cout << " Generated ref P/L" << endl;
 
