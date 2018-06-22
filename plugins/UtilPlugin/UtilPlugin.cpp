@@ -8,9 +8,8 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
-namespace {
 // 特定のリンクの次のポーズを求める
-PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
+PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
     // std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
@@ -29,7 +28,7 @@ PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, in
 }
 
 // 特定リンクの前のポーズを求める
-PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
+PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
     // std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
     PoseSeq::iterator iter;
@@ -47,6 +46,7 @@ PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, in
     return iter;
 }
 
+namespace {
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
 int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)

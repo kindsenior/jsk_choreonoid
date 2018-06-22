@@ -46,6 +46,9 @@ void generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::vector<L
 
 void calcContactLinkCandidateSet(std::set<Link*>& contactLinkCandidateSet, BodyPtr body, const PoseSeqPtr& poseSeqPtr);
 
+PoseSeq::iterator getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId);
+PoseSeq::iterator getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId);
+
 // どちらの足でもいいので次の接触ポーズにイテレータを進める
 // end()を返すこともある
 void incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const BodyPtr body);

@@ -582,7 +582,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 takeoffdCM.z() = 0.5 * g * jumpTime + (landingCM.z() - takeoffCM.z()) / jumpTime;
                 landingdCM.z() = takeoffdCM.z() - g * jumpTime;
 
-                startPoseIter = frontPoseIter; --startPoseIter;
+                startPoseIter = getPrevPose(frontPoseIter, poseSeq, body->rootLink()->index());
                 endPoseIter = frontPoseIter;
                 startFrame = startPoseIter->time()*frameRate; endFrame = endPoseIter->time()*frameRate;
                 startTime = startFrame*dt; endTime = endFrame*dt;
@@ -598,7 +598,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             }else{// landing phase
                 int delayOffset = 2;// forward-difference delay + median-filter delay = 1 + 1 = 2
                 startPoseIter = backPoseIter;
-                endPoseIter = backPoseIter; ++endPoseIter;
+                endPoseIter = getNextPose(backPoseIter, poseSeq, body->rootLink()->index());
                 startFrame = startPoseIter->time()*frameRate + jumpFrameOffset; endFrame = min((int)(endPoseIter->time()*frameRate) + delayOffset, numFrames-1);// add jumpFrameOffset for fz differential or delay
                 startTime = startFrame*dt; endTime = endFrame*dt;// add delay
 
