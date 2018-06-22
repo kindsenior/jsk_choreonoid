@@ -186,6 +186,7 @@ void MultiContactStabilizerParam::convertToMpcParam()
     numEquals = 1;//Fzの合計
     numInequals = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
+        (*iter)->setupParam();
         numEquals += (*iter)->numEquals;
         numInequals += (*iter)->numInequals;
     }

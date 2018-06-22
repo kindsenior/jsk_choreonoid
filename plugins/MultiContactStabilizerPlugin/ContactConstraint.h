@@ -65,6 +65,11 @@ public:
     dmatrix inputForceConvertMat;
     dmatrix inputWeightConvertMat;
 
+    virtual void setupParam()
+    {
+        if(vertexVec.size() != 0) calcEdgeFromVertex();// overwrite edgeVec by using vertexVec
+    }
+
     virtual void calcEqualMatrix(){equalMat.resize(0,0);};
     virtual void calcEqualVector(){equalVec.resize(0);};
     virtual void calcInequalMatrix(){inequalMat.resize(0,0);};
@@ -89,15 +94,17 @@ public:
     {
         linkName = linkName_;
         vertexVec = vertexVec_;
-        calcEdgeFromVertex();
+        // calcEdgeFromVertex();
     }
 };
 
 class FloatConstraintParam : virtual public ContactConstraintParam
 {
-protected:
-    void initialize()
+public:
+    virtual void setupParam()
     {
+        ContactConstraintParam::setupParam();
+
         inputForceDim = 6;
         inputDim = inputForceDim;
         // numEquals = 6;
@@ -107,7 +114,6 @@ protected:
         inputWeightConvertMat = dmatrix::Identity(inputForceDim,inputDim);
     }
 
-public:
     // void calcEqualMatrix(){equalMat = dmatrix::Identity(numEquals, inputDim);}
     // void calcEqualVector(){equalVec = dvector::Zero(numEquals);}
     void calcInequalMatrix(){inequalMat.resize(0,0);}
@@ -125,22 +131,22 @@ public:
     FloatConstraintParam(const std::string linkName_, const std::vector<Vector3> edgeVec_)
         : ContactConstraintParam(linkName_, edgeVec_)
     {
-        initialize();
     }
 
     FloatConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_)
         : ContactConstraintParam(linkName_, vertexVec_)
     {
-        initialize();
     }
 
 };
 
 class SimpleContactConstraintParam : virtual public ContactConstraintParam
 {
-protected:
-    void initialize()
+public:
+    virtual void setupParam()
     {
+        ContactConstraintParam::setupParam();
+
         inputForceDim = 6;// 6軸力
         inputDim = inputForceDim;// 6軸力
         numEquals = 0;
@@ -149,7 +155,6 @@ protected:
         inputWeightConvertMat = dmatrix::Identity(inputForceDim,inputDim);
     }
 
-public:
     virtual void calcInequalMatrix();
     virtual void calcInequalMinimumVector();
     virtual void calcInequalMaximumVector();
@@ -165,22 +170,21 @@ public:
     SimpleContactConstraintParam(const std::string linkName_, const std::vector<Vector3> edgeVec_)
         : ContactConstraintParam(linkName_, edgeVec_)
     {
-        initialize();
     };
 
     SimpleContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_)
         : ContactConstraintParam(linkName_, vertexVec_)
     {
-        initialize();
     };
 };
 
 class StaticContactConstraintParam : public SimpleContactConstraintParam
 {
-protected:
-    void initialize(const double mu_)
+public:
+    virtual void setupParam()
     {
-        muTrans = mu_;
+        SimpleContactConstraintParam::setupParam();
+
         muRot = 0;
         for(auto vertex : vertexVec) muRot += muTrans*vertex.norm();
         muRot /= vertexVec.size();
@@ -200,7 +204,6 @@ protected:
         numInequals = 6 + edgeVec.size();// 並進静止摩擦制約4式 + 回転静止摩擦制約式2式
     }
 
-public:
     double muTrans, muRot;
 
     void calcInequalMatrix();
@@ -216,20 +219,31 @@ public:
         : ContactConstraintParam(linkName_, edgeVec_),
           SimpleContactConstraintParam(linkName_, edgeVec_)
     {
-        initialize(mu_);
+        // initialize(mu_);
+        muTrans = mu_;
+        // muRot = 0;
     };
 
     StaticContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, const double mu_)
         : ContactConstraintParam(linkName_, vertexVec_),
           SimpleContactConstraintParam(linkName_, vertexVec_)
     {
-        initialize(mu_);
+        // initialize(mu_);
+        muTrans = mu_;
+        // muRot = 0;
     }
 };
 
 class SlideContactConstraintParam : public SimpleContactConstraintParam
 {
 public:
+    virtual void setupParam()
+    {
+        SimpleContactConstraintParam::setupParam();
+
+        numInequals = 2 + edgeVec.size();// 動摩擦制約2式
+    }
+
     // double muTrans, muRot;
     double muTrans;
     Vector3 direction;
@@ -250,7 +264,6 @@ public:
     {
         muTrans = mu_;
         direction = direction_;
-        numInequals = 2 + edgeVec.size();// 動摩擦制約2式
     };
 
     SlideContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, const double mu_, const Vector3& direction_)
@@ -277,25 +290,9 @@ public:
     int rows(){return rows_;}
     int cols(){return cols_;}
 
-    virtual void calcMinimumVector();
-
-    explicit DistributedForceContactConstraintParam(const DistributedForceContactConstraintParam* ccParam)
-        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
-          SimpleContactConstraintParam(ccParam->linkName, ccParam->vertexVec)
+    virtual void setupParam()
     {
-        *this = *ccParam;
-    }
-
-    DistributedForceContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, int rows, int cols)
-        : ContactConstraintParam(linkName_, vertexVec_),
-          SimpleContactConstraintParam(linkName_, vertexVec_)
-    {
-        inputForceDim = 6;// 6軸
-        distributedNum = (rows+1)*(cols+1);// distributed fz
-        nonDistributedDim = inputForceDim - 3; // 3 (fx,fy,tauz)
-        inputDim = nonDistributedDim + distributedNum;// input dimension
-        rows_ = rows;
-        cols_ = cols;
+        SimpleContactConstraintParam::setupParam();
 
         // forcePointVec
         startVertex = vertexVec.front();
@@ -303,9 +300,9 @@ public:
         for(std::vector<Vector2>::iterator iter = vertexVec.begin(); iter != vertexVec.end(); ++iter){
             if((*iter - startVertex).norm() > diagonalVec.norm()) diagonalVec = *iter - startVertex;
         }
-        double xStep = diagonalVec[0]/rows, yStep = diagonalVec[1]/cols;
-        for(int i=0; i<rows+1; ++i){
-            for(int j=0; j<cols+1; ++j){
+        double xStep = diagonalVec[0]/rows_, yStep = diagonalVec[1]/cols_;
+        for(int i=0; i<rows_+1; ++i){
+            for(int j=0; j<cols_+1; ++j){
                 Vector3 forcePoint;
                 forcePoint << startVertex[0]+xStep*i, startVertex[1]+yStep*j, 0;
                 forcePointVec.push_back(forcePoint);
@@ -331,6 +328,27 @@ public:
         // inputWeightConvertMat
         inputWeightConvertMat = inputForceConvertMat;
         inputWeightConvertMat.block(3,0, 2,inputDim) = dmatrix::Zero(2,inputDim);
+    }
+
+    virtual void calcMinimumVector();
+
+    explicit DistributedForceContactConstraintParam(const DistributedForceContactConstraintParam* ccParam)
+        : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
+          SimpleContactConstraintParam(ccParam->linkName, ccParam->vertexVec)
+    {
+        *this = *ccParam;
+    }
+
+    DistributedForceContactConstraintParam(const std::string linkName_, const std::vector<Vector2> vertexVec_, int rows, int cols)
+        : ContactConstraintParam(linkName_, vertexVec_),
+          SimpleContactConstraintParam(linkName_, vertexVec_)
+    {
+        inputForceDim = 6;// 6軸
+        distributedNum = (rows+1)*(cols+1);// distributed fz
+        nonDistributedDim = inputForceDim - 3; // 3 (fx,fy,tauz)
+        inputDim = nonDistributedDim + distributedNum;// input dimension
+        rows_ = rows;
+        cols_ = cols;
     };
 };
 
@@ -338,6 +356,14 @@ class DistributedForceStaticContactConstraintParam : public StaticContactConstra
                                                      public DistributedForceContactConstraintParam
 {
 public:
+    virtual void setupParam()
+    {
+        StaticContactConstraintParam::setupParam();
+        DistributedForceContactConstraintParam::setupParam();
+
+        numInequals = 6 + edgeVec.size();// overwrite DFCCP
+    }
+
     explicit DistributedForceStaticContactConstraintParam(const DistributedForceStaticContactConstraintParam* ccParam)
         : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
           StaticContactConstraintParam(ccParam->linkName, ccParam->vertexVec, ccParam->muTrans),
@@ -351,8 +377,6 @@ public:
           StaticContactConstraintParam(linkName_, vertexVec_, mu_),
           DistributedForceContactConstraintParam(linkName_, vertexVec_, rows, cols)
     {
-        // numInequals = 4 + edgeVec.size();// overwrite DFCCP
-        numInequals = 6 + edgeVec.size();// overwrite DFCCP
     }
 
     void calcInequalMatrix(){StaticContactConstraintParam::calcInequalMatrix();}
@@ -367,6 +391,13 @@ class DistributedForceSlideContactConstraintParam : public DistributedForceConta
 public:
     double muTrans;
 
+    virtual void setupParam()
+    {
+        DistributedForceContactConstraintParam::setupParam();
+
+        numInequals = 3 + edgeVec.size();// overwrite SC <- SCC <- DFCCP
+    }
+
     explicit DistributedForceSlideContactConstraintParam(const DistributedForceSlideContactConstraintParam* ccParam)
         : ContactConstraintParam(ccParam->linkName, ccParam->vertexVec),
           DistributedForceContactConstraintParam(ccParam->linkName, ccParam->vertexVec, ccParam->rows_, ccParam->cols_)
@@ -378,7 +409,6 @@ public:
         : ContactConstraintParam(linkName_, vertexVec_),// virtual inheritance
           DistributedForceContactConstraintParam(linkName_, vertexVec_, rows, cols)
     {
-        numInequals = 3 + edgeVec.size();// overwrite SC <- SCC <- DFCCP
         muTrans = mu_;
     }
 
