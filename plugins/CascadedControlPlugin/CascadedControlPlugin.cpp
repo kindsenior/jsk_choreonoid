@@ -258,7 +258,7 @@ void CascadedControlPlugin::execControl(bool loadFlg)
         loadExtraSeq(mPoseSeqPath ,childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
     }else{
         generateVerticalTrajectory(body, poseSeqItemPtr, contactLinkCandidateSet, childSfcLayout->takeoffPhaseRatioSpinArray->value(),childSfcLayout->landingPhaseRatioSpinArray->value());
-        generatePreModelPredictiveControlParamDeque(parentSfc, body, poseSeqItemPtr, contactLinkCandidateSet);
+        generatePreModelPredictiveControlParamDeque(parentSfc, bodyItemPtr, poseSeqItemPtr, contactLinkCandidateSet);
         {// add last param for interpolation
             SlideFrictionControlParam* lastSfcParam = (SlideFrictionControlParam*) parentSfc->preMpcParamDeque.back();
             SlideFrictionControlParam* tmpParam = new SlideFrictionControlParam(lastSfcParam->index()+1, parentSfc, lastSfcParam);

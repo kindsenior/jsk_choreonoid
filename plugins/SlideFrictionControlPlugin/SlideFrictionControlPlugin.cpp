@@ -353,13 +353,77 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
 }
 
 namespace {
-void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, const SlideFrictionControl* const sfc, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
+// bool operator>(const Vector3d& vec1, const Vector3d& vec2) {return vec1.norm() > vec2.norm();}
+// bool operator<(const Vector3d& vec1, const Vector3d& vec2) {return vec1.norm() < vec2.norm();}
+bool compVector(const Vector3d& vec1, const Vector3d& vec2) {return vec1.norm() > vec2.norm();}
+
+Vector3d getLongestVector(std::vector<Vector3d> pointVec, const std::vector<Vector3d>& exceptionalPointVec = std::vector<Vector3d>(), const double distanceThresh = 0.05)
+{
+    // remove neighbor points of exceptionalPointVec
+    if(exceptionalPointVec.size() > 0){
+        for(auto exceptionalPoint : exceptionalPointVec){
+            auto iter = pointVec.begin();
+            while(iter != pointVec.end()){
+                if(((*iter) - exceptionalPoint).norm() < distanceThresh) iter = pointVec.erase(iter);
+                else ++iter;
+            }
+        }
+    }
+
+    // std::sort(pointVec.begin(), pointVec.end());
+    // std::sort(pointVec.begin(), pointVec.end(), std::greater<Vector3d>());
+    std::sort(pointVec.begin(), pointVec.end(), compVector);
+
+    return pointVec[0];
+}
+
+Vector3d getFarthestVector(std::vector<Vector3d> pointVec, const Vector3d& referencePoint)
+{
+    for(auto& point : pointVec) point -= referencePoint;
+    return referencePoint + getLongestVector(pointVec);
+}
+
+std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx)
+{
+    // collision取得
+    const std::vector<CollisionLinkPairPtr>& collisions = bodyItemPtr->collisionsOfLink(linkIdx);
+
+    const Link* link = bodyItemPtr->body()->link(linkIdx);
+
+    std::vector<Vector3d> collisionPointVec, vertexVec;
+    for(size_t i=0; i < collisions.size(); ++i){
+        CollisionLinkPair& collisionPair = *collisions[i];
+
+        for(std::vector<Collision>::iterator iter = collisionPair.collisions.begin(); iter != collisionPair.collisions.end(); ++iter){
+            collisionPointVec.push_back(link->R().transpose()*(iter->point - link->p()));
+        }
+        vertexVec.push_back(getLongestVector(collisionPointVec));
+
+        std::vector<Vector3d> v;
+        v.push_back(vertexVec[0]);
+        vertexVec.push_back(getLongestVector(collisionPointVec, v));
+
+        vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[0]));
+        vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[1]));
+
+    }
+
+    return vertexVec;
+}
+
+void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, BodyItemPtr& bodyItemPtr, const SlideFrictionControl* const sfc, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
     cout << "\x1b[34m" << "generateContactConstraintParamVec( ~" << poseIter->time() << "[sec] )" << "\x1b[m" << endl;
     ccParamVec.clear();
+
+    BodyPtr body = bodyItemPtr->body();
+
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
+
+        std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, linkIdx);
+
         // if(contactState < 2){// 接触フラグが0か1 要改良
         if(true){
             std::vector<hrp::Vector2> vertexVec;
@@ -435,8 +499,9 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
     cout << endl << endl;
 }
 
-void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d CM, Vector3d P, Vector3d L, Vector3d F, BodyPtr& body, std::vector<ContactConstraintParam*>& ccParamVec, std::vector<ContactConstraintParam*>& prevCcParamVec, double dt)
+void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vector3d CM, Vector3d P, Vector3d L, Vector3d F, BodyItemPtr& bodyItemPtr, std::vector<ContactConstraintParam*>& ccParamVec, std::vector<ContactConstraintParam*>& prevCcParamVec, double dt)
 {
+    BodyPtr body = bodyItemPtr->body();
 
     static Vector3 g;
     g << 0,0,9.8;
@@ -481,6 +546,9 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
         Vector3 soleOffset = Vector3(0.05,0,-0.1);
         (*iter)->p = body->link((*iter)->linkName)->p()+body->link((*iter)->linkName)->R()*soleOffset;
         (*iter)->R = body->link((*iter)->linkName)->R();
+
+        std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, body->link((*iter)->linkName)->index());
+
         // (*iter)->v = body->link((*iter)->linkName)->v();
         // (*iter)->w = body->link((*iter)->linkName)->w();
         // (*iter)->v << 0,body->link((*iter)->linkName)->v().y(),0;// overwrite x,z->0
@@ -694,11 +762,12 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
 }
 
-void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sfc, BodyPtr body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet)
+void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sfc, BodyItemPtr bodyItemPtr, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet)
 {
     cout << "generatePreModelPredictiveControlParamDeque()" << endl;
 
     const PoseSeqPtr poseSeqPtr = poseSeqItem->poseSeq();
+    BodyPtr body = bodyItemPtr->body();
     const BodyMotionItemPtr motionItem = poseSeqItem->bodyMotionItem();
     const BodyMotionPtr motion = motionItem->motion();
     const int frameRate = motion->frameRate();
@@ -706,8 +775,13 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     const double dt = 1.0/motion->frameRate();
     const Vector3d gVec = Vector3(0,0,9.80665);
 
+    QEventLoop eventLoop;
+
     updateBodyState(body, motion, 0, contactLinkCandidateSet);
     body->calcForwardKinematics();// use end effector's velocity
+
+    bodyItemPtr->notifyKinematicStateChange(true);
+    eventLoop.processEvents();
 
     Vector3SeqPtr refCMSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refCM")->seq();
     Vector3SeqPtr refPSeqPtr = motionItem->findSubItem<Vector3SeqItem>("refP")->seq();
@@ -716,18 +790,21 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
     int index = 0;
     std::vector<ContactConstraintParam*> prevCcParamVec;
-    ::generateContactConstraintParamVec(prevCcParamVec, sfc, contactLinkCandidateSet, ++poseSeqPtr->begin(), poseSeqPtr);
+    ::generateContactConstraintParamVec(prevCcParamVec, bodyItemPtr, sfc, contactLinkCandidateSet, ++poseSeqPtr->begin(), poseSeqPtr);
     for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,body)){
         if(!isContactStateChanging(frontPoseIter, poseSeqPtr, body)) continue;
 
         // 接触状態依存のパラメータのみ設定(動作軌道に依存するパラメータは後で設定)
         std::vector<ContactConstraintParam*> ccParamVec;
-        ::generateContactConstraintParamVec(ccParamVec, sfc, contactLinkCandidateSet, frontPoseIter, poseSeqPtr);
+        ::generateContactConstraintParamVec(ccParamVec, bodyItemPtr, sfc, contactLinkCandidateSet, frontPoseIter, poseSeqPtr);
 
         for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
         // for(int i=backPoseIter->time()*frameRate+1; i <= frontPoseIter->time()*frameRate; ++i){
             updateBodyState(body, motion, min(i,numFrames-1), contactLinkCandidateSet);
             body->calcForwardKinematics();// use end effector's velocity
+
+            bodyItemPtr->notifyKinematicStateChange(true);
+            eventLoop.processEvents();
 
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
             Vector3d P = refPSeqPtr->at(i);
@@ -736,13 +813,13 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
             if(i == backPoseIter->time()*frameRate){ // 接触状態の変わり目だけ別処理
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, thresh((P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
                 // forward-difference for jump
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, L, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
+                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, L, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), bodyItemPtr, ccParamVec, prevCcParamVec, dt);
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
             }else{
                 std::vector<ContactConstraintParam*> dummyCcparamVec;
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, thresh((P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
                 // forward-difference for jump
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, L, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
+                ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, L, thresh((refPSeqPtr->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), bodyItemPtr, ccParamVec, dummyCcparamVec, dt);
                 // ::generateSlideFrictionControlParam(sfcParam, refCMSeqPtr->at(i), P, (P - refPSeqPtr->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, dummyCcparamVec, dt);
             }
 
@@ -806,7 +883,7 @@ void SlideFrictionControlPlugin::execControl()
     sfc->numXDivisions = layout->xDivisionNumSpin->value();
     sfc->numYDivisions = layout->yDivisionNumSpin->value();
 
-    generatePreModelPredictiveControlParamDeque(sfc, body, poseSeqItemPtr, contactLinkCandidateSet);
+    generatePreModelPredictiveControlParamDeque(sfc, bodyItemPtr, poseSeqItemPtr, contactLinkCandidateSet);
 
     sweepControl(mPoseSeqPath, mBar->dialog->layout()->getParamString(), sfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
 

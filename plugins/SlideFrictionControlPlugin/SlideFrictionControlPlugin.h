@@ -19,6 +19,7 @@
 #include <cnoid/src/PoseSeqPlugin/PoseSeqItem.h>
 #include <cnoid/src/PoseSeqPlugin/BodyMotionGenerationBar.h>
 #include <cnoid/FileUtil>
+#include <QEventLoop>
 
 #include <UtilPlugin/UtilPlugin.h>
 #include <UtilPlugin/Interpolator.h>
@@ -27,7 +28,7 @@
 #include "SlideFrictionControlBar.h"
 
 namespace cnoid{
-    void generatePreModelPredictiveControlParamDeque(hrp::SlideFrictionControl* sfc, BodyPtr body, const PoseSeqItemPtr& poseSeqItemPtr, const std::set<Link*>& contactLinkCandidateSet);
+    void generatePreModelPredictiveControlParamDeque(hrp::SlideFrictionControl* sfc, BodyItemPtr bodyItemPtr, const PoseSeqItemPtr& poseSeqItemPtr, const std::set<Link*>& contactLinkCandidateSet);
     void generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& poseSeqItem, const std::set<Link*> contactLinkCandidateSet, const std::vector<double>& takeoffPhaseRatioVec, const std::vector<double>& landingPhaseRatioVec);
     void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
     void loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramStr, hrp::SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet);
