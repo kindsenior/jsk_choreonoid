@@ -58,6 +58,33 @@ items:
                 barLength: 1
             - 
               id: 4
+              name: "broad-jump-toe-takeoff-500mm"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_broad-jump-toe-takeoff-500mm.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 5
+              name: "broad-jump-toe-takeoff-750mm"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_broad-jump-toe-takeoff-750mm.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 6
+              name: "broad-jump-toe-takeoff-1000mm"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_broad-jump-toe-takeoff-1000mm.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 7
               name: "broad-jump-slide-land-1000mm"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -66,7 +93,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
         - 
-          id: 5
+          id: 8
           name: "Floor"
           plugin: Body
           class: BodyItem
@@ -100,8 +127,8 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 3 ]
-      checked: [ 2, 5 ]
+      selected: [ 4 ]
+      checked: [ 2, 8 ]
       expanded: [ 1, 2 ]
   - 
     id: 2
@@ -197,9 +224,9 @@ views:
       bodyItems: 
         - 
           id: 2
-          selectedLinks: [ 0 ]
+          selectedLinks: [ 25 ]
         - 
-          id: 5
+          id: 8
           selectedLinks: [ 0 ]
   - 
     id: 7
@@ -213,7 +240,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 3
+      currentPoseSeqItem: 4
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -411,7 +438,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 5
+        bodyItem: 8
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
