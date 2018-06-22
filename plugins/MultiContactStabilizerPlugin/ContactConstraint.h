@@ -33,7 +33,7 @@ protected:
                 }
                 if(pluseFlg || minusFlg){
                     Vector3 edge;
-                    if(c > 0){
+                    if(pluseFlg){
                         edge << a,b,c;
                     }else{
                         edge << -a,-b,-c;
