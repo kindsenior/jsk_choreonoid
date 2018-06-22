@@ -58,7 +58,8 @@ void DistributedForceSlideContactConstraintParam::calcInequalMatrix()
     int colIdx = nonDistributedDim;
     for(std::vector<Vector3>::iterator rIter = forcePointVec.begin(); rIter != forcePointVec.end(); ++rIter){
         Vector3 ri = *rIter;
-        Vector3 di = R.transpose()*(-v) + (R.transpose()*(-w)).cross((*rIter));// in local coordinate
+        // Vector3 di = R.transpose()*(-v) + (R.transpose()*(-w)).cross((*rIter));// in local coordinate
+        Vector3 di = contactRot().transpose()*(-contactVel()) + (contactRot().transpose()*(-contactAngVel())).cross((*rIter));// in local coordinate !!!need check!!!
         di.normalize();
 
         inequalMat.block(rowIdx,colIdx, 2,1) = -muTrans*di.head(2);// -mu*dxy

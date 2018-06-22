@@ -225,21 +225,28 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
                     ContactConstraintParam* ccParam = *iter;
                     int inputDim = ccParam->inputDim;
                     if((*linkIter)->name() == ccParam->linkName){
+                        Vector3 COPOffset = Vector3(ccParam->contactOffsetPos(0),ccParam->contactOffsetPos(1),0);
+                        cout << ccParam->linkName << ": COP offset = " << COPOffset.transpose() << " vertices = "; for(auto vertex : ccParam->vertexVec) cout << " [" << vertex.transpose() << "]";
+                        cout << endl;
+
                         ++numContacts;
                         contactOfs << " "<< ccParam->p.transpose() << " " << ccParam->v.transpose() << " " << ccParam->w.transpose();
                         VectorXd u = ccParam->inputForceConvertMat*u0.segment(colIdx,inputDim);
-                        wrenchOfs << " " << u.transpose();// local
+                        // wrenchOfs << " " << u.transpose();// local (around the point of contact constraint)
+                        wrenchOfs << " " << u.head(3).transpose() << " " << (u.tail(3)+COPOffset.cross((Vector3)u.head(3))).transpose() ;// local (around the projected point of ankle)
+                        // wrenchOfs << " " << u.head(3).transpose() << " " << (u.tail(3)+ccParam->contactOffsetPos.cross((Vector3)u.head(3))).transpose() ;// local (around ankle)
 
                         //calc ZMP 足は床上である前提
                         Vector3d f = ccParam->R*u.head(3);
                         Vector3d n = ccParam->R*u.tail(3);
                         Fz += f.z();
-                        zmp.x() += -n.y()+ccParam->p.x()*f.z();
-                        zmp.y() +=  n.x()+ccParam->p.y()*f.z();
-                        zmp.z() += ccParam->p.z();
+                        zmp.x() += -n.y()+ccParam->contactPos().x()*f.z();
+                        zmp.y() +=  n.x()+ccParam->contactPos().y()*f.z();
+                        zmp.z() += ccParam->contactPos().z();
 
-                        Vector3 soleOffset = Vector3(0.05,0,0);// COP offset
-                        n += (ccParam->R*soleOffset).cross(f);
+                        // -> moment around the projected point of ankle
+                        n += (ccParam->R*COPOffset).cross(f);// u is around center of contact face
+                        // n += (ccParam->R*ccParam->contactOffsetPos).cross(f);// u is around center of contact face
 
                         //wrench
                         VectorXd wrench(6);
@@ -427,45 +434,6 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
         // if(contactState < 2){// 接触フラグが0か1 要改良
         if(true){
             std::vector<hrp::Vector2> vertexVec;
-            hrp::Vector2 vertex;// 頂点の2次元座標を代入 (要 足の形状取得)
-            // vertex << 0.1,0.05; vertexVec.push_back(vertex);
-            // vertex << 0.1,-0.05; vertexVec.push_back(vertex);
-            // vertex << -0.1,0.05; vertexVec.push_back(vertex);
-            // vertex << -0.1,-0.05; vertexVec.push_back(vertex);
-            // vertex << 0.15,0.08; vertexVec.push_back(vertex);
-            // vertex << 0.15,-0.08; vertexVec.push_back(vertex);
-            // vertex << -0.1,0.08; vertexVec.push_back(vertex);
-            // vertex << -0.1,-0.08; vertexVec.push_back(vertex);
-            // vertex << 0.13,0.065; vertexVec.push_back(vertex);
-            // vertex << 0.13,-0.065; vertexVec.push_back(vertex);
-            // vertex << -0.1,0.065; vertexVec.push_back(vertex);
-            // vertex << -0.1,-0.065; vertexVec.push_back(vertex);
-            // vertex << 0.12,0.06; vertexVec.push_back(vertex);
-            // vertex << 0.12,-0.06; vertexVec.push_back(vertex);
-            // vertex << -0.09,0.06; vertexVec.push_back(vertex);
-            // vertex << -0.09,-0.06; vertexVec.push_back(vertex);
-
-            // for JAXON_BLUE
-            // vertex << 0.16,0.05; vertexVec.push_back(vertex);
-            // vertex << 0.16,-0.05; vertexVec.push_back(vertex);
-            // vertex << -0.07,0.05; vertexVec.push_back(vertex);
-            // vertex << -0.07,-0.05; vertexVec.push_back(vertex);
-            // side mergine
-            hrp::Vector2 soleOffset = Vector2(0.05,0);
-            // vertex << 0.16,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-            // vertex << 0.16,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-            // vertex << -0.07,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-            // vertex << -0.07,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-            vertex << 0.14,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-            vertex << 0.14,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-            vertex << -0.05,0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-            vertex << -0.05,-0.03; vertex -= soleOffset; vertexVec.push_back(vertex);
-
-            std::vector<hrp::Vector2> smallVertexVec;
-            vertex << 0.08,0.03; smallVertexVec.push_back(vertex);
-            vertex << 0.08,-0.03; smallVertexVec.push_back(vertex);
-            vertex << -0.05,0.03; smallVertexVec.push_back(vertex);
-            vertex << -0.05,-0.03; smallVertexVec.push_back(vertex);
 
             if(contactState == 0){// static contact
                 // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
@@ -542,20 +510,33 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
                 }
             }
         }
-        // (*iter)->p = body->link((*iter)->linkName)->p();
-        Vector3 soleOffset = Vector3(0.05,0,-0.1);
-        (*iter)->p = body->link((*iter)->linkName)->p()+body->link((*iter)->linkName)->R()*soleOffset;
-        (*iter)->R = body->link((*iter)->linkName)->R();
 
         std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, body->link((*iter)->linkName)->index());
+        Vector3d soleOffset = std::accumulate(contactPointVec.begin(), contactPointVec.end(), Vector3d::Zero().eval()) / contactPointVec.size();// center of contact face
 
+        (*iter)->contactOffsetPos = soleOffset;// local position offset
+        (*iter)->contactOffsetRot = body->link((*iter)->linkName)->R().transpose()*Matrix33::Identity();// link coordinate and contact coordinate is same
+
+        (*iter)->p = body->link((*iter)->linkName)->p();
+        (*iter)->R = body->link((*iter)->linkName)->R();// orient of contact fase should be used?
         // (*iter)->v = body->link((*iter)->linkName)->v();
         // (*iter)->w = body->link((*iter)->linkName)->w();
         // (*iter)->v << 0,body->link((*iter)->linkName)->v().y(),0;// overwrite x,z->0
         (*iter)->v << body->link((*iter)->linkName)->v().x(),body->link((*iter)->linkName)->v().y(),0;// overwrite z->0
         (*iter)->w << 0,0,body->link((*iter)->linkName)->w().z();// overwrite r,p->0
         // (*iter)->w << 0,0,0;// overwrite r,p,y->0
-        (*iter)->v += (*iter)->w.cross(soleOffset);
+        // (*iter)->v += (*iter)->w.cross((*iter)->contactOffsetRot*(*iter)->contactOffsetPos);// need check
+
+
+        std::vector<hrp::Vector2> vertexVec;
+        hrp::Vector2 vertex;// 頂点の2次元座標を代入 (要 足の形状取得)
+        for(auto contactPoint : contactPointVec){
+            vertex << contactPoint.segment(0,2);
+            vertex -= (*iter)->contactOffsetPos.segment(0,2);
+            vertexVec.push_back(vertex);
+        }
+
+        (*iter)->vertexVec = vertexVec;
 
         if(typeid(**iter) == typeid(SimpleContactConstraintParam)){
             sfcParam->ccParamVec.push_back(new SimpleContactConstraintParam(dynamic_cast<SimpleContactConstraintParam*>(*iter)));

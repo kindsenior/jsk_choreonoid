@@ -72,8 +72,8 @@ void SlideFrictionControlParam::calcInputMatrix()
 
     int colIdx = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
-        Matrix33 R = (*iter)->R;
-        Vector3 p = (*iter)->p;
+        Matrix33 R = (*iter)->contactRot();
+        Vector3 p = (*iter)->contactPos();
 
         dmatrix R2 = dmatrix::Zero(inputForceDim,inputForceDim);
         R2.block(0,0,3,3) = R;
@@ -131,8 +131,8 @@ void SlideFrictionControlParam::calcEqualConstraints()
     colIdx = 0;
     equalVec(rowIdx) = 0;// Lz = 0
     for(auto ccParam : ccParamVec){
-        Vector3 p = ccParam->p;
-        Matrix33 R = ccParam->R;
+        Vector3 p = ccParam->contactPos();
+        Matrix33 R = ccParam->contactRot();
         dmatrix crossRot = dmatrix(1,2);
         crossRot << -(p(1)-CM(1)),(p(0)-CM(0));
         equalMat.block(rowIdx,colIdx, 1,ccParam->inputDim)

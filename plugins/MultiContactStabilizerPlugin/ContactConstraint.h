@@ -53,6 +53,8 @@ public:
     Matrix33 R;
     std::vector<Vector3> edgeVec;
     std::vector<Vector2> vertexVec;
+    Vector3 contactOffsetPos;
+    Matrix33 contactOffsetRot;
 
     dmatrix equalMat;
     dvector equalVec;
@@ -64,6 +66,11 @@ public:
 
     dmatrix inputForceConvertMat;
     dmatrix inputWeightConvertMat;
+
+    virtual Vector3 contactPos(){return p + R*contactOffsetPos;};
+    virtual Matrix33 contactRot(){return R*contactOffsetRot;};
+    virtual Vector3 contactVel(){return v + w.cross(R*contactOffsetPos);};// need check
+    virtual Vector3 contactAngVel(){return w;};// need check
 
     virtual void setupParam()
     {
