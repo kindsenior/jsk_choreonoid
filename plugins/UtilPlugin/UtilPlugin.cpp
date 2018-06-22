@@ -49,17 +49,31 @@ PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr pose
 namespace {
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
-int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId)
+int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId, const std::vector<Vector3d>& contactPointVec)
 {
     // std::cout << "getContactState()";
     int state = 0;
 
     // 滑り判定(静止0 滑り1)
-    const double deltaPos = 0.005, deltaAngle = 0.02;// 要検討 5[mm] 0.02[rad]=1.15[deg]
+    const double deltaPos = 0.01, deltaAngle = 0.02;// 要検討 10[mm] 0.02[rad]=1.15[deg]
     const Pose::LinkInfo *linkInfo1 = pose1->ikLinkInfo(linkId), *linkInfo2 = pose2->ikLinkInfo(linkId);
-    if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
-        cout << "  posdiff = " << (linkInfo1->p - linkInfo2->p).norm() << " > " << deltaPos << " or angle diff = " << AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() << " > " << deltaAngle << endl;
-        state += 1;// 2^0
+    if(contactPointVec.size() == 0){
+        if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
+            cout << "  posdiff = " << (linkInfo1->p - linkInfo2->p).norm() << " > " << deltaPos << " or angle diff = " << AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() << " > " << deltaAngle << endl;
+            state += 1;// 2^0
+        }
+    }else{
+        state = 1;// 2^0
+        for(auto contactPoint : contactPointVec){
+            double diff = ((linkInfo1->p + linkInfo1->R*contactPoint) - (linkInfo2->p + linkInfo2->R*contactPoint)).norm();
+            if(diff < deltaPos){
+                state = 0;
+                break;
+            }else{
+                cout << "  posdiff = " << diff << " > " << deltaPos << ", ";
+            }
+            cout << endl;
+        }
     }
 
     // 遊脚判定(接触0 非接触1)
@@ -220,20 +234,20 @@ void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq
 }
 
 // poseIterが最後のポーズの時は-1を返す
-int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
+int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId, const std::vector<Vector3d>& contactPointVec)
 {
     std::cout << "getNextContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator nextPoseIter = getNextPose( poseIter, poseSeq, linkId );
     if(poseIter == nextPoseIter){std::cout << " this is final pose" << std::endl; return -1;}
-    return getContactState( getPrevPose( nextPoseIter, poseSeq, linkId )->get<Pose>(), nextPoseIter->get<Pose>(), linkId );
+    return getContactState( getPrevPose( nextPoseIter, poseSeq, linkId )->get<Pose>(), nextPoseIter->get<Pose>(), linkId, contactPointVec );
 }
 
-int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
+int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId, const std::vector<Vector3d>& contactPointVec)
 {
     std::cout << "getPrevContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator prevPoseIter = getPrevPose( poseIter, poseSeq, linkId );
     if(poseIter == prevPoseIter){std::cout << " this is first pose" << std::endl; return -1;}
-    return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId );
+    return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId, contactPointVec );
 }
 
 // 特定の接触状態のLinkSetを取得

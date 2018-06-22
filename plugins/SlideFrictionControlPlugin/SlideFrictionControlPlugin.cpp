@@ -420,10 +420,10 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
 
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
-        int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx);
 
         std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, linkIdx);
 
+        int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx, contactPointVec);
         // if(contactState < 2){// 接触フラグが0か1 要改良
         if(true){
             std::vector<hrp::Vector2> vertexVec;

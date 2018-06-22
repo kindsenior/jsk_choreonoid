@@ -55,9 +55,9 @@ void incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const
 void incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq, const Link* link);
 
 // poseIterが最後のポーズの時は-1を返す
-int getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
+int getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId, const std::vector<Vector3d>& contactPointVec = std::vector<Vector3d>());
 
-int getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId);
+int getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId, const std::vector<Vector3d>& contactPointVec = std::vector<Vector3d>());
 
 void getNextTargetContactLinkSet(std::set<Link*>& linkSet, BodyPtr& body, const int contactState, const std::set<Link*>& contactLinkCandidateSet, const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq);
 
