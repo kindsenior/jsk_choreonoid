@@ -598,6 +598,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
     Vector3d takeoffdCM, landingdCM;
     double jumpTime;
     for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); incContactPose(frontPoseIter,poseSeq,body)){
+        // contact stateが変わるかどうかではなく, 支持脚・遊脚が変わるかで判断すべき
         if(!isContactStateChanging(frontPoseIter, poseSeq, body)) continue;
 
         bool isTakeoff = true, isJumping = true, isLanding = true;

@@ -101,7 +101,6 @@ public:
     {
         linkName = linkName_;
         vertexVec = vertexVec_;
-        // calcEdgeFromVertex();
     }
 };
 

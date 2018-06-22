@@ -400,7 +400,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
     for(auto link: linkVec){
         for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,link)){
             if(!isContactStateChanging(frontPoseIter, poseSeqPtr, link)) continue;
-            int contactState = getPrevContactState(frontPoseIter, poseSeqPtr, link->index());
+            int contactState = getPrevContactState(frontPoseIter, poseSeqPtr, link->index());// note!!!: toe/heel contact is mistaken as sliding
             int optionalDataState;
             if(contactState == 0) optionalDataState = 1;// 0:静止接触
             if(contactState == 1) optionalDataState = -1;// 1:滑り接触

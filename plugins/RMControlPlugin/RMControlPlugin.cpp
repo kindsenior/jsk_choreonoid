@@ -611,7 +611,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             }
 
             // q,dq,ddq,rootLink p,R,v,w更新
-            updateBodyState(mBody, motion, currentFrame);
+            updateBodyState(mBody, motion, currentFrame);// gap exists between currentFrame and nextFrame
 
             mBody->calcForwardKinematics(true,true);// 状態更新
             mBody->calcCenterOfMass(); // update wc
