@@ -101,10 +101,11 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
                 }
             }
         }
-        // overwrite optionalData (slide contact -1 -> 0)
+        // overwrite optionalData (slide contact -1 -> 0 or 1)
         for(int j=0; j<cycle; ++j){
             for(int k=0; k<numContacts; ++k){
-                if(optionalDataSeqPtr->frame(i+j)[k] == -1) optionalDataSeqPtr->frame(i+j)[k] = 0;
+                // if(optionalDataSeqPtr->frame(i+j)[k] == -1) optionalDataSeqPtr->frame(i+j)[k] = 0;// single foot slide
+                if(optionalDataSeqPtr->frame(i+j)[k] == -1) optionalDataSeqPtr->frame(i+j)[k] = 1;// both feet slide (temporally toe/heel contact)
             }
         }
     }
