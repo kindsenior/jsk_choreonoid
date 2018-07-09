@@ -41,3 +41,5 @@ replot pos @hip_p_dq t "r-hip-p dq*".sprintf("%.2f",a)
 knee_dq=udiff(5)
 replot pos @knee_dq t "r-knee dq*".sprintf("%.2f",a)
 
+root_dp=udiff(3)
+replot hip @root_dp t "root pitch vel*".sprintf("%.2f",a)
