@@ -401,7 +401,7 @@ toolbars:
           dtCheck: true
       - 
         SFC: 
-          takeoffPhaseRatioList: 1,0,10,0,1
+          takeoffPhaseRatioList: 1,0,2,8,1
           takeoffPhaseRatioListCheck: true
           landingPhaseRatioList: 1,0,10,0,1
           landingPhaseRatioListCheck: true
