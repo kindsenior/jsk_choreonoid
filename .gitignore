@@ -32,6 +32,7 @@
 
 # choreonoid
 *.dat
+*.bak
 
 # hrpsys sequence file
 *.pos
