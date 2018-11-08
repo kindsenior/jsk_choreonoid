@@ -19,6 +19,28 @@ public:
     Interpolator(){}
 };
 
+class LinearInterpolator : public Interpolator
+{
+protected:
+    int polynominalDegree;
+
+public:
+    LinearInterpolator() : Interpolator(){
+        polynominalDegree = 2;
+    }
+
+    void calcCoefficients(const VectorXd& x0, const VectorXd& x1, const double duration){
+        const int numDimensions = x0.size();
+        while(coefficientVec.size() < polynominalDegree) coefficientVec.push_back(VectorXd::Zero(numDimensions));
+
+        coefficientVec[0] = x0;
+        coefficientVec[1] = (x1 - x0)/duration;
+    }
+
+    VectorXd x(double t){return coefficientVec[0] + coefficientVec[1] * t;};
+    VectorXd dx(double t = 0){return coefficientVec[1];};
+};
+
 class CubicSplineInterpolator : public Interpolator
 {
 protected:
