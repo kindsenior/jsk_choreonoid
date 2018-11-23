@@ -15,8 +15,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-	<build_depend>choreonoid</build_depend>
   <build_depend>cmake_modules</build_depend>
+  <build_depend>choreonoid</build_depend>
+  <build_depend>hrpsys</build_depend>
 
   <run_depend>choreonoid</run_depend>
 
