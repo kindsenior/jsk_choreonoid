@@ -35,6 +35,9 @@ link_directories(${Boost_LIBRARY_DIRS})
 #   RESULT_VARIABLE RESULT
 #   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
+# for python module
+catkin_python_setup()
+
 file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
 catkin_package(
 	INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}
@@ -107,7 +110,3 @@ foreach(_plugin_dir ${_plugin_dirs})
 	message("Build: ${_plugin_dir}")
 	add_subdirectory(${_plugin_dir})
 endforeach()
-
-
-# for python module
-catkin_python_setup()
