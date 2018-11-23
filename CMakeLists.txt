@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.1.0)
 project(jsk_choreonoid)
 
 ## include cmake util function
@@ -8,6 +8,9 @@ message("********************find pkg********************")
 message("PKG_CONFIG_PATH: $ENV{PKG_CONFIG_PATH}")
 # find_package(catkin REQUIRED COMPONENTS mk choreonoid)
 # find_package(catkin REQUIRED COMPONENTS mk)
+include(FindPkgConfig)
+include(CheckIncludeFiles)
+
 find_package(catkin REQUIRED cmake_modules)
 find_package(choreonoid)
 if(NOT ${choreonoid_FOUND})
