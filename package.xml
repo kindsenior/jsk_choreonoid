@@ -2,14 +2,16 @@
   <name>jsk_choreonoid</name>
   <version>0.1.0</version>
   <description>
-This program has been developed by Kunio Kojima.
-	</description>
-  <maintainer email="k-kojima@jsk.t.u-tokyo.ac.jp">Kunio Kojima</maintainer>
+   <p>An <a href = "http://choreonoid.org/en/">Choreonoid</a>-based plugin. This package is the most tailored for humanoid (biped) robots for historical reason.</p>
+  </description>
 
-  <author>Kunio Kojima</author>
   <license>BSD</license>
+  <maintainer email="k-kojima@jsk.imi.i.u-tokyo.ac.jp">Kunio Kojima</maintainer>
+  <author>Kunio Kojima</author>
 
   <url type="website">http://ros.org/wiki/jsk_choreonoid</url>
+  <url type="repository">https://github.com/kindsenior/jsk_choreonoid</url>
+  <url type="bugtracker">https://github.com/kindsenior/jsk_choreonoid/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
 
