@@ -8,7 +8,7 @@ message("********************find pkg********************")
 message("PKG_CONFIG_PATH: $ENV{PKG_CONFIG_PATH}")
 # find_package(catkin REQUIRED COMPONENTS mk choreonoid)
 # find_package(catkin REQUIRED COMPONENTS mk)
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED cmake_modules)
 find_package(choreonoid)
 if(NOT ${choreonoid_FOUND})
 	find_package(PkgConfig)
@@ -35,7 +35,7 @@ execute_process(COMMAND pkg-config --variable=plugindir choreonoid
 file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
 catkin_package(
 	INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}
-	DEPENDS eigen)
+	DEPENDS Eigen)
 
 message("********************choreonoid pkg infomation********************")
 # pkg_search_module(choreonoid choreonoid REQUIRED)
@@ -61,6 +61,8 @@ message("choreonoid-body-plugin_LDFLAGS :${choreonoid-body-plugin_LDFLAGS}")
 message("choreonoid-body-plugin_INCLUDE_DIRS: ${choreonoid-body-plugin_INCLUDE_DIRS}")
 message("choreonoid-body-plugin_LIBRARY_DIRS: ${choreonoid-body-plugin_LIBRARY_DIRS}")
 message("choreonoid-body-plugin_LIBRARIES: ${choreonoid-body-plugin_LIBRARIES}")
+message("EIGEN_INCLUDE_DIRS: ${EIGEN_INCLUDE_DIRS}")
+include_directories(${Eigen_INCLUDE_DIRS})
 
 # -I
 include_directories(${choreonoid_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/plugins)
