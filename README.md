@@ -6,13 +6,13 @@ jsk_choreonid contains several controller: Multi Contact Stabilizer, Resolved Mo
 
 Requirements
 ------------
-1. ros hydro or later
-1. [choreonid-ros-pkg](https://github.com/kindsenior/choreonoid-ros-pkg)
+1. ros indigo or later
+1. [choreonid](https://github.com/kindsenior/choreonoid)
 
 Install
 -------
 Go to ros workspace  
-Clone https://github.com/kindsenior/choreonoid-ros-pkg and this package  
+Clone https://github.com/kindsenior/choreonoid and this package  
 catkin build jsk_choreonid --force-cmake  
 
 Usage
