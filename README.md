@@ -17,7 +17,7 @@ catkin build jsk_choreonid --force-cmake
 
 Usage
 -----
-**First, see [choreonoid tutorials](http://choreonoid.org/en/manuals/1.5/index.html or http://choreonoid.org/ja/manuals/1.5/index.html)**
+**First, see [choreonoid tutorials](http://choreonoid.org/en/manuals/ or http://choreonoid.org/ja/manuals/)**
 
 1. run choreonoid
 
