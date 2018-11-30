@@ -20,6 +20,7 @@
 #include <cnoid/FileUtil>
 #include <cnoid/BodyMotionGenerationBar>
 #include <cnoid/JointPath>
+#include <cnoid/ZMPSeq>
 
 #include <cnoid/LeggedBodyHelper>
 #include <cnoid/AppConfig>

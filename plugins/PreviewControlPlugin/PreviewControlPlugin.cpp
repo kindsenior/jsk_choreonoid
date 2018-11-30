@@ -91,7 +91,8 @@ void PreviewControlPlugin::execControl()
     // }
 
     // refZmpSeqPtr = motion->getOrCreateExtraSeq<Vector3Seq>("ZMP");// motionのZMP
-    refZmpSeqPtr = motion->extraSeq<Vector3Seq>("ZMP");// motionのZMP Vector3SeqはZMPSeqでもいい??
+    // refZmpSeqPtr = motion->extraSeq<Vector3Seq>("ZMP");// motionのZMP Vector3SeqはZMPSeqでもいい??
+    refZmpSeqPtr = cnoid::getOrCreateZMPSeq(*motion);
     cout << "Finished generating ref zmp seq" << endl;
 
     Vector3SeqPtr initialZMPSeqPtr;
@@ -270,7 +271,7 @@ void PreviewControlPlugin::execControl()
     }// modifying loop
 
     // motionに出力動作ZMPを代入
-    Vector3SeqPtr finalZMPSeqPtr = motion->extraSeq<Vector3Seq>("ZMP");// motionのZMP
+    Vector3SeqPtr finalZMPSeqPtr = getOrCreateZMPSeq(*motion);// motionのZMP
     for(int i = 0; i < motion->numFrames(); ++i){
         finalZMPSeqPtr->at(i) = zmpSeqPtr->at(i);
     }
