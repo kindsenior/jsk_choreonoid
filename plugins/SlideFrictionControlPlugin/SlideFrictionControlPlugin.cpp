@@ -44,7 +44,9 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
     Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
-    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+    // Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+    // Vector3SeqPtr refZmpSeqPtr = getOrCreateZMPSeq(*motion);// motionのZMP
+    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq();
     MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
     refWrenchesSeqPtr->setNumParts(6*4,true);
 
@@ -148,7 +150,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");// 上書き確認
     Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
     Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
-    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+    // Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
+    // Vector3SeqPtr refZmpSeqPtr = getOrCreateZMPSeq(*(bodyMotionItemPtr->motion()));
+    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq();
     MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches");
     refWrenchesSeqPtr->setNumParts(6*4,true);
 
@@ -343,7 +347,7 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     setSubItem("refCM", refCMSeqPtr, bodyMotionItemPtr);
     setSubItem("refP", refPSeqPtr, bodyMotionItemPtr);
     setSubItem("refL", refLSeqPtr, bodyMotionItemPtr);
-    setSubItem("ZMP", refZmpSeqPtr, bodyMotionItemPtr);
+    // setSubItem("ZMP", refZmpSeqPtr, bodyMotionItemPtr);
     setSubItem("wrenches", refWrenchesSeqPtr, bodyMotionItemPtr);
 
     refPLOfs.close();
