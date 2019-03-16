@@ -601,6 +601,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
     Vector3d takeoffdCM, landingdCM;
     double jumpTime;
+    int startFrame = 0, endFrame = 0;
     for(PoseSeq::iterator frontPoseIter = (++poseSeq->begin()),backPoseIter = poseSeq->begin(); frontPoseIter != poseSeq->end(); incContactPose(frontPoseIter,poseSeq,body)){
         // contact stateが変わるかどうかではなく, 支持脚・遊脚が変わるかで判断すべき
         if(!isContactStateChanging(frontPoseIter, poseSeq, body)) continue;
@@ -624,7 +625,6 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
 
             PoseSeq::iterator startPoseIter, endPoseIter;
             double startTime, endTime;
-            int startFrame, endFrame;
             Vector3d startCM, endCM, startP, endP; // use simple model momentum calculated by UtilPlugin
             if(isTakeoff){// takeoff phase is necessary and must be first in if branching for setting takeoffdCM
                 takeoffIter = frontPoseIter;
@@ -695,7 +695,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             }
         }else if(isJumping){// jumping phases
             // cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: jumping phase\x1b[m" << endl;
-            int startFrame = backPoseIter->time()*frameRate, endFrame = frontPoseIter->time()*frameRate + jumpFrameOffset;// add  jumpFrameOffset for fz differential
+            startFrame = backPoseIter->time()*frameRate; endFrame = frontPoseIter->time()*frameRate + jumpFrameOffset;// add  jumpFrameOffset for fz differential
             double startTime = startFrame*dt, endTime = endFrame*dt;// add delay
             Vector3d startCM = initCMSeqPtr->at(startFrame), endCM = initCMSeqPtr->at(endFrame);
             Vector3d startP = initPSeqPtr->at(startFrame),   endP = initPSeqPtr->at(endFrame); // use simple model momentum calculated by UtilPlugin
@@ -715,7 +715,10 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             }
         }else{// other phases
             cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: normal phase\x1b[m" << endl;
-            for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
+            startFrame = std::max(endFrame, (int) backPoseIter->time()*frameRate); // previous interpolating ends after next starting phase while toe landing
+            endFrame = (int) (frontPoseIter->time()*frameRate);
+            cout << "  set init value: " << startFrame << " -> " << endFrame << endl;
+            for(int i=startFrame; i < endFrame; ++i){
                 refCMSeqPtr->at(i) = initCMSeqPtr->at(i);
                 refPSeqPtr->at(i) = initPSeqPtr->at(i);
                 // refLSeqPtr->at(i) = Vector3d(0,0,0);
