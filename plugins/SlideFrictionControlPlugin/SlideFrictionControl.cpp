@@ -214,6 +214,7 @@ void SlideFrictionControlParam::convertToMpcParam()
     numInequals = 0;
     for(std::vector<ContactConstraintParam*>::iterator iter = ccParamVec.begin(); iter != ccParamVec.end(); ++iter){
         (*iter)->setupParam();
+
         numEquals += (*iter)->numEquals;
         numInequals += (*iter)->numInequals;
         inputDim += (*iter)->inputDim;

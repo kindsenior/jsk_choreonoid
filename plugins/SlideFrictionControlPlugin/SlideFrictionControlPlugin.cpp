@@ -493,8 +493,8 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
     // sfcParam->CM += CM;
     sfcParam->P = P;
     // sfcParam->P << 0,0,P.z();// overwrite only xy coordinates
-    sfcParam->L = L;
-    // sfcParam->L << 0,0,0;
+    // sfcParam->L = L;
+    sfcParam->L << 0,0,0;
     // sfcParam->F = body->mass()*g;
     sfcParam->F = F;
 

@@ -65,9 +65,6 @@ public:
         updateWeight();
     }
 
-    void calcWholeBodyJacobian() {
-    }
-
     void update() {
         // update jacobian
         updateJacobian();
