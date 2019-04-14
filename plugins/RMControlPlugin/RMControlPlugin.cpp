@@ -494,13 +494,13 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
         fnamess.str("");
         fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_PL_" << motion->frameRate() << "fps_" << i << ".dat";
         ofstream ofs( fnamess.str().c_str() );
-        if(!ofs){ cerr << "File Open Error: " << fnamess << endl; return;}
+        if(!ofs){ cerr << "File Open Error: " << fnamess.str() << endl; return;}
         ofs << "time CMx CMy CMz Px Py Pz Lx Ly Lz" << endl;
 
         fnamess.str("");
         fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_EE_" << motion->frameRate() << "fps_" << i << ".dat";
         ofstream eeOfs( fnamess.str().c_str() );
-        if(!eeOfs){ cerr << "File Open Error: " << fnamess << endl; return;}
+        if(!eeOfs){ cerr << "File Open Error: " << fnamess.str() << endl; return;}
         eeOfs << "time";
         std::vector<string> columnHeadKeyVec={"px","py","pz", "vx","vy","vz", "wx","wy","wz"};
         for(auto link : endEffectorLinkVec) for(auto columnHeadKey : columnHeadKeyVec) eeOfs << " " << link->name() << columnHeadKey;

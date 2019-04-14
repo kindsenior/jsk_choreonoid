@@ -9,6 +9,7 @@
 #include <map>
 #include <vector>
 #include <deque>
+#include <numeric>
 
 #include <hrpUtil/EigenTypes.h>
 

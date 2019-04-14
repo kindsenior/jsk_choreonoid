@@ -9,7 +9,7 @@ using namespace cnoid;
 double cnoid::calcManipulability(const MatrixXd& m) { return sqrt((m*m.transpose()).determinant()); }
 
 template <typename t_matrix>
-t_matrix cnoid::PseudoInverse(const t_matrix& m, const double &tolerance=1.e-6)
+t_matrix cnoid::PseudoInverse(const t_matrix& m, const double &tolerance)
 {
     using namespace Eigen;
     typedef JacobiSVD<t_matrix> TSVD;
