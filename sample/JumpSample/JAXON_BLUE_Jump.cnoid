@@ -12,6 +12,7 @@ items:
       data: 
         collisionDetection: true
         collisionDetector: AISTCollisionDetector
+        materialTableFile: "${SHARE}/default/materials.yaml"
       children: 
         - 
           id: 2
@@ -21,14 +22,14 @@ items:
           data: 
             modelFile: "${PROJECT_DIR}/../../share/model/JAXON_BLUE/jaxon_blue.yaml"
             currentBaseLink: "LLEG_JOINT5"
-            rootPosition: [ 4.04093441e-05, 0, 0.799460041 ]
+            rootPosition: [ 0.02, 5.55111512e-17, 0.66 ]
             rootAttitude: [ 
-              1, -1.10590509e-34, -1.11022302e-16, 
-              5.92072995e-34, 1, -1.92592994e-34, 
-              1.11022302e-16, -7.00797256e-37, 1 ]
+              1, -3.91926744e-32, 3.33066907e-16, 
+              3.69778549e-32, 1, 3.85185989e-32, 
+              -3.33066907e-16, -3.97887907e-32, 1 ]
             jointPositions: [ 
-              -0.000000, -0.000000, -0.792438,  1.558864, -0.766426,  0.000000, -0.000000, -0.000000, -0.792438,  1.558864, 
-              -0.766426,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.698132, -0.349066, -0.087266, 
+              -0.000000,  0.000000, -0.911011,  2.061875, -1.150864, -0.000000, -0.000000,  0.000000, -0.911011,  2.061875, 
+              -1.150864, -0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.698132, -0.349066, -0.087266, 
               -1.396263,  0.000000,  0.000000,  0.000000,  0.698132,  0.349066,  0.087266, -1.396263,  0.000000,  0.000000, 
                0.000000 ]
             initialRootPosition: [ 0, 0, 1.0235 ]
@@ -41,7 +42,7 @@ items:
                0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000, 
                0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000,  0.000000, 
                0.000000 ]
-            zmp: [ 0.0382, 0, 0 ]
+            zmp: [ 0.160000534, 2.77555756e-17, 0 ]
             collisionDetection: true
             selfCollisionDetection: false
             isEditable: true
@@ -93,6 +94,15 @@ items:
                 barLength: 1
             - 
               id: 8
+              name: "jump-toe-200msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-200msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 9
               name: "jump-250msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -101,7 +111,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 9
+              id: 10
               name: "jump-toe-takeoff-250msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -110,7 +120,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 10
+              id: 11
+              name: "jump-toe-250msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-250msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 12
               name: "jump-270msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -119,7 +138,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 11
+              id: 13
               name: "jump-toe-takeoff-270msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -128,7 +147,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 12
+              id: 14
+              name: "jump-toe-270msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-270msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 15
               name: "jump-300msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -137,7 +165,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 13
+              id: 16
               name: "jump-toe-takeoff-300msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -146,7 +174,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 14
+              id: 17
+              name: "jump-toe-300msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-300msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 18
               name: "jump-320msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -155,7 +192,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 15
+              id: 19
               name: "jump-350msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -164,7 +201,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 16
+              id: 20
+              name: "jump-toe-350msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-350msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 21
               name: "jump-370msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -173,7 +219,7 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 17
+              id: 22
               name: "jump-400msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -182,7 +228,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 18
+              id: 23
+              name: "jump-toe-400msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-400msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 24
               name: "jump-420msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -191,7 +246,16 @@ items:
                 format: POSE-SEQ-YAML
                 barLength: 1
             - 
-              id: 19
+              id: 25
+              name: "jump-toe-450msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-450msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
+            - 
+              id: 26
               name: "jump-500msec"
               plugin: PoseSeq
               class: PoseSeqItem
@@ -199,14 +263,23 @@ items:
                 filename: "${PROJECT_DIR}/JAXON_BLUE_jump-500msec.pseq"
                 format: POSE-SEQ-YAML
                 barLength: 1
+            - 
+              id: 27
+              name: "jump-toe-500msec"
+              plugin: PoseSeq
+              class: PoseSeqItem
+              data: 
+                filename: "${PROJECT_DIR}/JAXON_BLUE_jump-toe-500msec.pseq"
+                format: POSE-SEQ-YAML
+                barLength: 1
         - 
-          id: 20
+          id: 29
           name: "Floor"
           plugin: Body
           class: BodyItem
           data: 
             modelFile: "${SHARE}/model/misc/floor.wrl"
-            currentBaseLink: "BASE"
+            currentBaseLink: ""
             rootPosition: [ 0, 0, -0.1 ]
             rootAttitude: [ 
               1, 0, 0, 
@@ -234,9 +307,9 @@ views:
     class: ItemTreeView
     mounted: true
     state: 
-      selected: [ 13 ]
-      checked: [ 2, 20 ]
-      expanded: [ 1, 2 ]
+      selected: [ 28 ]
+      checked: [ 2, 29 ]
+      expanded: [ 1, 2, 17, 20, 23, 25, 27 ]
   - 
     id: 2
     plugin: Base
@@ -252,6 +325,7 @@ views:
       viewpointControlMode: thirdPerson
       collisionLines: false
       polygonMode: fill
+      cullingMode: enabled
       defaultHeadLight: true
       defaultHeadLightIntensity: 0.75
       headLightLightingFromBack: false
@@ -286,9 +360,9 @@ views:
           fieldOfView: 0.698132
           near: 0.01
           far: 100
-          eye: [ 2.77706524, -1.99464265, 1.09175696 ]
-          direction: [ -0.83629537, 0.547914325, -0.0199986662 ]
-          up: [ -0.0167281375, 0.0109597476, 0.999800007 ]
+          eye: [ 0.238130075, -2.45769822, 0.705291354 ]
+          direction: [ -2.82725301e-17, 0.99875026, 0.0499791682 ]
+          up: [ 1.41480568e-18, -0.0499791682, 0.99875026 ]
         - 
           camera: [ System, Orthographic ]
           orthoHeight: 20
@@ -337,6 +411,12 @@ views:
     plugin: OpenRTM
     class: RTSNameServerView
     mounted: true
+    state: 
+      NameServers: 
+        - 
+          isDefaultNameServer: false
+          host: "localhost"
+          port: 2809
   - 
     id: 8
     name: "Pose Roll"
@@ -344,7 +424,7 @@ views:
     class: PoseRollView
     mounted: true
     state: 
-      currentPoseSeqItem: 13
+      currentPoseSeqItem: 28
       defaultTransitionTime: 0
       updateAll: true
       autoUpdate: false
@@ -373,22 +453,18 @@ toolbars:
     speedScale: 1
     syncToOngoingUpdates: true
     autoExpansion: true
+  "LeggedBodyBar": 
+    stanceWidth: 0.15
   "KinematicsBar": 
     mode: AUTO
     enablePositionDragger: true
-    penetrationBlock: true
+    penetrationBlock: false
     collisionLinkHighlight: false
     snapDistance: 0.025
     penetrationBlockDepth: 0.0005
     lazyCollisionDetectionMode: true
-  "RMControlBar": 
-    initialTrajectory: Load
-    initialTrajectoryCheck: false
-    saveParameterInFileName: true
   "BodyBar": 
     current: 2
-  "LeggedBodyBar": 
-    stanceWidth: 0.15
   "BodyMotionGenerationBar": 
     autoGenerationForNewBody: true
     balancer: false
@@ -422,6 +498,10 @@ toolbars:
     waistHeightRelaxation: false
     gravity: 9.8
     dynamicsTimeRatio: 1
+  "RMControlBar": 
+    initialTrajectory: Load
+    initialTrajectoryCheck: false
+    saveParameterInFileName: true
   "SlideFrictionControlBar": 
     saveParameterInFileName: false
     SFC: 
@@ -505,9 +585,9 @@ toolbars:
           dtCheck: true
       - 
         SFC: 
-          takeoffPhaseRatioList: 1,0,10,0,1
+          takeoffPhaseRatioList: 1,0,5,5,1
           takeoffPhaseRatioListCheck: true
-          landingPhaseRatioList: 1,0,10,0,1
+          landingPhaseRatioList: 1,5,5,0,1
           landingPhaseRatioListCheck: true
           errorCMWeight: 1000
           errorCMWeightCheck: true
@@ -542,7 +622,7 @@ Body:
         showPpcom: false
         showZmp: true
       - 
-        bodyItem: 20
+        bodyItem: 29
         showCenterOfMass: false
         showPpcom: false
         showZmp: false
@@ -556,6 +636,11 @@ Body:
     targetJoints: all
     checkSelfCollisions: true
     onlyTimeBarRange: false
+  "SplineFilterDialog": 
+    isInputFrameRateSpecified: false
+    inputFrameRate: 200
+    isOutputFrameRateSpecified: false
+    outputFrameRate: 200
 OpenRTM: 
   "deleteUnmanagedRTCsOnStartingSimulation": false
 viewAreas: 
@@ -565,12 +650,12 @@ viewAreas:
     contents: 
       type: splitter
       orientation: horizontal
-      sizes: [ 426, 2079 ]
+      sizes: [ 426, 2081 ]
       children: 
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 750, 750 ]
+          sizes: [ 741, 741 ]
           children: 
             - 
               type: pane
@@ -583,12 +668,12 @@ viewAreas:
         - 
           type: splitter
           orientation: vertical
-          sizes: [ 1071, 429 ]
+          sizes: [ 1058, 424 ]
           children: 
             - 
               type: splitter
               orientation: horizontal
-              sizes: [ 901, 1172 ]
+              sizes: [ 903, 1174 ]
               children: 
                 - 
                   type: pane
