@@ -19,11 +19,26 @@ Usage
 -----
 **First, see [choreonoid tutorials](http://choreonoid.org/en/manuals/ or http://choreonoid.org/ja/manuals/)**
 
-1. run choreonoid
+- Sample of the multi contact stabilizer
+1. run choreonoid with project file
 
   ```
   $ roscd jsk_choreonoid/sample/WalkSample/
   $ choreonoid JAXON_RED_Walk.cnoid
   ```
+1. select poseseq
 1. push MCS button
+1. select motion item
+1. push play button
+
+- Sample of the preview control
+1. run choreonoid with project file
+
+  ```
+  $ roscd jsk_choreonoid/sample/WalkSample/
+  $ choreonoid JAXON_RED_Walk.cnoid
+  ```
+1. select poseseq
+1. push PreviewControl button
+1. select motion item
 1. push play button
