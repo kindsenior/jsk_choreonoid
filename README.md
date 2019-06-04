@@ -28,6 +28,7 @@ Usage
   ```
 1. select poseseq
 1. push MCS button
+1. push RM button
 1. select motion item
 1. push play button
 
