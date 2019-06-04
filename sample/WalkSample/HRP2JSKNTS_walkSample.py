@@ -38,7 +38,7 @@ robotItem.addChildItem(poseSeqItem)
 ItemTreeView.instance().selectItem(poseSeqItem)
 
 floorItem = BodyItem()
-floorItem.load(os.path.join(shareDirectory(), "model/misc/floor.wrl"))
+floorItem.load(os.path.join(shareDirectory(), "model/misc/floor.body"))
 worldItem.addChildItem(floorItem)
 
 simulatorItem = AISTSimulatorItem()
