@@ -48,11 +48,8 @@ catkin_python_setup()
 
 file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
 catkin_package(
-  INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}
-  DEPENDS Eigen)
+  INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
 
-message("EIGEN_INCLUDE_DIRS: ${EIGEN_INCLUDE_DIRS}")
-include_directories(${Eigen_INCLUDE_DIRS})
 
 # -I
 include_directories(${CHOREONOID_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/plugins)
