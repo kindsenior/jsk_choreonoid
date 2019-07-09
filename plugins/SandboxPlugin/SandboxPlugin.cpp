@@ -200,9 +200,9 @@ public:
 
 
         // シグナル
-        // Signal<void()> sigTest;
-        // sigTest.connect(bind(&SandboxPlugin::test, this));
-        // sigTest();
+        Signal<void()> sigTest;
+        sigTest.connect(bind(&SandboxPlugin::test, this));
+        sigTest();
 
         // スレッドでcollision取得->pointで表示
         // boost::thread thr(&SandboxPlugin::test, this);
