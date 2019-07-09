@@ -71,9 +71,11 @@ public:
 
     void onButtonClicked(bool print_flg)
     {
+        cout << "onButtonClicked()" << endl;
         stringstream ss;
 
         ItemList<Item> selectedItems = ItemTreeView::mainInstance()->selectedItems<Item>();
+        cout << "selectedItems: " << selectedItems.size() << endl;
 
         TimeBar* tb = TimeBar::instance();;
         // tb->setTime(3);    // 時刻設定
@@ -81,6 +83,8 @@ public:
 
         // 関節・リンク情報取得・設定
         ItemList<BodyItem> bodyItems = ItemTreeView::mainInstance()->checkedItems<BodyItem>();
+        cout << "bodyItems: " << bodyItems.size() << endl;
+
         // checkedItems チェックされたアイテムを取得
         if(print_flg){
             MessageView::instance()->putln("Print called !");
@@ -102,6 +106,7 @@ public:
                 //   ss << zmp[0] << " " << zmp[1] << " " << zmp[2] << endl;
             }
             MessageView::instance()->putln(ss.str());
+
             return;
         }// end prit
 
@@ -109,8 +114,10 @@ public:
         QEventLoop eventLoop;
         // 各PoseSeqへアクセス
         ItemList<PoseSeqItem> poseSeqItems = ItemTreeView::mainInstance()->selectedItems<Item>();
+        cout << poseSeqItems.size() << " poseseqs are selected" << endl;
         for(size_t i=0; i < poseSeqItems.size(); ++i){
             PoseSeqPtr poseSeq = poseSeqItems[i]->poseSeq();
+            cout << "PoseSeq: " <<poseSeq->name() << endl;
 
             BodyPtr body = bodyItems[0]->body();
 
@@ -232,6 +239,7 @@ public:
     // collision取得
     void test()
     {
+        cout << "test" << endl;
         BodyItemPtr bodyItemPtr; BodyPtr robot;
         PoseSeqItemPtr poseSeqItemPtr; PoseSeqPtr poseSeqPtr;
         BodyMotionItemPtr bodyMotionItemPtr; BodyMotionPtr motion;
@@ -245,6 +253,7 @@ public:
             pointSetItemPtr->setName("ContactPoint");
             worldItemPtr->addChildItem(pointSetItemPtr);
             ItemTreeView::mainInstance()->checkItem(pointSetItemPtr);// check + updateCollisions() -> segmentation fault
+            cout << "Created ContactPoint" << endl;
         }
 
         connections = bodyItemPtr->sigCollisionsUpdated().connect(boost::bind(&SandboxPlugin::test2, this, bodyItemPtr, robot, motion, pointSetItemPtr));
