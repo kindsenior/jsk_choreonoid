@@ -168,18 +168,17 @@ public:
             // 各Poseへアクセス
             for(PoseSeq::iterator poseIter = poseSeq->begin(); poseIter != poseSeq->end(); ++poseIter){
                 PosePtr pose = poseIter->get<Pose>();// PosePtr取得
-
-                Pose::LinkInfo* linkInfo = pose->ikLinkInfo(37);
                 cout << poseIter->time() << "[sec]: ";
-                cout << linkInfo->isTouching() << " " << linkInfo->isStationaryPoint();
-                // cout << linkInfo->isTouching() << "->";
-                linkInfo->clearTouching();
-                // cout << linkInfo->isTouching() << endl;
 
-                linkInfo = pose->ikLinkInfo(31);
-                cout << linkInfo->isTouching() << " " << linkInfo->isStationaryPoint() << endl;
-                // cout << linkInfo->isTouching() << "->";
-                linkInfo->clearTouching();
+                std::string linkName = "LLEG_JOINT5";
+                LinkPtr link = body->link(linkName);
+                Pose::LinkInfo* linkInfo = pose->ikLinkInfo(link->index());
+                if( linkInfo != 0 ){
+                    cout << "Found: " << linkName << " "<< linkInfo->isTouching() << " " << linkInfo->isStationaryPoint() << endl;
+                    linkInfo->clearTouching();
+                }else{
+                    cout << "Not found: " << linkName << endl;
+                }
 
                 // tb->setTime(poseIter->time());
                 // BodyPtr body = bodyItems[0]->body();
