@@ -1,5 +1,6 @@
 /**
    @author Noriaki Takasugi
+   @author Kunio Kojima
 */
 
 #include <vector>
