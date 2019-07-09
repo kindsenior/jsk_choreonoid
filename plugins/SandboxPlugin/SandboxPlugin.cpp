@@ -22,6 +22,9 @@
 #include <cnoid/PoseProviderToBodyMotionConverter>
 #include <cnoid/BodyMotionUtil>
 #include <cnoid/PointSetItem>
+#include <cnoid/SceneWidget>
+#include <cnoid/SceneView>
+#include <cnoid/SceneRenderer>
 #include <cnoid/TimeBar>
 #include <cnoid/Archive>
 #include <cnoid/MenuManager>
@@ -63,6 +66,10 @@ public:
             ->sigClicked().connect(bind(&SandboxPlugin::onButtonClicked, this, false));
         bar->addButton("print")
             ->sigClicked().connect(bind(&SandboxPlugin::onButtonClicked, this, true));
+
+        bar->addButton("Lines")
+            ->sigClicked().connect(bind(&SandboxPlugin::onDrawLinesClicked, this));
+
 
         addToolBar(bar);
 
@@ -233,6 +240,66 @@ public:
         }
 
         MessageView::instance()->putln(ss.str());
+    }
+
+    void onDrawLinesClicked()
+    {
+        cout << "onDrawLinesClicked()" << endl;
+
+        QEventLoop eventLoop;
+
+        SceneView* sv = SceneView::instance();
+        SceneWidget* sw = sv->sceneWidget();
+        SceneRenderer* renderer = sw->renderer();
+        SgLineSet* lineSet = new SgLineSet;
+        SgVertexArrayPtr vertices = lineSet->getOrCreateVertices();
+        // sw->sceneRoot()->addChild(lineSet, true);
+        sw->sceneRoot()->addChildOnce(lineSet, true);
+
+        // vertices->reserve(1);
+        // lineSet->reserveNumLines(1);
+        Vector3f pivotVec = Vector3f(0,0,0);
+        Vector3f offsetVec = Vector3f(1,0,0);
+        vertices->push_back(pivotVec);
+        vertices->push_back(pivotVec+offsetVec);
+        lineSet->addLine(0,1);
+
+        // width
+        lineSet->setLineWidth(10);
+
+        // color
+        SgColorArrayPtr colors = lineSet->getOrCreateColors();
+        colors->push_back(Vector3f(1.0f, 0.0f, 0.0f));
+        colors->push_back(Vector3f(0.0f, 1.0f, 0.0f));
+        SgIndexArray& colorIndices = lineSet->colorIndices();
+        colorIndices.reserve(2);
+        colorIndices.push_back(0);
+        colorIndices.push_back(1);
+
+        cout << "hasVertices: " << lineSet->hasVertices() << endl;
+        cout << "lineWidth: " << lineSet->lineWidth() << endl;
+        cout << "numLines: " << lineSet->numLines() << endl;
+
+        BodyItemPtr bodyItemPtr; BodyPtr robot;
+        PoseSeqItemPtr poseSeqItemPtr; PoseSeqPtr poseSeqPtr;
+        BodyMotionItemPtr bodyMotionItemPtr; BodyMotionPtr motion;
+        if(!getSelectedPoseSeqSet(bodyItemPtr, robot, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion)) return;
+        cout << "PoseSeqItem: " << poseSeqItemPtr->name() << endl;
+
+        for(size_t j=0; j < motion->numFrames(); ++j){
+            (BodyMotion::ConstFrame) motion->frame(j) >> *robot;
+
+            Vector3 vec = robot->rootLink()->p();
+            pivotVec << vec.x(), vec.y(), vec.z();
+            vertices->at(0) = pivotVec;
+            vertices->at(1) = pivotVec + offsetVec;
+
+            bodyItemPtr->notifyKinematicStateChange(true);
+            // renderer->renderNode(lineSet);
+            // vertices->notifyUpdate();
+            eventLoop.processEvents();
+        }
+        sw->sceneRoot()->removeChild(lineSet, true);
     }
 
     // collision取得
