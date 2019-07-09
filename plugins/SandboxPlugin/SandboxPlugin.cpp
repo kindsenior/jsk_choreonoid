@@ -239,7 +239,6 @@ public:
             cout << "StaticFriction: " << staticFriction << "  SlipFriction: " << slipFriction << endl;
         }
 
-        MessageView::instance()->putln(ss.str());
     }
 
     void onDrawLinesClicked()
