@@ -30,9 +30,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath, std::string paramS
 
     ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
 
-    Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM");
-    Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP");
-    Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL");
+    Vector3Seq refCMSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM"));
+    Vector3Seq refPSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP"));
+    Vector3Seq refLSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL"));
 
     for(int i=0; i < numFrames + mcs->numWindows(); ++i){
         // if(i > mcs->numWindows() + 1) goto BREAK;
@@ -51,9 +51,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath, std::string paramS
             P << x0[1],x0[3],0;
             L << x0[4],x0[5],0;
             CM /= body->mass();
-            refCMSeqPtr->at(i - mcs->numWindows()) = CM;
-            refPSeqPtr->at(i - mcs->numWindows()) = P;
-            refLSeqPtr->at(i - mcs->numWindows()) = L;
+            refCMSeq.at(i - mcs->numWindows()) = CM;
+            refPSeq.at(i - mcs->numWindows()) = P;
+            refLSeq.at(i - mcs->numWindows()) = L;
             ofs << (i - mcs->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
         }
     }
@@ -65,9 +65,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath, std::string paramS
     // }
  // BREAK:
 
-    setSubItem("refCM", refCMSeqPtr, bodyMotionItemPtr);
-    setSubItem("refP", refPSeqPtr, bodyMotionItemPtr);
-    setSubItem("refL", refLSeqPtr, bodyMotionItemPtr);
+    setSubItem("refCM", refCMSeq, bodyMotionItemPtr);
+    setSubItem("refP", refPSeq, bodyMotionItemPtr);
+    setSubItem("refL", refLSeq, bodyMotionItemPtr);
 
     ofs.close();
 
@@ -139,11 +139,11 @@ void generateMultiContactStabilizerParam(MultiContactStabilizerParam* mcsParam, 
 
 }
 
-void cnoid::generatePreModelPredictiveControlParamDeque(MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet)
+void cnoid::generatePreModelPredictiveControlParamDeque(MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotion& motion, const std::set<Link*>& contactLinkCandidateSet)
 {
-    const int frameRate = motion->frameRate();
-    const int numFrames = motion->numFrames();
-    const double dt = 1.0/motion->frameRate();
+    const int frameRate = motion.frameRate();
+    const int numFrames = motion.numFrames();
+    const double dt = 1.0/motion.frameRate();
     Vector3d lastP, tmpL;
     updateBodyState(body, motion, 0);
     body->calcForwardKinematics(true, true);
@@ -184,7 +184,8 @@ void MultiContactStabilizerPlugin::execControl()
     BodyItemPtr bodyItemPtr;
     PoseSeqItemPtr poseSeqItemPtr;
     PoseSeqPtr poseSeqPtr;
-    if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr, motion)) return;
+    if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr)) return;
+    BodyMotion& motion = *(mBodyMotionItemPtr->motion());
 
     mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
     cout << "PoseSeqPath: " << mPoseSeqPath << endl;
@@ -192,9 +193,9 @@ void MultiContactStabilizerPlugin::execControl()
     // BodyMotion作成
     generateBodyMotionFromBar(body, poseSeqItemPtr, mBodyMotionItemPtr);
 
-    frameRate = motion->frameRate();
+    frameRate = motion.frameRate();
     dt = 1.0/frameRate;
-    numFrames = motion->numFrames();
+    numFrames = motion.numFrames();
 
     std::vector<Link*> dummyVec;
     generateInitSeq(body, poseSeqItemPtr, dummyVec);

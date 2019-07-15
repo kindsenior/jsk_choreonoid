@@ -68,7 +68,7 @@ bool isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, cons
 
 bool getSelectedPoseSeqSet(BodyItemPtr& bodyItemPtr, BodyPtr& body,
                            PoseSeqItemPtr& poseSeqItemPtr, PoseSeqPtr& poseSeqPtr,
-                           BodyMotionItemPtr& bodyMotionItem, BodyMotionPtr& motion);
+                           BodyMotionItemPtr& bodyMotionItem);
 
 void generateBodyMotionFromBar(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemptr, const BodyMotionItemPtr& bodyMotionItemPtr);
 
@@ -77,9 +77,9 @@ void generateTorque(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, const s
 
 bool getEndEffectorLinkVector(std::vector<Link*>& endEffectorLinkVector, BodyPtr& body);
 
-void updateBodyState(BodyPtr& body, const BodyMotionPtr& motion, const int currentFrame, const std::set<Link*>& linkSet=std::set<Link*>());
+void updateBodyState(BodyPtr& body, const BodyMotion& motion, const int currentFrame, const std::set<Link*>& linkSet=std::set<Link*>());
 
-void calcDifferential(const BodyMotionPtr& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq);
+void calcDifferential(const BodyMotion& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq);
 
 void calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& Iw, const VectorXd& dq);
 
@@ -87,8 +87,8 @@ Matrix3d D(Vector3d r);
 
 void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
 
-void setSubItem(std::string seqName, const Vector3SeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem);
-void setSubItem(std::string seqName, const MultiValueSeqPtr& seqPtr, BodyMotionItem* pBodyMotionItem);
+void setSubItem(std::string seqName, const Vector3Seq& seq, BodyMotionItem* pBodyMotionItem);
+void setSubItem(std::string seqName, const MultiValueSeq& seq, BodyMotionItem* pBodyMotionItem);
 
 double thresh(double x, double thresh, double target = 0);
 VectorXd thresh(VectorXd x, double thresh, VectorXd target = VectorXd::Zero(3));

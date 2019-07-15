@@ -23,7 +23,7 @@
 namespace cnoid {
 
 // zmp計算
-void calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& zmpSeqPtr, const bool checkLargeDiff = false);
+void calcZMP(const BodyPtr& body, BodyMotion& motion, Vector3Seq& zmpSeq, const bool checkLargeDiff = false);
 
 class DynamicsPlugin : public Plugin
 {

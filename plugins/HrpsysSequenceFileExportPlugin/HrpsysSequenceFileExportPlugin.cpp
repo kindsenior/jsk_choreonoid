@@ -21,14 +21,14 @@ void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport()
   PoseSeqPtr poseSeq = poseSeqItem->poseSeq();
 
   BodyMotionItem* bodyMotionItem = poseSeqItem->bodyMotionItem();
-  BodyMotionPtr motion = bodyMotionItem->motion();
+  BodyMotion& motion = *(bodyMotionItem->motion());
 
   string poseSeqPathString = poseSeqItem->filePath();
   boost::filesystem::path poseSeqPath(poseSeqPathString);
   cout << " parent_path:" << poseSeqPath.parent_path().string() << " basename:" << getBasename(poseSeqPath) << endl;
 
-  double dt = ((double) 1)/motion->frameRate();
-  int numFrames = motion->numFrames();
+  double dt = ((double) 1)/motion.frameRate();
+  int numFrames = motion.numFrames();
 
   std::vector<string> extentionVec{"wrenches","optionaldata"};
   for(auto ext : extentionVec){
@@ -43,10 +43,10 @@ void HrpsysSequenceFileExportPlugin::HrpsysSequenceFileExport()
       ofstream ofs;
       ofs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
 
-      MultiValueSeqPtr multiValueSeqPtr = seqItem->seq();
+      MultiValueSeq multiValueSeq = *(seqItem->seq());
       for(int i=0; i<numFrames; ++i){
           ofs << i*dt;
-          MultiValueSeq::Frame frame = multiValueSeqPtr->frame(i);
+          MultiValueSeq::Frame frame = multiValueSeq.frame(i);
           for(int j=0; j<frame.size(); ++j){
               ofs << " " << frame[j];
           }

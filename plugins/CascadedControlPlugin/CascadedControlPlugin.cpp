@@ -27,51 +27,51 @@ MultiValueSeq::Frame operator-(const MultiValueSeq::Frame& frame0, const MultiVa
 void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
 {
     cout << "interpolateExtraSeq()" << endl;
-    BodyMotionPtr motion = bodyMotionItemPtr->motion();
-    const double dt = 1.0/motion->frameRate();
+    BodyMotion& motion = *(bodyMotionItemPtr->motion());
+    const double dt = 1.0/motion.frameRate();
     const int cycle = T/dt;
-    const int numFrames = motion->numFrames();
-    Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq();
-    Vector3SeqPtr refCMSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refCM")->seq();
-    Vector3SeqPtr refPSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refP")->seq();
-    Vector3SeqPtr refLSeqPtr = bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refL")->seq();
-    MultiValueSeqPtr refWrenchesSeqPtr = bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq();
-    MultiValueSeqPtr optionalDataSeqPtr = bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("optionaldata")->seq();
+    const int numFrames = motion.numFrames();
+    Vector3Seq refZmpSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq());
+    Vector3Seq refCMSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refCM")->seq());
+    Vector3Seq refPSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refP")->seq());
+    Vector3Seq refLSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refL")->seq());
+    MultiValueSeq refWrenchesSeq = *(bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq());
+    MultiValueSeq optionalDataSeq = *(bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("optionaldata")->seq());
 
     const double wrenchDim = 6;
-    const int numContacts = refWrenchesSeqPtr->frame(0).size()/wrenchDim;
+    const int numContacts = refWrenchesSeq.frame(0).size()/wrenchDim;
     for(int i=0; i<numFrames-cycle; i+=cycle){
-        Vector3d frontZmp = refZmpSeqPtr->at(i);
-        Vector3d diffZmp = refZmpSeqPtr->at(i+cycle) - frontZmp;
-        Vector3d frontCM = refCMSeqPtr->at(i);
-        Vector3d diffCM = refCMSeqPtr->at(i+cycle) - frontCM;
-        Vector3d frontP = refPSeqPtr->at(i);
-        Vector3d diffP = refPSeqPtr->at(i+cycle) - frontP;
-        Vector3d frontL = refLSeqPtr->at(i);
-        Vector3d diffL = refLSeqPtr->at(i+cycle) - frontL;
+        Vector3d frontZmp = refZmpSeq.at(i);
+        Vector3d diffZmp = refZmpSeq.at(i+cycle) - frontZmp;
+        Vector3d frontCM = refCMSeq.at(i);
+        Vector3d diffCM = refCMSeq.at(i+cycle) - frontCM;
+        Vector3d frontP = refPSeq.at(i);
+        Vector3d diffP = refPSeq.at(i+cycle) - frontP;
+        Vector3d frontL = refLSeq.at(i);
+        Vector3d diffL = refLSeq.at(i+cycle) - frontL;
         for(int j=1; j<cycle; ++j){
             double r = ((double)j/cycle);
-            refZmpSeqPtr->at(i+j) = frontZmp + r*diffZmp;
+            refZmpSeq.at(i+j) = frontZmp + r*diffZmp;
             Vector3d CM = frontCM + r*diffCM;
-            CM.z() = refCMSeqPtr->at(i+j).z(); // keep z coodinates
-            refCMSeqPtr->at(i+j) = CM;
+            CM.z() = refCMSeq.at(i+j).z(); // keep z coodinates
+            refCMSeq.at(i+j) = CM;
             Vector3d P = frontP + r*diffP;
-            P.z() = refPSeqPtr->at(i+j).z(); // keep z coodinates
-            refPSeqPtr->at(i+j) = P;
-            refLSeqPtr->at(i+j) = frontL + r*diffL;
+            P.z() = refPSeq.at(i+j).z(); // keep z coodinates
+            refPSeq.at(i+j) = P;
+            refLSeq.at(i+j) = frontL + r*diffL;
         }
 
-        MultiValueSeq::Frame frontWrenches = refWrenchesSeqPtr->frame(i);
-        MultiValueSeq::Frame nextWrenches = refWrenchesSeqPtr->frame(i+cycle);
+        MultiValueSeq::Frame frontWrenches = refWrenchesSeq.frame(i);
+        MultiValueSeq::Frame nextWrenches = refWrenchesSeq.frame(i+cycle);
         std::vector<VectorXd> frontWrenchVec, nextWrenchVec;
         std::vector<int> frontIdxVec, nextIdxVec;
         for(int k=0; k<numContacts; ++k){// find front wrench
             frontWrenchVec.push_back(VectorXd::Zero(wrenchDim));
             for(int ii=0; ii<wrenchDim; ++ii) frontWrenchVec[k](ii) = frontWrenches[k*wrenchDim+ii];
             frontIdxVec.push_back(0);
-            if(!optionalDataSeqPtr->frame(i+0)[k]){
+            if(!optionalDataSeq.frame(i+0)[k]){
                 for(int j=1; j<cycle; ++j){
-                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeqPtr->frame(i+j);
+                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeq.frame(i+j);
                     if(optionalDataFrame[k] == 0){
                         frontWrenchVec[k] = VectorXd::Zero(wrenchDim);
                         frontIdxVec[k] = j;
@@ -83,9 +83,9 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             nextWrenchVec.push_back(VectorXd::Zero(wrenchDim));
             for(int ii=0; ii<wrenchDim; ++ii) nextWrenchVec[k](ii) = nextWrenches[k*wrenchDim+ii];
             nextIdxVec.push_back(cycle);
-            if(!optionalDataSeqPtr->frame(i+cycle)[k]){
+            if(!optionalDataSeq.frame(i+cycle)[k]){
                 for(int j=cycle; j>1; --j){
-                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeqPtr->frame(i+j);
+                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeq.frame(i+j);
                     if(optionalDataFrame[k] == 0){
                         nextWrenchVec[k] = VectorXd::Zero(wrenchDim);
                         nextIdxVec[k] = j;
@@ -97,15 +97,15 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             for(int j=frontIdxVec[k]+1; j<nextIdxVec[k]; ++j){
                 double r= ((double)(j-frontIdxVec[k])/(nextIdxVec[k]-frontIdxVec[k]));
                 for(int ii=0; ii<wrenchDim; ++ii){
-                    refWrenchesSeqPtr->frame(i+j)[k*wrenchDim+ii] = (1-r)*frontWrenchVec[k](ii) + r*nextWrenchVec[k](ii);
+                    refWrenchesSeq.frame(i+j)[k*wrenchDim+ii] = (1-r)*frontWrenchVec[k](ii) + r*nextWrenchVec[k](ii);
                 }
             }
         }
         // overwrite optionalData (slide contact -1 -> 0 or 1)
         for(int j=0; j<cycle; ++j){
             for(int k=0; k<numContacts; ++k){
-                // if(optionalDataSeqPtr->frame(i+j)[k] == -1) optionalDataSeqPtr->frame(i+j)[k] = 0;// single foot slide
-                if(optionalDataSeqPtr->frame(i+j)[k] == -1) optionalDataSeqPtr->frame(i+j)[k] = 1;// both feet slide (temporally toe/heel contact)
+                // if(optionalDataSeq.frame(i+j)[k] == -1) optionalDataSeq.frame(i+j)[k] = 0;// single foot slide
+                if(optionalDataSeq.frame(i+j)[k] == -1) optionalDataSeq.frame(i+j)[k] = 1;// both feet slide (temporally toe/heel contact)
             }
         }
     }
@@ -113,13 +113,13 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     {
         int finalDivisibleIdx = ((int) numFrames/cycle)*cycle;
         cout << "Remainder frame is from " << finalDivisibleIdx << " (" << finalDivisibleIdx*dt << "[sec]) to " << numFrames << " (" << numFrames*dt << "[sec])" << endl;
-        MultiValueSeq::Frame lastWrenchFrame = refWrenchesSeqPtr->frame(finalDivisibleIdx);
+        MultiValueSeq::Frame lastWrenchFrame = refWrenchesSeq.frame(finalDivisibleIdx);
         for(int i=finalDivisibleIdx+1; i<numFrames; ++i){
-            refZmpSeqPtr->at(i) = refZmpSeqPtr->at(finalDivisibleIdx);
-            refCMSeqPtr->at(i) = refCMSeqPtr->at(finalDivisibleIdx);
-            refPSeqPtr->at(i) = refPSeqPtr->at(finalDivisibleIdx);
-            refLSeqPtr->at(i) = refLSeqPtr->at(finalDivisibleIdx);
-            for(int k=0; k<lastWrenchFrame.size(); ++k) refWrenchesSeqPtr->frame(i)[k] = lastWrenchFrame[k];
+            refZmpSeq.at(i) = refZmpSeq.at(finalDivisibleIdx);
+            refCMSeq.at(i) = refCMSeq.at(finalDivisibleIdx);
+            refPSeq.at(i) = refPSeq.at(finalDivisibleIdx);
+            refLSeq.at(i) = refLSeq.at(finalDivisibleIdx);
+            for(int k=0; k<lastWrenchFrame.size(); ++k) refWrenchesSeq.frame(i)[k] = lastWrenchFrame[k];
         }
     }
 
@@ -127,22 +127,22 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     Vector3d prevZmp;
     int prevIdx;
     for(int i=0; i<numFrames; ++i){
-        Vector3d zmp = refZmpSeqPtr->at(i);
+        Vector3d zmp = refZmpSeq.at(i);
         if(std::isnan(zmp.x())){ // check x coordinate
             int nextVaridIdx = i;
-            while(std::isnan(refZmpSeqPtr->at(nextVaridIdx).x())) ++nextVaridIdx; // check x coordinate
-            Vector3d diffZmp = refZmpSeqPtr->at(nextVaridIdx) - prevZmp;
+            while(std::isnan(refZmpSeq.at(nextVaridIdx).x())) ++nextVaridIdx; // check x coordinate
+            Vector3d diffZmp = refZmpSeq.at(nextVaridIdx) - prevZmp;
             cout << "jumping phase(nan check): " << prevIdx << " -> " << nextVaridIdx << endl;
             int startInterpolationIdx = prevIdx + cycle;
             int stopInterpolationIdx = nextVaridIdx - cycle;
             for(int j=prevIdx+1; j<startInterpolationIdx; ++j){
-                refZmpSeqPtr->at(j) = prevZmp;
+                refZmpSeq.at(j) = prevZmp;
             }
             for(int j=startInterpolationIdx; j<stopInterpolationIdx; ++j){
-                refZmpSeqPtr->at(j) = ((double)(j - startInterpolationIdx))/(stopInterpolationIdx - startInterpolationIdx)*diffZmp + prevZmp;
+                refZmpSeq.at(j) = ((double)(j - startInterpolationIdx))/(stopInterpolationIdx - startInterpolationIdx)*diffZmp + prevZmp;
             }
             for(int j=stopInterpolationIdx; j<nextVaridIdx; ++j){
-                refZmpSeqPtr->at(j) = prevZmp + diffZmp;
+                refZmpSeq.at(j) = prevZmp + diffZmp;
             }
 
             i = nextVaridIdx;
@@ -162,7 +162,8 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     BodyItemPtr bodyItemPtr;
     PoseSeqItemPtr poseSeqItemPtr;
     PoseSeqPtr poseSeqPtr;
-    if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr, motion)) return;
+    if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr)) return;
+    BodyMotion& motion = *(mBodyMotionItemPtr->motion());
 
     mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
     cout << "PoseSeqPath: " << mPoseSeqPath << endl;
@@ -175,9 +176,9 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     // BodyMotion作成
     generateBodyMotionFromBar(body, poseSeqItemPtr, mBodyMotionItemPtr);
 
-    frameRate = motion->frameRate();
+    frameRate = motion.frameRate();
     dt = 1.0/frameRate;
-    numFrames = motion->numFrames();
+    numFrames = motion.numFrames();
 
     generateInitSeq(body, poseSeqItemPtr, endEffectorLinkVec);
 

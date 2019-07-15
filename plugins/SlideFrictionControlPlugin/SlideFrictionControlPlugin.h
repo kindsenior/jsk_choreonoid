@@ -39,14 +39,12 @@ namespace cnoid{
     class SlideFrictionControlPlugin : public Plugin
     {
     private:
-        Vector3SeqPtr mRefCMSeqPtr, mRefPSeqPtr, mRefLSeqPtr;
         hrp::SlideFrictionControl* sfc;
         std::vector<int> failIdxVec;
 
     public:
         BodyPtr body;
         BodyMotionItemPtr mBodyMotionItemPtr;
-        BodyMotionPtr motion;
         SlideFrictionControlBar* mBar;
 
         boost::filesystem::path mPoseSeqPath;

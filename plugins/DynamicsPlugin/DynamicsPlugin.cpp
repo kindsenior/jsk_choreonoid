@@ -67,13 +67,13 @@ Vector6 calcInverseDynamicsSub(Link* link, const Vector3& vo_parent, const Vecto
 }
 
 
-void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& zmpSeqPtr, const bool checkLargeDiff)
+void cnoid::calcZMP(const BodyPtr& body, BodyMotion& motion, Vector3Seq& zmpSeq, const bool checkLargeDiff)
 {
     int bodyItemIdx = 0,poseSeqIdx = 0;
     const double DEFAULT_GRAVITY_ACCELERATION = 9.80665;
     // double g = -DEFAULT_GRAVITY_ACCELERATION;
     Vector3d g(0, 0, DEFAULT_GRAVITY_ACCELERATION);
-    const double dt = 1.0/motion->frameRate();
+    const double dt = 1.0/motion.frameRate();
     const double dt2 = dt * dt;
 
     FILE* fp = fopen("/tmp/tmp.dat","w");
@@ -83,19 +83,19 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
     int filterSize = 10;
     std::deque<float> zmpXDeque,zmpYDeque;
     std::vector<float> sortedXVector, sortedYVector;
-    for(int currentFrame = 0; currentFrame < motion->numFrames(); ++currentFrame){
+    for(int currentFrame = 0; currentFrame < motion.numFrames(); ++currentFrame){
         // 腰座標更新
-        (BodyMotion::ConstFrame) motion->frame(currentFrame) >> *body;
+        (BodyMotion::ConstFrame) motion.frame(currentFrame) >> *body;
 
         // 関節角速度・角加速度更新
         // int prevFrame = std::max(currentFrame - 1, 0);
-        // int nextFrame = std::min(currentFrame + 1, motion->numFrames());
+        // int nextFrame = std::min(currentFrame + 1, motion.numFrames());
         int prevFrame = std::max(currentFrame - 1, 0);
-        int nextFrame = std::min(currentFrame + 1, motion->numFrames()-1);
-        MultiValueSeq::Frame q0 = motion->jointPosSeq()->frame(prevFrame);
-        MultiValueSeq::Frame q1 = motion->jointPosSeq()->frame(currentFrame);
-        MultiValueSeq::Frame q2 = motion->jointPosSeq()->frame(nextFrame);
-        for(int k=0; k < motion->numJoints(); ++k){
+        int nextFrame = std::min(currentFrame + 1, motion.numFrames()-1);
+        MultiValueSeq::Frame q0 = motion.jointPosSeq()->frame(prevFrame);
+        MultiValueSeq::Frame q1 = motion.jointPosSeq()->frame(currentFrame);
+        MultiValueSeq::Frame q2 = motion.jointPosSeq()->frame(nextFrame);
+        for(int k=0; k < motion.numJoints(); ++k){
             Link* joint = body->joint(k);
             joint->q() = q1[k];
             joint->dq() = (q2[k] - q1[k]) / dt;
@@ -103,11 +103,11 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         }
         // rootLink速度・加速度
         MultiSE3Seq::Frame p;
-        p = motion->linkPosSeq()->frame(prevFrame);
+        p = motion.linkPosSeq()->frame(prevFrame);
         Vector3 p0 = p[0].translation(); Matrix3 R0 = p[0].rotation().toRotationMatrix();
-        p = motion->linkPosSeq()->frame(currentFrame);
+        p = motion.linkPosSeq()->frame(currentFrame);
         Vector3 p1 = p[0].translation(); Matrix3 R1 = p[0].rotation().toRotationMatrix();
-        p = motion->linkPosSeq()->frame(nextFrame);
+        p = motion.linkPosSeq()->frame(nextFrame);
         Vector3 p2 = p[0].translation(); Matrix3 R2 = p[0].rotation().toRotationMatrix();
         body->rootLink()->v() = (p2- p1) / dt;
         // body->rootLink()->dv() = (p2 - 2.0 * p1 + p0) / dt2 + g;
@@ -195,7 +195,7 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
                 zmpYDeque.pop_front();
             }
         }
-        zmpSeqPtr->at(currentFrame) = zmp;
+        zmpSeq.at(currentFrame) = zmp;
 
 
         // // 西脇方式
@@ -212,10 +212,10 @@ void cnoid::calcZMP(const BodyPtr& body, BodyMotionPtr& motion, Vector3SeqPtr& z
         // }
         // // cout << dt*currentFrame << "   " << zmp.x() << " " << denom << endl;
         // zmp.x() /= denom; zmp.y() /= denom;// z成分は0
-        // zmpSeqPtr->at(currentFrame) = zmp;
+        // zmpSeq.at(currentFrame) = zmp;
       
     }// motion loop
-    // zmpSeqPtr->at( zmpSeqPtr->numFrames()-1 ) = zmpSeqPtr->at( max( 0, zmpSeqPtr->numFrames()-2 ) );
+    // zmpSeq.at( zmpSeq.numFrames()-1 ) = zmpSeq.at( max( 0, zmpSeq.numFrames()-2 ) );
     return;
 }
 

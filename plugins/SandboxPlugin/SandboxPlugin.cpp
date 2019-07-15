@@ -130,15 +130,15 @@ public:
 
             // BodyMotionの各Frameへのアクセス
             BodyMotionItem* bodyMotionItem = poseSeqItems[i]->bodyMotionItem();
-            BodyMotionPtr motion = bodyMotionItem->motion();
-            const double dt = 1.0/motion->frameRate();
+            BodyMotion& motion = *(bodyMotionItem->motion());
+            const double dt = 1.0/motion.frameRate();
 
-            for(int j=0;j < motion->numFrames(); ++j){// zmpSeq.numFrames()でもOK
+            for(int j=0;j < motion.numFrames(); ++j){// zmpSeq.numFrames()でもOK
 
               if(j % 10 == 0){
-                // BodyMotion::Frame frame = motion->frame(j);
-                MultiValueSeq::Frame q = motion->jointPosSeq()->frame(j);// jはframe.frame()でもいい
-                MultiSE3Seq::Frame links = motion->linkPosSeq()->frame(j);
+                // BodyMotion::Frame frame = motion.frame(j);
+                MultiValueSeq::Frame q = motion.jointPosSeq()->frame(j);// jはframe.frame()でもいい
+                MultiSE3Seq::Frame links = motion.linkPosSeq()->frame(j);
 
                 // SE3とは??
                 // SO(3) 3次特殊直交群 eg R
@@ -154,7 +154,7 @@ public:
                 // ss << zmp.x() << " " << zmp.y() << " " << zmp.z() << endl;// 今一不明
 
                 // 姿勢更新
-                (BodyMotion::ConstFrame) motion->frame(j) >> *body;
+                (BodyMotion::ConstFrame) motion.frame(j) >> *body;
                 bodyItems[0]->notifyKinematicStateChange(true);
 
                 // collision取得
@@ -281,12 +281,13 @@ public:
 
         BodyItemPtr bodyItemPtr; BodyPtr robot;
         PoseSeqItemPtr poseSeqItemPtr; PoseSeqPtr poseSeqPtr;
-        BodyMotionItemPtr bodyMotionItemPtr; BodyMotionPtr motion;
-        if(!getSelectedPoseSeqSet(bodyItemPtr, robot, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion)) return;
+        BodyMotionItemPtr bodyMotionItemPtr;
+        if(!getSelectedPoseSeqSet(bodyItemPtr, robot, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr)) return;
+        BodyMotion& motion = *(bodyMotionItemPtr->motion());
         cout << "PoseSeqItem: " << poseSeqItemPtr->name() << endl;
 
-        for(size_t j=0; j < motion->numFrames(); ++j){
-            (BodyMotion::ConstFrame) motion->frame(j) >> *robot;
+        for(size_t j=0; j < motion.numFrames(); ++j){
+            (BodyMotion::ConstFrame) motion.frame(j) >> *robot;
 
             Vector3 vec = robot->rootLink()->p();
             pivotVec << vec.x(), vec.y(), vec.z();
@@ -307,10 +308,11 @@ public:
         cout << "test" << endl;
         BodyItemPtr bodyItemPtr; BodyPtr robot;
         PoseSeqItemPtr poseSeqItemPtr; PoseSeqPtr poseSeqPtr;
-        BodyMotionItemPtr bodyMotionItemPtr; BodyMotionPtr motion;
-        if(!getSelectedPoseSeqSet(bodyItemPtr, robot, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion)) return;
+        BodyMotionItemPtr bodyMotionItemPtr;
+        if(!getSelectedPoseSeqSet(bodyItemPtr, robot, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr)) return;
+        BodyMotion& motion = *(bodyMotionItemPtr->motion());
         WorldItemPtr worldItemPtr = bodyItemPtr->findOwnerItem<WorldItem>();
-        const double dt = 1.0/motion->frameRate();
+        const double dt = 1.0/motion.frameRate();
 
         PointSetItemPtr pointSetItemPtr;
         if(!(pointSetItemPtr = worldItemPtr->findItem<PointSetItem>("ContactPoint"))){
@@ -325,10 +327,10 @@ public:
         test2(bodyItemPtr, robot, motion, pointSetItemPtr);
     }
 
-    void test2(BodyItemPtr& bodyItemPtr, BodyPtr& robot, BodyMotionPtr& motion, PointSetItemPtr& pointSetItemPtr)
+    void test2(BodyItemPtr& bodyItemPtr, BodyPtr& robot, BodyMotion& motion, PointSetItemPtr& pointSetItemPtr)
     {
         static int idx = 0;
-        static const double dt = 1.0/motion->frameRate();
+        static const double dt = 1.0/motion.frameRate();
 
         usleep(50*1000);
 
@@ -347,8 +349,8 @@ public:
             }cout << endl;
         }
 
-        if(idx < motion->numFrames()){
-            (BodyMotion::ConstFrame) motion->frame(idx) >> *robot;
+        if(idx < motion.numFrames()){
+            (BodyMotion::ConstFrame) motion.frame(idx) >> *robot;
             bodyItemPtr->notifyKinematicStateChange(true);
             ++idx;
         }else{

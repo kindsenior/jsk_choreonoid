@@ -98,7 +98,7 @@ protected:
     int numBodyJoints_;
     int numTotalJoints_; // include virtual base joints
 
-    JointPathPtr commonJointPathPtr;
+    std::shared_ptr<JointPath> commonJointPathPtr;
 
     std::set<int> exclusiveJointIdSet_;
     std::set<int> commonJointIdSet_;

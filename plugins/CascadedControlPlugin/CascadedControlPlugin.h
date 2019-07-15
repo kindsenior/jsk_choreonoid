@@ -35,7 +35,6 @@ namespace cnoid{
     class CascadedControlPlugin : public Plugin
     {
     private:
-        Vector3SeqPtr mRefCMSeqPtr, mRefPSeqPtr, mRefLSeqPtr;
         std::ofstream mOfs;
         hrp::MultiContactStabilizer* mcs;
         Vector3d lastP;
@@ -44,7 +43,6 @@ namespace cnoid{
     public:
         BodyPtr body;
         BodyMotionItemPtr mBodyMotionItemPtr;
-        BodyMotionPtr motion;
         CascadedControlBar* mBar;
 
         boost::filesystem::path mPoseSeqPath;

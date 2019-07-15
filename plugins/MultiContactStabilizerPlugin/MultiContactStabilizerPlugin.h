@@ -49,7 +49,7 @@
 #include "MultiContactStabilizerBar.h"
 
 namespace cnoid{
-    void generatePreModelPredictiveControlParamDeque(hrp::MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotionPtr& motion, const std::set<Link*>& contactLinkCandidateSet);
+    void generatePreModelPredictiveControlParamDeque(hrp::MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotion& motion, const std::set<Link*>& contactLinkCandidateSet);
     void sweepControl(boost::filesystem::path poseSeqPath, std::string paramStr, hrp::MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr);
 
     class MultiContactStabilizerBar;
@@ -57,7 +57,6 @@ namespace cnoid{
     class MultiContactStabilizerPlugin : public Plugin
     {
     private:
-        Vector3SeqPtr mRefCMSeqPtr, mRefPSeqPtr, mRefLSeqPtr;
         std::ofstream mOfs;
         hrp::MultiContactStabilizer* mcs;
         Vector3d lastP;
@@ -66,7 +65,6 @@ namespace cnoid{
     public:
         BodyPtr body;
         BodyMotionItemPtr mBodyMotionItemPtr;
-        BodyMotionPtr motion;
         MultiContactStabilizerBar* mBar;
 
         boost::filesystem::path mPoseSeqPath;

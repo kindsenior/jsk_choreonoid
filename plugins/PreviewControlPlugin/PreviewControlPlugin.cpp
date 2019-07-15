@@ -47,8 +47,8 @@ void PreviewControlPlugin::execControl()
     PoseSeqItemPtr poseSeqItemPtr;
     PoseSeqPtr poseSeqPtr;
     BodyMotionItemPtr bodyMotionItemPtr;
-    BodyMotionPtr motion;
-    if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr, motion)) return;
+    if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, bodyMotionItemPtr)) return;
+    BodyMotion& motion = *(bodyMotionItemPtr->motion());
 
     // 足先リンク名取得
     Link *lFootLink, *rFootLink;
@@ -57,30 +57,29 @@ void PreviewControlPlugin::execControl()
     boost::filesystem::path poseSeqPath(poseSeqItemPtr->filePath());
     cout << " parent_path:" << poseSeqPath.parent_path().string() << " basename:" << getBasename(poseSeqPath) << endl;
 
-    JointPathPtr jpl = getCustomJointPath( body, body->rootLink(), lFootLink );
-    JointPathPtr jpr = getCustomJointPath( body, body->rootLink(), rFootLink );
+    Link* rootLink = body->rootLink();
+    JointPath jpl, jpr;
+    jpl = JointPath( rootLink, lFootLink );
+    jpr = JointPath( rootLink, rFootLink );
 
     // 脚長さ計算
-    for(int i = 0; i < jpl->numJoints(); ++i) jpl->joint(i)->q() =0;
+    for(int i = 0; i < jpl.numJoints(); ++i) jpl.joint(i)->q() =0;
     body->calcForwardKinematics();
-    double legLength = ( jpl->joint(0)->p() - jpl->endLink()->p() ).norm();
+    double legLength = ( jpl.joint(0)->p() - jpl.endLink()->p() ).norm();
     cout << "legLength: " << legLength << endl;
 
     // motion生成
-    cout << "numFrames: " << motion->numFrames() << endl;
-    if(motion->numFrames() == 0){
+    cout << "numFrames: " << motion.numFrames() << endl;
+    if(motion.numFrames() == 0){
         generateBodyMotionFromBar(body, poseSeqItemPtr, bodyMotionItemPtr);
     }else{
         cout << "Need not generate motion" << endl;
     }
 
-    double dt = 1.0/motion->frameRate(), max_tm = motion->numFrames() / (double)motion->frameRate();
+    double dt = 1.0/motion.frameRate(), max_tm = motion.numFrames() / (double)motion.frameRate();
 
     // 目標zmpを計算
     PoseSeqInterpolatorPtr poseSeqInterpolatorPtr = poseSeqItemPtr->interpolator();
-    Vector3SeqPtr refZmpSeqPtr;
-    // refZmpSeqPtr.reset( new Vector3Seq() );
-    // refZmpSeqPtr->setNumFrames(motion->numFrames(), true);
     // for(size_t i = 0; i < static_cast<size_t>(round(max_tm / dt)); i++){
     //   poseSeqInterpolatorPtr->seek( i * dt );
 
@@ -90,28 +89,25 @@ void PreviewControlPlugin::execControl()
     //   refZmpSeqPtr->at(i).z() = (*(poseSeqInterpolatorPtr->ZMP())).z();
     // }
 
-    // refZmpSeqPtr = motion->getOrCreateExtraSeq<Vector3Seq>("ZMP");// motionのZMP
-    // refZmpSeqPtr = motion->extraSeq<Vector3Seq>("ZMP");// motionのZMP Vector3SeqはZMPSeqでもいい??
-    refZmpSeqPtr = cnoid::getOrCreateZMPSeq(*motion);
+    Vector3Seq& refZmpSeq = *(cnoid::getOrCreateZMPSeq(motion));
     cout << "Finished generating ref zmp seq" << endl;
 
-    Vector3SeqPtr initialZMPSeqPtr;
-    initialZMPSeqPtr.reset( new Vector3Seq() );
-    initialZMPSeqPtr->setNumFrames(motion->numFrames(), true);
-    calcZMP(body, motion, initialZMPSeqPtr);// 入力動作のzmpの計算
+    Vector3Seq initialZMPSeq;
+    initialZMPSeq.setNumFrames(motion.numFrames(), true);
+    calcZMP(body, motion, initialZMPSeq);// 入力動作のzmpの計算
 
     // 目標zmp・初期zmp・初期重心軌道書き出し
     {
         stringstream ss;
         ss << poseSeqPath.stem().string() << "_PC";
         if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) ss << mBar->dialog->getParamString();
-        ss << "_" << motion->frameRate() << "fps.dat";
+        ss << "_" << motion.frameRate() << "fps.dat";
         ofstream ofs(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
         Vector3d lastPosVec = body->rootLink()->p();
         Vector3d lastVelVec = VectorXd::Zero(3);
         ofs << "time initZMPx initZMPy initZMPz refZMPx refZMPy refZMPz initCMx initCMy initCMz rootPosX rootPosY rootPosZ rootVelX rootVelY rootVelZ rootAccX rootAccY rootAccZ" << endl;
-        for(int i = 0; i < motion->numFrames(); ++i){
-            (BodyMotion::ConstFrame) motion->frame(i) >> *body;
+        for(int i = 0; i < motion.numFrames(); ++i){
+            (BodyMotion::ConstFrame) motion.frame(i) >> *body;
             body->calcForwardKinematics();
             body->calcCenterOfMass();
       
@@ -120,14 +116,14 @@ void PreviewControlPlugin::execControl()
             lastPosVec = body->rootLink()->p(); lastVelVec = velVec;
 
             ofs << i*dt
-                << " " << initialZMPSeqPtr->at(i).transpose() << " " << refZmpSeqPtr->at(i).transpose() << " " << body->centerOfMass().transpose()
+                << " " << initialZMPSeq.at(i).transpose() << " " << refZmpSeq.at(i).transpose() << " " << body->centerOfMass().transpose()
                 << " " << body->rootLink()->p().transpose() << " " << velVec.transpose() << " " << accVec.transpose() << endl;
         }
         ofs.close();
     }
 
     // 予見制御収束ループ
-    Vector3SeqPtr zmpSeqPtr;
+    Vector3Seq zmpSeq;
     string modeStr = mBar->dialog->controlModeCombo->currentText().toStdString();
     cout << "control mode: " << modeStr << endl;
     string dfMode = mBar->dialog->controlModeCombo->itemText(DynamicsFilter).toStdString();
@@ -135,9 +131,8 @@ void PreviewControlPlugin::execControl()
     for(int loopNum = 0; loopNum < 3; ++loopNum){
         cout << "loop: " << loopNum << endl;
 
-        zmpSeqPtr.reset( new Vector3Seq() );
-        zmpSeqPtr->setNumFrames(motion->numFrames(), true);
-        calcZMP(body, motion, zmpSeqPtr , true);// 実際のzmpの計算
+        zmpSeq.setNumFrames(motion.numFrames(), true);
+        calcZMP(body, motion, zmpSeq , true);// 実際のzmpの計算
 
         // 予見制御用の実際のzmpと目標zmp、誤差zmp、時刻tmを計算
         std::queue<hrp::Vector3> ref_zmp_list;
@@ -148,10 +143,10 @@ void PreviewControlPlugin::execControl()
             tm_list.push_back(tmp_tm);
             // ref_zmp_list
             hrp::Vector3 ref_v;// 目標zmp
-            ref_v << refZmpSeqPtr->at(i).x(), refZmpSeqPtr->at(i).y(), refZmpSeqPtr->at(i).z();
+            ref_v << refZmpSeq.at(i).x(), refZmpSeq.at(i).y(), refZmpSeq.at(i).z();
         
             hrp::Vector3 v;// 実際のzmp
-            v << zmpSeqPtr->at(i).x(), zmpSeqPtr->at(i).y(), zmpSeqPtr->at(i).z();
+            v << zmpSeq.at(i).x(), zmpSeq.at(i).y(), zmpSeq.at(i).z();
 
             // 目標値リストに入力
             if(i+1 < static_cast<size_t>(round(max_tm / dt))){
@@ -169,19 +164,16 @@ void PreviewControlPlugin::execControl()
         }
         cout << "Finished generating ref zmp list" << endl;
 
-        Vector3SeqPtr inputZMPSeqPtr;
-        inputZMPSeqPtr.reset( new Vector3Seq() );
-        inputZMPSeqPtr->setNumFrames(motion->numFrames(), true);
+        Vector3Seq inputZMPSeq;
+        inputZMPSeq.setNumFrames(motion.numFrames(), true);
 
-        Vector3SeqPtr outputCMSeqPtr;
-        outputCMSeqPtr.reset( new Vector3Seq() );
-        outputCMSeqPtr->setNumFrames(motion->numFrames(), true);
+        Vector3Seq outputCMSeq;
+        outputCMSeq.setNumFrames(motion.numFrames(), true);
 
-        Vector3SeqPtr outputZMPSeqPtr;
-        outputZMPSeqPtr.reset(new Vector3Seq());
-        outputZMPSeqPtr->setNumFrames(motion->numFrames(), true);
+        Vector3Seq outputZMPSeq;
+        outputZMPSeq.setNumFrames(motion.numFrames(), true);
 
-        (BodyMotion::ConstFrame) motion->frame(0) >> *body;
+        (BodyMotion::ConstFrame) motion.frame(0) >> *body;
         body->calcForwardKinematics();
         Vector3d CM = body->calcCenterOfMass();
         rats2::preview_dynamics_filter<rats2::extended_preview_control> df(dt, CM.z(), ref_zmp_list.front());
@@ -196,10 +188,10 @@ void PreviewControlPlugin::execControl()
                 df.get_cart_zmp(output_zmp);
                 df.get_current_refzmp(input_zmp);
 
-                outputCMSeqPtr->at(index) = x;
+                outputCMSeq.at(index) = x;
 
-                inputZMPSeqPtr->at(index) << input_zmp[0], input_zmp[1], input_zmp[2];
-                outputZMPSeqPtr->at(index) << output_zmp[0], output_zmp[1], output_zmp[2];
+                inputZMPSeq.at(index) << input_zmp[0], input_zmp[1], input_zmp[2];
+                outputZMPSeq.at(index) << output_zmp[0], output_zmp[1], output_zmp[2];
 
                 ++index;
             } else if ( !ref_zmp_list.empty() ) r = true;
@@ -209,39 +201,39 @@ void PreviewControlPlugin::execControl()
         }
         cout << "Finished calculating ref diff centroid" << endl;
 
-        for(int i = 0; i < motion->numFrames(); ++i){
+        for(int i = 0; i < motion.numFrames(); ++i){
             Vector3d lFootPos,rFootPos, lHipPos, rHipPos, refCM;
             Matrix3 lFootR,rFootR;
-            (BodyMotion::ConstFrame) motion->frame(i) >> *body;
+            (BodyMotion::ConstFrame) motion.frame(i) >> *body;
             body->calcForwardKinematics();// 状態更新
 
             lFootPos = lFootLink->p(); lFootR = lFootLink->R();// 足先位置取得
             rFootPos = rFootLink->p(); rFootR = rFootLink->R();
 
             if(modeStr == dfMode){
-                Vector3d diffCM = outputCMSeqPtr->at(i);
+                Vector3d diffCM = outputCMSeq.at(i);
                 diffCM.z() = 0;
                 // body->rootLink()->p() += 0.5*diffCM;// 腰位置修正 ゲインを掛けるだけでは微妙
                 body->rootLink()->p() += 1.0*diffCM;// for HRP2 and JAXON_BLUE
             }else if(modeStr == tpMode){
-                Vector3d CM =  outputCMSeqPtr->at(i);
+                Vector3d CM =  outputCMSeq.at(i);
                 Vector3d CM2RootLink =  body->rootLink()->p() - body->calcCenterOfMass();
                 CM2RootLink.z() = 0;
                 CM.z() = body->rootLink()->p().z();
                 body->rootLink()->p() = CM + CM2RootLink;
             }
             body->calcForwardKinematics();// 状態更新
-            lHipPos = jpl->joint(0)->p(); rHipPos = jpr->joint(0)->p();
+            lHipPos = jpl.joint(0)->p(); rHipPos = jpr.joint(0)->p();
 
             Vector3 tmpVec = body->rootLink()->p();
             modifyWaistIntoRange( tmpVec, lFootPos, rFootPos, lHipPos, rHipPos, legLength );
             body->rootLink()->p() = tmpVec;// 腰位置修正は要改良
             body->calcForwardKinematics();// 状態更新
 
-            if(!jpl->calcInverseKinematics(lFootPos,lFootR)) cout << "\x1b[31m" << i*dt << " lfoot IK fail" << "\x1b[m" << endl;
-            if(!jpr->calcInverseKinematics(rFootPos,rFootR)) cout << "\x1b[31m" << i*dt << " rfoot IK fail" << "\x1b[m" << endl;
+            if(!jpl.calcInverseKinematics(lFootPos,lFootR)) cout << "\x1b[31m" << i*dt << " lfoot IK fail" << "\x1b[m" << endl;
+            if(!jpr.calcInverseKinematics(rFootPos,rFootR)) cout << "\x1b[31m" << i*dt << " rfoot IK fail" << "\x1b[m" << endl;
 
-            motion->frame(i) << *body;
+            motion.frame(i) << *body;
         }
         cout << "Finished modifying waist position" << endl;
 
@@ -250,19 +242,19 @@ void PreviewControlPlugin::execControl()
             stringstream ss;
             ss << poseSeqPath.stem().string() << "_PC";
             if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) ss << mBar->dialog->getParamString();
-            ss << "_" << motion->frameRate() << "fps_" << loopNum << ".dat";
+            ss << "_" << motion.frameRate() << "fps_" << loopNum << ".dat";
             ofstream ofs;
             ofs.open(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
 
-            calcZMP(body, motion, zmpSeqPtr, true);
+            calcZMP(body, motion, zmpSeq, true);
             ofs << "time  inputZMPx inputZMPy inputZMPz outputZMPx outputZMPy outputZMPz outputCMx outputCMy outputCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;
-            for(int i = 0; i < motion->numFrames(); ++i){
-                (BodyMotion::ConstFrame) motion->frame(i) >> *body;
+            for(int i = 0; i < motion.numFrames(); ++i){
+                (BodyMotion::ConstFrame) motion.frame(i) >> *body;
                 body->calcForwardKinematics();
                 body->calcCenterOfMass();
                 ofs << i*dt
-                    << " " << inputZMPSeqPtr->at(i).transpose() << " " << outputZMPSeqPtr->at(i).transpose() << " " << outputCMSeqPtr->at(i).transpose()
-                    << " " << zmpSeqPtr->at(i).transpose() << " " << body->centerOfMass().transpose() << " " << body->rootLink()->p().transpose() << endl;
+                    << " " << inputZMPSeq.at(i).transpose() << " " << outputZMPSeq.at(i).transpose() << " " << outputCMSeq.at(i).transpose()
+                    << " " << zmpSeq.at(i).transpose() << " " << body->centerOfMass().transpose() << " " << body->rootLink()->p().transpose() << endl;
             }
             ofs.close();
         }
@@ -271,9 +263,9 @@ void PreviewControlPlugin::execControl()
     }// modifying loop
 
     // motionに出力動作ZMPを代入
-    Vector3SeqPtr finalZMPSeqPtr = getOrCreateZMPSeq(*motion);// motionのZMP
-    for(int i = 0; i < motion->numFrames(); ++i){
-        finalZMPSeqPtr->at(i) = zmpSeqPtr->at(i);
+    Vector3Seq& finalZMPSeq = *(getOrCreateZMPSeq(motion));// motionのZMP
+    for(int i = 0; i < motion.numFrames(); ++i){
+        finalZMPSeq.at(i) = zmpSeq.at(i);
     }
 
     cout << "Finished assigning ZMP to motion class" << endl;
