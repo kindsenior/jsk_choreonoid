@@ -1,9 +1,9 @@
-message("This is UtilPlugin")
 option(BUILD_UTIL_PLUGIN "Build Util Plugin" ON)
+set(PLUGIN_NAME UtilPlugin)
+set(TARGET Cnoid${PLUGIN_NAME})
+message("TARGET: ${TARGET}")
 if(BUILD_UTIL_PLUGIN)
 
-  set(PLUGIN_NAME UtilPlugin)
-  set(TARGET Cnoid${PLUGIN_NAME})
   set(headers
     UtilPlugin.h
     Interpolator.h
@@ -34,4 +34,6 @@ if(BUILD_UTIL_PLUGIN)
 		  RESULT_VARIABLE _copy_failed)
   endforeach()
 
+else()
+  message("Skip building ${TARGET}")
 endif()

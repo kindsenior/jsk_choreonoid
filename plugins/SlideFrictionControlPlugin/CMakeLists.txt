@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
-message("This is SlideFrictionControlPlugin")
 option(BUILD_SLIDEFRICTIONCONTROL_PLUGIN "Build SlideFrictionControl Plugin" ON)
+set(TARGET CnoidSlideFrictionControlPlugin)
+message("TARGET: ${TARGET}")
 if(BUILD_SLIDEFRICTIONCONTROL_PLUGIN)
 
   if(NOT ONLYTEST)
-	  set(TARGET CnoidSlideFrictionControlPlugin)
 
 	  message("Build qpOASES")
 	  link_directories(${CMAKE_CURRENT_BINARY_DIR}/../../3rdparty/qpOASES/qpOASES-3.0/bin)
@@ -49,4 +49,6 @@ if(BUILD_SLIDEFRICTIONCONTROL_PLUGIN)
 		  RESULT_VARIABLE _copy_failed)
   endforeach()
 
+else()
+  message("Skip building ${TARGET}")
 endif()

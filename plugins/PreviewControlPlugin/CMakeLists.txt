@@ -1,8 +1,7 @@
-message("This is PreviewControlPlugin")
 option(BUILD_PREVIEWCONTROL_PLUGIN "Build PreviewControl Plugin" ON)
+set(TARGET CnoidPreviewControlPlugin)
+message("TARGET: ${TARGET}")
 if(BUILD_PREVIEWCONTROL_PLUGIN)
-
-  set(TARGET CnoidPreviewControlPlugin)
 
   pkg_check_modules(openhrp3 REQUIRED openhrp3.1)
   include_directories(${openhrp3_INCLUDE_DIRS})
@@ -17,4 +16,6 @@ if(BUILD_PREVIEWCONTROL_PLUGIN)
   set_target_properties(${TARGET}
     PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${choreonoid_PLUGINDIR})
 
+else()
+  message("Skip building ${TARGET}")
 endif()

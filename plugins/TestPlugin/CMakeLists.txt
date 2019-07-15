@@ -1,6 +1,6 @@
-message("This is CnoidTestPlugin")
-set(TARGET CnoidTestPlugin)
 option(BUILD_TEST_PLUGIN "Build Test Plugin" ON)
+set(TARGET CnoidTestPlugin)
+message("TARGET ${TARGET}")
 if(BUILD_TEST_PLUGIN)
 
   add_library(${TARGET} SHARED TestPlugin.cpp)
@@ -10,4 +10,6 @@ if(BUILD_TEST_PLUGIN)
 
   add_subdirectory(python)
 
+else()
+  message("Skip building ${TARGET}")
 endif()

@@ -1,9 +1,9 @@
-message("This is DynamicsPlugin")
 option(BUILD_DYNAMICS_PLUGIN "Build Dynamics Plugin" ON)
+set(PLUGIN_NAME DynamicsPlugin)
+set(TARGET Cnoid${PLUGIN_NAME})
+message("TARGET: ${TARGET}")
 if(BUILD_DYNAMICS_PLUGIN)
 
-  set(PLUGIN_NAME DynamicsPlugin)
-  set(TARGET Cnoid${PLUGIN_NAME})
   set(headers DynamicsPlugin.h Jacobian.h)
 
   add_library(${TARGET} SHARED DynamicsPlugin Jacobian)
@@ -24,4 +24,6 @@ if(BUILD_DYNAMICS_PLUGIN)
 		  RESULT_VARIABLE _copy_failed)
   endforeach()
 
+else()
+  message("Skip building ${TARGET}")
 endif()

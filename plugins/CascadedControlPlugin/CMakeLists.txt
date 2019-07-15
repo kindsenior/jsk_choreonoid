@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
-message("This is CascadedControlPlugin")
 option(BUILD_CASCADEDCONTROL_PLUGIN "Build CascatedControl Plugin" ON)
+set(TARGET CnoidCascadedControlPlugin)
+message("TARGET: ${TARGET}")
 if(BUILD_CASCADEDCONTROL_PLUGIN)
 
   if(NOT ONLYTEST)
-	  set(TARGET CnoidCascadedControlPlugin)
 
     # for qpoases
 	  include_directories(${CMAKE_CURRENT_BINARY_DIR}/../../3rdparty/qpOASES/qpOASES-3.0/include)
@@ -26,4 +26,6 @@ if(BUILD_CASCADEDCONTROL_PLUGIN)
   set_target_properties(${TARGET}
     PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${choreonoid_PLUGINDIR})
 
+else()
+  message("Skip building ${TARGET}")
 endif()

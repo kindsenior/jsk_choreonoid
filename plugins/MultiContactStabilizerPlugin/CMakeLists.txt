@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 2.8.3)
-message("This is MultiContactStabilizerPlugin")
 option(BUILD_MULTICONTACTSTABILIZER_PLUGIN "Build MultiContactStabilizer Plugin" ON)
+set(TARGET CnoidMultiContactStabilizerPlugin)
+message("TARGET: ${TARGET}")
 if(BUILD_MULTICONTACTSTABILIZER_PLUGIN)
 
   if(NOT ONLYTEST)
-	  set(TARGET CnoidMultiContactStabilizerPlugin)
 
 	  message("Build qpOASES")
 	  add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/../../3rdparty/qpOASES/qpOASES-3.0 ${CMAKE_CURRENT_BINARY_DIR}/../../3rdparty/qpOASES/qpOASES-3.0)
@@ -53,4 +53,6 @@ if(BUILD_MULTICONTACTSTABILIZER_PLUGIN)
 		  RESULT_VARIABLE _copy_failed)
   endforeach()
 
+else()
+  message("Skip building ${TARGET}")
 endif()
