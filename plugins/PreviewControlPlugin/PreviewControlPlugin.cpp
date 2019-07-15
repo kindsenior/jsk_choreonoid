@@ -79,16 +79,6 @@ void PreviewControlPlugin::execControl()
     double dt = 1.0/motion.frameRate(), max_tm = motion.numFrames() / (double)motion.frameRate();
 
     // 目標zmpを計算
-    PoseSeqInterpolatorPtr poseSeqInterpolatorPtr = poseSeqItemPtr->interpolator();
-    // for(size_t i = 0; i < static_cast<size_t>(round(max_tm / dt)); i++){
-    //   poseSeqInterpolatorPtr->seek( i * dt );
-
-    //   // poseSeqのZMP
-    //   refZmpSeqPtr->at(i).x() = (*(poseSeqInterpolatorPtr->ZMP())).x();
-    //   refZmpSeqPtr->at(i).y() = (*(poseSeqInterpolatorPtr->ZMP())).y();
-    //   refZmpSeqPtr->at(i).z() = (*(poseSeqInterpolatorPtr->ZMP())).z();
-    // }
-
     Vector3Seq& refZmpSeq = *(cnoid::getOrCreateZMPSeq(motion));
     cout << "Finished generating ref zmp seq" << endl;
 

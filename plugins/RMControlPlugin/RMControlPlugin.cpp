@@ -60,11 +60,8 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
 {
     stringstream ss;
 
-    // 重心
-    // const Vector3d currentCM = mBody->calcCenterOfMass();
 
     // Ml Mr Hl Hr作成
-    // MatrixXd M,H;
     calcCMJacobian(mBody,NULL,M);
     calcAngularMomentumJacobian(mBody, NULL, H);
     M = mBody->mass() * M;
@@ -72,23 +69,6 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
     H.block(0,mBody->numJoints()+3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw;
     MatrixXd MH(M.rows()+H.rows(), M.cols());
     MH.block(0,0, M.rows(),M.cols()) = M; MH.block(M.rows(),0, H.rows(),H.cols()) = H;
-
-    // Link* rootLink = mBody->rootLink();
-    // Link* lFoot = mBody->link("RLEG_JOINT5"); Link* rFoot = mBody->link("LLEG_JOINT5");
-    // JointPathPtr mJpl = getCustomJointPath(mBody, rootLink, lFoot);
-    // JointPathPtr mJpr = getCustomJointPath(mBody, rootLink, rFoot);
-
-    // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
-    // Hrleg = H.block(0,mBody->link("RLEG_JOINT0")->jointId, 3,mJpr->numJoints());
-
-    // Mfree, Hfree作成
-    // freeジョイントがない場合の処理にはおそらく未対応
-    // free関節かどうか
-
-    // Fl,Fr作成
-
-
-
 
     // A_を計算
     // A_ = MatrixXd(MH.cols(), wholeBodyConstraintPtr->complementJointIdSet().size());
@@ -101,15 +81,10 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
         // A_ += MH * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix() * jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose());// use modified refdq of null-space
     }
 
-    // Hlleg = H.block(0,mBody->link("LLEG_JOINT0")->jointId, 3,mJpl->numJoints());
-    // Hrleg = H.block(0,mBody->link("RLEG_JOINT0")->jointId, 3,mJpr->numJoints());
-
-    // MessageView::instance()->putln(ss.str());
     return;
 }
 
 // 目標運動量・角運動量軌道生成
-// void generateRefPLSeq(BodyPtr body,BodyItem* bodyItem, const BodyMotionPtr motion,const PoseSeqPtr poseSeq,
 void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr poseSeq,
                                        const Vector3d initDCM, const Vector3d endDCM, const Vector3d initL, const Vector3d endL)
 {
@@ -251,19 +226,6 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
             refPSeq.at(i) = m * takeoffDCM;
             refPSeq.at(i).z() = - m * g * (i - takeoffFrame)*dt + m * takeoffDCM.z();
         }else if(initRMCFrame <= i && i <= endRMCFrame){// 接地期
-            // Vector3d f0,v0,f1,v1;
-            // if(i <= takeoffFrame){
-            //     startFrame = initRMCFrame;
-            //     endFrame = takeoffFrame;
-            //     f0 = initCM; v0 = initDCM;
-            //     f1 = takeoffCM; v1 = takeoffDCM;
-            // }else if(landingFrame <= i){
-            //     startFrame = landingFrame;
-            //     endFrame = endRMCFrame;
-            //     f0 = landingCM; v0 = landingDCM;
-            //     f1 = endCM; v1 = endDCM;
-            // }
-            // double tau = (endFrame - startFrame) * dt;
 
             // スプライン補間/躍度最小補間
             if(i == initRMCFrame){
@@ -326,7 +288,6 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     setSubItem("refP", refPSeq, motionItem);
     setSubItem("refL", refLSeq, motionItem);
 
-    // MessageView::instance()->putln(ss.str());
     ofs.close();
 }
 
@@ -540,32 +501,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
         cout << "correct L " << L_world.transpose() << endl;
         cout << "my L " << (mBody->centerOfMass().cross(P_g) + L_g).transpose() << endl << endl;// 原点回りに変換
 
-        // VectorXd prevXib = VectorXd::Zero(6);;
-
-        // // 脚のヤコビアンが正しいかどうかの確認
-        // motion.frame(0) >> *body;// 腰座標、q更新 body更新
-        // for(int k=0; k < motion.numJoints(); ++k){
-        //   Link* joint = mBody->joint(k);
-        //   joint->dq() = 0.1;
-        //   joint->ddq() = 0;
-        // }
-        // mBody->calcForwardKinematics(true,true);// v,wを更新
-        // MatrixXd Jl_,Jr_; mJpl->calcJacobian(Jl_); mJpr->calcJacobian(Jr_);// 脚・腰間ヤコビアン
-        // VectorXd dql_ = VectorXd::Constant(6,0.1);
-        // VectorXd dqr_ = VectorXd::Constant(6,0.1);
-        // VectorXd xil_(6);        VectorXd xir_(6);
-        // xil_.block(0,0, 3,1) = mBody->link("LLEG_JOINT5")->v; xil_.block(3,0, 3,1) = mBody->link("LLEG_JOINT5")->w();
-        // xir_.block(0,0, 3,1) = mBody->link("RLEG_JOINT5")->v; xir_.block(3,0, 3,1) = mBody->link("RLEG_JOINT5")->w();
-        // ss << "lleg xi " << endl << xil_.transpose() << endl;
-        // ss << "lleg xi from J" << endl << (Jl_*dql_).transpose() << endl;
-        // ss << "lleg xi " << endl << xir_.transpose() << endl;
-        // ss << "rleg xi from J" << endl << (Jr_*dqr_).transpose() << endl;
-        // ss << "lleg dq " << endl << dql_.transpose() << endl;
-        // ss << "lleg dq from J inv " << endl << (Jl_.inverse() * xil_).transpose() << endl;
-        // ss << "rleg dq " << endl << dqr_.transpose() << endl;
-        // ss << "rleg dq from J inv " << endl << (Jr_.inverse() * xir_).transpose() << endl;
-
-
         // motion loop 計算 step 2 〜 6
         // for(int currentFrame = 0; currentFrame < 1; ++currentFrame){
         for(int currentFrame = 0; currentFrame < motion.numFrames(); ++currentFrame){
@@ -578,20 +513,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             // prevFrame,nextFrame設定
             int prevFrame = std::max(currentFrame - 1, 0);
             int nextFrame = std::min(currentFrame + 1, motion.numFrames() - 1);
-
-            // // 足先更新
-            // Vector3d v_,w_;
-            // Matrix3 R_;
-            // motion.frame(nextFrame) >> *mBody;
-            // mBody->calcForwardKinematics();
-            // v_ = mBody->link(BASE_LINK)->p();
-            // R_ = mBody->link(BASE_LINK)->R;
-            // motion.frame(currentFrame) >> *mBody;
-            // mBody->calcForwardKinematics();
-            // v_ = ( v_ - mBody->link(BASE_LINK)->p() ) /dt;
-            // AngleAxis aa  = AngleAxis( R_ * mBody->link(BASE_LINK)->R.inverse() );
-            // w_ = aa.axis() * aa.angle()/dt;
-
 
             // 足先速度調査
             (BodyMotion::ConstFrame) motion.frame(nextFrame) >> *mBody;
@@ -611,7 +532,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             }
 
             // q,dq,ddq,rootLink p,R,v,w更新
-            // updateBodyState(mBody, motion, currentFrame);// gap exists between currentFrame and nextFrame
             updateBodyState(mBody, motion, currentFrame);// gap exists between currentFrame and nextFrame
 
             mBody->calcForwardKinematics(true,true);// 状態更新
@@ -620,42 +540,11 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             wholeBodyConstraintPtr->update();
 
-            // overwrite EE velocity
-            // for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
-            //     MatrixXd Jb = MatrixXd::Identity(6,6);
-            //     Vector3d vec = jointPathPtr->endLink()->p() - jointPathPtr->baseLink()->body()->rootLink()->p();
-            //     for(int i=0; i<3; ++i) Jb.block(0,3+i, 3,1) = Matrix3::Identity().col(i).cross(vec);
-
-            //     VectorXd refRelTwist = jointPathPtr->twist - Jb*prevXib;
-            //     MatrixXd J;
-            //     jointPathPtr->calcJacobian(J);
-            //     VectorXd modifRelTwist = J * jointPathPtr->inverseJacobian() * refRelTwist;
-            //     VectorXd modifTwist = modifRelTwist + Jb*prevXib;
-
-            //     VectorXd diffTwist = VectorXd::Zero(6);
-            //     diffTwist(2) = modifTwist(2) - jointPathPtr->twist(2);// overwrite only z
-            //     diffTwist = jointPathPtr->passTwistFilter(diffTwist);
-            //     jointPathPtr->twist(2) = max(jointPathPtr->twist(2)+diffTwist(2), jointPathPtr->twist(2));
-            // }
-
-            // ss << "root v after << " << mBody->rootLink()->v().transpose() << endl;
-            // ss << "root w" << endl << mBody->rootLink()->w() << endl;
-            // ss << "ref xib " << xib.transpose() << endl;
-
-            // ss << "arm v " << mBody->link("LARM_JOINT3")->v().transpose() << endl;
-            // ss << "leg v " << mBody->link("LLEG_JOINT5")->v().transpose() << endl;
-            // ss << "arm w" << endl << mBody->link("LARM_JOINT3")->w() << endl;
-            // ss << "leg w" << endl << mBody->link("LLEG_JOINT5")->w() << endl;
-
             // step 2
             // cout << " step2";
             MatrixXd A,A_,M,H;
             calcMatrixies(A_, M,H);
             A = S * A_;
-
-            // int dof = wholeBodyConstraintPtr->freeJointIdSet().size();
-
-            // cout << " Finished Step 2" << endl;
 
             // step 3 y計算
             // cout << " step3";
@@ -668,8 +557,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             }
             refdq.segment(mBody->numJoints(),3) = mBody->rootLink()->v();
             refdq.segment(mBody->numJoints()+3,3) = mBody->rootLink()->w();
-            // VectorXd currentDq(mBody->numJoints());
-            // for(int i=0; i<mBody->numJoints(); ++i) currentDq(i) = refdq(i);
 
             VectorXd refM(6);
             refM.block(0,0, 3,1) = refPSeq.at(currentFrame);
@@ -679,8 +566,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
                 int numJoints = jointPathPtr->numJoints();
                 MatrixXd MH(6,numJoints);
-                // MH.block(0,0, 3,numJoints) = extractMatrixColumn(M, jointPathPtr->exclusiveJointIdSet());
-                // MH.block(3,0, 3,numJoints) = extractMatrixColumn(H, jointPathPtr->exclusiveJointIdSet());
                 MH.block(0,0, 3,numJoints) = M * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
                 MH.block(3,0, 3,numJoints) = H * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
                 y -= MH  * jointPathPtr->inverseJacobian() * jointPathPtr->twist;// use modified refdq or disable refdq of constraint null-space
@@ -692,10 +577,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             // step 4 腰座標速度,free関節角速度計算 目標量から制御量の算出
             // cout << " step4";
-            // VectorXd valVec( 6 + dof );
-            // valVec.head(dof) = wholeBodyConstraintPtr->jointExtendMatrix().block(0,0, mBody->numJoints(),wholeBodyConstraintPtr->freeJointIdSet().size()).transpose() * currentDq;
-            // valVec.segment(dof,3) = mBody->rootLink()->v();
-            // valVec.segment(dof+3,3) = mBody->rootLink()->w();
             // VectorXd valVec = wholeBodyConstraintPtr->complementJointWeightMatrix() * refdq;// disable refdq of constraint null-space
             VectorXd valVec = refdq;// enable refdq of constraint joints
 
@@ -711,27 +592,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             dq = Ainv * y + AnullSpace * wholeBodyConstraintPtr->complementJointWeightMatrix() * valVec;// disable dq of constraint joints
             // dq += wholeBodyConstraintPtr->jointExtendMatrix() * valVec;
 
-            // cout << endl;
-            // cout << "S " << endl << S << endl;
-            // cout << "Jl " << endl << Jl << endl;
-            // cout << "Jl inv " << endl << Jl.inverse() << endl;
-            // cout << "Fl " << endl << Fl << endl;
-            // cout << "M " << endl << M.transpose() << endl;
-            // cout << "Ml " << endl << Ml << endl;
-            // cout << "Mfree " << endl << Mfree << endl;
-            // cout << "H " << endl << H << endl;
-            // cout << "Hl " << endl << Hl << endl;
-            // cout << "Hfree " << endl << Hfree << endl;
-            // cout << endl;
-            // cout << "A_ " << endl << A_ << endl;
-            // cout << "A " << endl << A << endl;
-            // cout << "A inv " << endl << Ainv << endl;
-            // cout << "y " << y.transpose() << endl;
-            // cout << endl;
-
-            // ss << "valVec " << valVec.transpose() << endl;
-            // ss << "xib " << xib.transpose() << endl;
-
             // cout << " Finished Step 4" << endl;
 
             // step 5 脚関節角速度計算
@@ -743,15 +603,12 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix()*jointPathPtr->inverseJacobian() * (jointPathPtr->twist - F * dq);// disable dq of constraint null-space
                 // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix() * (jointPathPtr->inverseJacobian()*(jointPathPtr->twist-F*dq) + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*refdq);// use direct refdq
                 // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix() * (jointPathPtr->inverseJacobian()*(jointPathPtr->twist-F*dq) + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*valVec);// use modified refdq
-                // dq += jointPathPtr->exclusiveJointWeightMatrix()*jointPathPtr->jointExtendMatrix()*inverseJacobian((JointPathPtr&)jointPathPtr) * (jointPathPtr->twist - F * dq);// disable dq of constraint null-space and use normal IK
             }
 
             // cout << " Finished Step 5" << endl;
 
             // step 6 関節角速度計算
             // cout << " step6";
-            // ss << "dqfree " << dqfree.transpose() << endl;
-            // cout << "dq " << dq.transpose() << endl;
 
             // RootLink位置更新
             (BodyMotion::ConstFrame) motion.frame(currentFrame) >> *mBody;
@@ -760,24 +617,12 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             if(omega.norm() != 0) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
             else cout << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
 
-            // prevXib.head(3) = dq.segment(mBody->numJoints(),3);
-            // prevXib.tail(3) = dq.segment(mBody->numJoints()+3,3);
-
-            // // BaseLink更新
-            // mBody->link(BASE_LINK)->p += mBody->link(BASE_LINK)->v() * dt;
-            // Vector3d omega = mBody->link(BASE_LINK)->w();
-            // if(omega.norm() != 0)mBody->link(BASE_LINK)->R() = mBody->link(BASE_LINK)->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
-
             // q更新
             for(int i = 0; i < mBody->numJoints(); ++i){
                 mBody->joint(i)->q() += dq[mBody->joint(i)->jointId()] * dt;
             }
             mBody->calcForwardKinematics();// 状態更新
             // bodyItems[0]->calcForwardKinematics();// 状態更新
-
-            // 足先修正
-            // mJpl->calcInverseKinematics(lp,lR);
-            // mJpr->calcInverseKinematics(rp,rR);
 
             motion.frame(nextFrame) << *mBody;// frame更新
 
@@ -822,18 +667,6 @@ void RMControlPlugin::execControl()
 {
     MessageView::instance()->putln("RMControl called !");
     cout << "\x1b[31m" << "RMControl()" << "\x1b[m" << endl;
-
-    // yamlファイルから足先リンク取得
-    // YAMLReader parser;
-    // parser.load("/home/kunio/Dropbox/choreonoid/models/HRP2JSK/hrp2jsk.yaml");
-    // MappingPtr info = parser.document()->toMapping();
-    // // info->findListing("linkGroup");
-    // Listing& linkGroupList = *info->findListing("footLinks");
-    // ValueNode& node = linkGroupList[0];
-    // std::cout << (node.type() == ValueNode::SCALAR) << " " <<(node.type() == ValueNode::MAPPING) << std::endl;
-    // Mapping& group = *node.toMapping();
-    // std::cout << group["link"].toString() << std::endl;
-
 
     // 最初のBodyItemのみ処理
     ItemList<BodyItem> bodyItems = ItemTreeView::mainInstance()->checkedItems<BodyItem>();// checkedItems チェックされたアイテムを取得
@@ -895,9 +728,6 @@ void RMControlPlugin::execControl()
         loadRefPLSeq(bodyMotionItem, poseSeqItem->poseSeq(), initDCM, endDCM, initL, endL);
         cout << " Loaded ref P/L" << endl;
     }
-
-    // 跳躍期間のrootLinkを目標重心軌道に合わせて修正
-    // modifyJumpingTrajectory(poseSeqItem, contactLinkCandidateSet);
 
     sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, endEffectorLinkVec);// ParamString is not gotten from ParamSetupLayout and is empty
 

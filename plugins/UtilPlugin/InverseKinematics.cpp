@@ -48,20 +48,6 @@ Eigen::MatrixXd cnoid::SRInverse(const Eigen::MatrixXd& m, Eigen::MatrixXd& weig
     return weight_mat*m.transpose() * ((m*weight_mat*m.transpose() + (manipulability < manipulability_thresh ? weight*pow(1-manipulability/manipulability_thresh,2) : 0) * Eigen::MatrixXd::Identity(m.rows(),m.rows())).inverse());
 }
 
-// Eigen::MatrixXd cnoid::calcInverseJacobian(const Eigen::MatrixXd& m)
-Eigen::MatrixXd cnoid::inverseJacobian(JointPathPtr& jp)
-{
-    MatrixXd J;
-    jp->calcJacobian(J);
-    // const int numJoints = jp->numJoints();
-    // Eigen::MatrixXd weight_mat = Eigen::MatrixXd::Identity(numJoints, numJoints);
-
-    // return PseudoInverse(m);
-    // return SRInverse(J, weight_mat);
-    // return SRInverse(J);
-    return J.inverse();
-}
-
 MatrixXd cnoid::threshMatrix(const MatrixXd& m, double thresh) {
     MatrixXd ret;
     int numRows = m.rows(), numCols = m.cols();
