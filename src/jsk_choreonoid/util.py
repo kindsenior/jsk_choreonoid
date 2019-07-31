@@ -4,10 +4,10 @@ from cnoid import Base, Body, BodyPlugin, PoseSeqPlugin
 
 
 def get_child_items(item, class_type=None):
-    if item.childItem() is None:
+    if item.childItem is None:
         ret = []
     else:
-        ret = get_all_items(item.childItem(), class_type, [])
+        ret = get_all_items(item.childItem, class_type, [])
     return ret
 
 
@@ -19,11 +19,11 @@ def get_all_items(item, class_type, ret=None):
     if class_type is None or type(item) is class_type:
         ret.append(item)
     # add child
-    child = item.childItem()
+    child = item.childItem
     if child is not None:
         get_all_items(child, class_type, ret)
     # add sibling
-    sibling = item.nextItem()
+    sibling = item.nextItem
     if sibling is not None:
         get_all_items(sibling, class_type, ret)
     return ret
@@ -32,24 +32,24 @@ def get_all_items(item, class_type, ret=None):
 def get_robot(path_or_item):
     if type(path_or_item) is BodyPlugin.BodyItem:
         print "get robot from robotItem"
-        return path_or_item.body()
+        return path_or_item.body
     else:
-        loader = Body.BodyLoader()
+        loader = Body.BodyLoader
         robot = loader.load(str(path_or_item))
         print "load " + str(path_or_item)
         return robot
 
 
 class World(object):
-    itemTreeView = Base.ItemTreeView.instance()
-    rootItem = Base.RootItem.instance()
+    itemTreeView = Base.ItemTreeView.instance
+    rootItem = Base.RootItem.instance
     is_choreonoid = True if itemTreeView else False
 
     def __init__(self, model_path=None, worldItem=None):
         if self.is_choreonoid:  # use choreonoid
             # set world item
             if worldItem is None:
-                worldItems = get_all_items(Base.ItemTreeView.instance().rootItem(), BodyPlugin.WorldItem)
+                worldItems = get_all_items(Base.ItemTreeView.instance.rootItem, BodyPlugin.WorldItem)
                 if len(worldItems) == 0:
                     self.set_worldItem()
                 else:
@@ -70,12 +70,12 @@ class World(object):
     @classmethod
     def checkItem(cls, item):
         cls.itemTreeView.checkItem(item)
-        print "checked " + item.name()
+        print "checked " + item.name
 
     @classmethod
     def selectItem(cls, item):
         cls.itemTreeView.selectItem(item)
-        print "selected " + item.name()
+        print "selected " + item.name
 
     @classmethod
     def add_worldItem(cls):
@@ -88,13 +88,13 @@ class World(object):
 
     def set_item(self, item, parent=None, name=None):
         # set name
-        item_name = name if name else item.name().lower() + "Item"
+        item_name = name if name else item.name.lower() + "Item"
         print "set " + item_name
         setattr(self, item_name, item)
         # add child to parent
         if parent:
             parent.addChildItem(item)
-            print item_name + " add to " + parent.name() + "Item"
+            print item_name + " add to " + parent.name + "Item"
 
         return item
 
@@ -118,11 +118,11 @@ class World(object):
                                        name + "Item" if name else None)
         # set robot
         robot = get_robot(robotItem)
-        setattr(self, name if name else robot.name(), robot)
+        setattr(self, name if name else robot.name, robot)
         return robotItem
 
     def set_poseSeqItem(self, path, parent, name="poseSeqItem"):
-        poseSeqItem = PoseSeqPlugin.PoseSeqItem()
+        poseSeqItem = PoseSeqPlugin.PoseSeqItem
         poseSeqItem.load(str(path), parent)
         self.set_item(poseSeqItem, parent, name)
         return poseSeqItem

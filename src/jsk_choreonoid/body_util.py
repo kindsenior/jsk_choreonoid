@@ -5,14 +5,14 @@ import numpy as np
 # define function
 ## cnoid.Body.Body (robot)
 def links(self):
-    num=self.numLinks()
+    num=self.numLinks
     return [self.link(link_i) for link_i in range(num)]
 def jointList(self):
-    num=self.numJoints()
+    num=self.numJoints
     return [self.joint(joint_i) for joint_i in range(num)]
 def angleVector(self,angles=None):
     if not angles is None:
-        if self.numJoints() != len(angles):
+        if self.numJoints != len(angles):
             raise TypeError('length of angles do not agree with self.numJoints')
         for j,joint in enumerate(self.jointList()):
             joint.q=angles[j]
