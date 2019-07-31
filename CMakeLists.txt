@@ -14,7 +14,14 @@ if(NOT ${CHOREONOID_FOUND})
   find_package(PkgConfig)
   pkg_check_modules(choreonoid choreonoid REQUIRED)
 endif()
+# apply choreonoid cmake settings
+add_definitions(${CHOREONOID_DEFINITIONS})
+include_directories(${CHOREONOID_INCLUDE_DIRS})
+link_directories(${CHOREONOID_LIBRARY_DIRS})
+
+# set path for installing jsk_choreonoid libraries in choreonoid
 set(choreonoid_PLUGINDIR ${CHOREONOID_PLUGIN_DIR})
+set(choreonoid_PYTHON_DIR ${CHOREONOID_ROOT_DIR}/${CHOREONOID_PYTHON_SUBDIR}/cnoid)
 
 message("********************choreonoid pkg infomation********************")
 message("CHOREONOID_FOUND: ${CHOREONOID_FOUND}")
@@ -28,21 +35,6 @@ message("CHOREONOID_LIBRARIES: ${CHOREONOID_LIBRARIES}")
 message("CHOREONOID_PLUGIN_DIR: ${CHOREONOID_PLUGIN_DIR}")
 message("CHOREONOID_ADDITIONAL_LIBRARIES: ${CHOREONOID_ADDITIONAL_LIBRARIES}")
 
-# for python wrapper
-## python package
-find_package(PythonLibs 2.7 REQUIRED)
-include_directories(${PYTHON_INCLUDE_PATH})
-## boost package
-find_package(Boost 1.47.0 REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-
-# string(REGEX REPLACE ".0" "" CHOREONOID_VER ${CHOREONOID_VERSION})
-# execute_process(COMMAND pkg-config --variable=plugindir choreonoid
-#   OUTPUT_VARIABLE CHOREONOID_PLUGINDIR
-#   RESULT_VARIABLE RESULT
-#   OUTPUT_STRIP_TRAILING_WHITESPACE)
-
 # for python module
 catkin_python_setup()
 
@@ -50,18 +42,9 @@ file(MAKE_DIRECTORY ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
 catkin_package(
   INCLUDE_DIRS ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME})
 
-
 # -I
-include_directories(${CHOREONOID_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/plugins)
-# -L
-link_directories(${CHOREONOID_LIBRARY_DIRS})
-set(CHOREONOID_ADDITIONAL_LIBRARIES CnoidPoseSeqPlugin)
-
-#set the default path for built executables to the "bin" directory
-# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${CHOREONOID_PLUGIN_DIR})
+message("CATKIN_PACKAGE_INCLUDE_DESTINATION: ${CATKIN_PACKAGE_INCLUDE_DESTINATION}")
+include_directories(${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 # for -std=c++11
 # set(CMAKE_CXX_STANDARD 11)# cannot?

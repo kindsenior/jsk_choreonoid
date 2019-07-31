@@ -38,11 +38,12 @@ if(BUILD_MULTICONTACTSTABILIZER_PLUGIN)
 
   set(PLUGIN_NAME MultiContactStabilizerPlugin)
   set(headers
-	  MultiContactStabilizerPlugin.h
-	  MultiContactStabilizerBar.h
-	  ModelPredictiveController.h
-	  MultiContactStabilizer.h
-	  ContactConstraint.h)
+    MultiContactStabilizerPlugin.h
+    MultiContactStabilizerBar.h
+    ModelPredictiveController.h
+    MultiContactStabilizer.h
+    ContactConstraint.h
+    QP.h)
   set(INCLUDE_DEST_DIR ${CATKIN_DEVEL_PREFIX}/include/${PROJECT_NAME}/${PLUGIN_NAME})
   execute_process(
     COMMAND cmake -E make_directory ${INCLUDE_DEST_DIR}
