@@ -5,21 +5,23 @@
 #include <cnoid/PyUtil>
 #include "../BodyUtil.h"
 
-using namespace boost::python;
+#include <pybind11/pybind11.h>
+
 using namespace cnoid;
+namespace py = pybind11;
 
-namespace cnoid {
-    void exportPyTypesPlugin();
-}
-
-BOOST_PYTHON_MODULE(BodyUtil)
+PYBIND11_MODULE(BodyUtil, m)
 {
-    exportPyTypesPlugin();
-    def("links", links);
-    def("jointList", jointList);
-    def("angleVector", angleVector);
+    m.doc() = "Choreonoid BodyUtil module";
 
-    class_< DrawInterface, DrawInterfacePtr, bases<Referenced> >("DrawInterface", init<Vector3f>())
+    py::module::import("cnoid.Util");
+
+    m.def("links", links);
+    m.def("jointList", jointList);
+    m.def("angleVector", angleVector);
+
+    py::class_< DrawInterface, DrawInterfacePtr, Referenced >(m, "DrawInterface")
+        .def(py::init<Eigen::Vector3f>())
         .def("setLineWidth", &DrawInterface::setLineWidth)
         .def("setColor", &DrawInterface::setColor)
         .def("show", &DrawInterface::show)

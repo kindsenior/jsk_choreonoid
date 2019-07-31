@@ -5,14 +5,17 @@
 #include <iostream>
 #include <cnoid/PyUtil>
 
-using namespace boost::python;
+#include <pybind11/pybind11.h>
+
+using namespace cnoid;
+namespace py = pybind11;
 
 void test()
 {
   std::cout << "This is Test Plugin" << std::endl;
 }
 
-BOOST_PYTHON_MODULE(TestPlugin)
+PYBIND11_MODULE(TestPlugin, m)
 {
-  def("test", test);
+  m.def("test", test);
 }
