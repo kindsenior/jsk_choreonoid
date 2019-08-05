@@ -26,11 +26,27 @@ Usage
   $ roscd jsk_choreonoid/sample/WalkSample/
   $ choreonoid JAXON_RED_Walk.cnoid
   ```
-1. select poseseq
-1. push MCS button
-1. push RM button
-1. select motion item
+1. select a poseseq item in Item Tree View
+1. push "MCS" button
+1. push "RMC" button
+1. select a motion item in Item Tree View
 1. push play button
+
+- Sample of the slide friction control (support jump motions)
+1. run choreonoid with project file
+
+  ```
+  $ roscd jsk_choreonoid/sample/JumpSample/
+  $ choreonoid JAXON_RED_Jump.cnoid
+  ```
+1. select a poseseq item in Item Tree View
+1. push "CC" button
+1. push "RMC" button
+1. select a motion item
+1. push play button
+1. export optional hrpsys sequence file (push "export" button)
+1. export hrpsys sequence files (select the motion item and File->Export Selected Items)
+1. send the exported hrpsys sequence files to hrpsys-base by load-pattern service
 
 - Sample of the preview control
 1. run choreonoid with project file
@@ -39,7 +55,7 @@ Usage
   $ roscd jsk_choreonoid/sample/WalkSample/
   $ choreonoid JAXON_RED_Walk.cnoid
   ```
-1. select poseseq
+1. select a poseseq in Item Tree View
 1. push PreviewControl button
-1. select motion item
+1. select a motion item
 1. push play button
