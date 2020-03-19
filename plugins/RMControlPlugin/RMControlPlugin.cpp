@@ -558,20 +558,21 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
             refdq.segment(mBody->numJoints(),3) = mBody->rootLink()->v();
             refdq.segment(mBody->numJoints()+3,3) = mBody->rootLink()->w();
 
-            VectorXd refM(6);
-            refM.block(0,0, 3,1) = refPSeq.at(currentFrame);
-            refM.block(3,0, 3,1) = refLSeq.at(currentFrame);
             VectorXd y(numSelects);
-            y = refM;
-            for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
-                int numJoints = jointPathPtr->numJoints();
-                MatrixXd MH(6,numJoints);
-                MH.block(0,0, 3,numJoints) = M * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
-                MH.block(3,0, 3,numJoints) = H * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
-                y -= MH  * jointPathPtr->inverseJacobian() * jointPathPtr->twist;// use modified refdq or disable refdq of constraint null-space
-                // y -= MH  * (jointPathPtr->inverseJacobian()*jointPathPtr->twist  + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*refdq);// use direct refdq
+            {
+                VectorXd tmpy(6);
+                tmpy.block(0,0, 3,1) = refPSeq.at(currentFrame);
+                tmpy.block(3,0, 3,1) = refLSeq.at(currentFrame);
+                for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
+                    int numJoints = jointPathPtr->numJoints();
+                    MatrixXd MH(6,numJoints);
+                    MH.block(0,0, 3,numJoints) = M * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
+                    MH.block(3,0, 3,numJoints) = H * jointPathPtr->exclusiveJointWeightMatrix() * jointPathPtr->jointExtendMatrix();
+                    tmpy -= MH  * jointPathPtr->inverseJacobian() * jointPathPtr->twist;// use modified refdq or disable refdq of constraint null-space
+                    // tmpy -= MH  * (jointPathPtr->inverseJacobian()*jointPathPtr->twist  + jointPathPtr->jacobianNullSpace()*(jointPathPtr->jointExtendMatrix().transpose())*refdq);// use direct refdq
+                }
+                y = S*tmpy;
             }
-            y = S*y;
 
             // cout << " Finished Step 3" << endl;
 
