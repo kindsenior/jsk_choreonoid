@@ -34,8 +34,7 @@ def get_robot(path_or_item):
         print "get robot from robotItem"
         return path_or_item.body
     else:
-        loader = Body.BodyLoader
-        robot = loader.load(str(path_or_item))
+        robot = Body.BodyLoader().load(str(path_or_item))
         print "load " + str(path_or_item)
         return robot
 
