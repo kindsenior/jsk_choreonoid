@@ -60,7 +60,6 @@ protected:
     RMControlBar* mBar;
 
 public:
-    std::vector<SubMass> mSubMasses;
     BodyPtr mBody;
     Link* mLFootLink;
     Link* mRFootLink;

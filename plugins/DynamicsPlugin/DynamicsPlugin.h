@@ -18,8 +18,6 @@
 #include <cnoid/src/Body/InverseDynamics.h>
 #include <cnoid/Vector3Seq>
 
-#include "Jacobian.h"
-
 namespace cnoid {
 
 // zmp計算

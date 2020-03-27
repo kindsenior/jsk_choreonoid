@@ -65,8 +65,6 @@ void RMControlPlugin::calcMatrixies(MatrixXd& A_, MatrixXd& M, MatrixXd& H)
     calcCMJacobian(mBody,NULL,M);
     calcAngularMomentumJacobian(mBody, NULL, H);
     M = mBody->mass() * M;
-    H.block(0,mBody->numJoints(), 3,3) = MatrixXd::Zero(3,3);
-    H.block(0,mBody->numJoints()+3, 3,3) = mSubMasses[mBody->rootLink()->index()].Iw;
     MatrixXd MH(M.rows()+H.rows(), M.cols());
     MH.block(0,0, M.rows(),M.cols()) = M; MH.block(M.rows(),0, H.rows(),H.cols()) = H;
 
@@ -197,8 +195,7 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
         mBody->rootLink()->v() = v;
         mBody->rootLink()->w() = w;
         Vector3d P,L;
-        calcSubMass(mBody->rootLink(), mSubMasses);// リンク先重心・慣性行列更新
-        calcTotalMomentum(P, L, mBody, mSubMasses[mBody->rootLink()->index()].Iw, dq);
+        calcTotalMomentum(P, L, mBody, dq);
 
         ofs1 << dt*i;
         ofs1 << " " << refCMSeq.at(i).transpose();//重心 2,3,4
@@ -483,9 +480,8 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
         }
         mBody->calcForwardKinematics(true,true);// v,wを更新
 
-        mBody->rootLink()->v() = Vector3d::Zero();
+        mBody->rootLink()->v() << 0.02, 0.02, 0.02;
         mBody->rootLink()->w() << 0.1, 0.1, 0.1;
-        // mBody->rootLink()->w() << 0, 0, 0;
         mBody->calcForwardKinematics(true,true);
 
         mBody->calcCenterOfMass();// wcを更新
@@ -493,13 +489,12 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
         Vector3 P_world;Vector3 L_world;// 運動量、角運動量(世界座標原点)
         mBody->calcTotalMomentum(P_world,L_world);
         Vector3 L_g,P_g;// 運動量ヤコビアン、角運動量ヤコビアン(重心基準)
-        calcSubMass( mBody->rootLink(), mSubMasses);
-        calcTotalMomentum(P_g, L_g, mBody, mSubMasses[mBody->rootLink()->index()].Iw, dq_);
+        calcTotalMomentum(P_g, L_g, mBody, dq_);
 
         cout << "correct P " << P_world.transpose() << endl;
-        cout << "my P " << P_g.transpose() << endl;
-        cout << "correct L " << L_world.transpose() << endl;
-        cout << "my L " << (mBody->centerOfMass().cross(P_g) + L_g).transpose() << endl << endl;// 原点回りに変換
+        cout << "     my P " << P_g.transpose() << endl;
+        cout << "correct L " << (L_world - mBody->centerOfMass().cross(P_g)).transpose() << endl;
+        cout << "     my L " << L_g.transpose() << endl << endl;// 原点回りに変換
 
         // motion loop 計算 step 2 〜 6
         // for(int currentFrame = 0; currentFrame < 1; ++currentFrame){
@@ -536,7 +531,6 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
 
             mBody->calcForwardKinematics(true,true);// 状態更新
             mBody->calcCenterOfMass(); // update wc
-            calcSubMass(mBody->rootLink(), mSubMasses);
 
             wholeBodyConstraintPtr->update();
 
@@ -639,8 +633,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
                 mBody->rootLink()->w() = dq.segment(mBody->numJoints()+3,3);
                 Vector3d P,L;
                 mBody->calcCenterOfMass();// update wc
-                calcSubMass(mBody->rootLink(), mSubMasses);// リンク先重心・慣性行列更新
-                calcTotalMomentum(P, L, mBody, mSubMasses[mBody->rootLink()->index()].Iw, dq);
+                calcTotalMomentum(P, L, mBody, dq);
 
                 ofs << " "  << mBody->centerOfMass().transpose();// 重心 2,3,4
                 ofs << " " << P.transpose() << " " << L.transpose();// 運動量 5,6,7 角運動量 8,9,10
@@ -673,7 +666,6 @@ void RMControlPlugin::execControl()
     ItemList<BodyItem> bodyItems = ItemTreeView::mainInstance()->checkedItems<BodyItem>();// checkedItems チェックされたアイテムを取得
     mBody = bodyItems[0]->body();
     // bodyItems[0]->setCurrentBaseLink( mBody->link(BASE_LINK) );// 左足をbaseに設定
-    mSubMasses.resize(mBody->numLinks());
     cout << "numLinks:" <<  mBody->numLinks() << endl;
 
     // 足先リンク取得

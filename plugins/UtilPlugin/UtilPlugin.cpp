@@ -569,17 +569,16 @@ void cnoid::calcDifferential(const BodyMotion& motion, const int currentFrame, V
     w = currentWaistSE3.rotation().toRotationMatrix() * aa.axis() * aa.angle()/dt;// w is in world frame
 }
 
-void cnoid::calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& Iw, const VectorXd& dq)
+void cnoid::calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const VectorXd& dq)
 {
-    MatrixXd M,H,M_tmp,H_tmp;
-    calcCMJacobian(body, NULL, M_tmp);// 運動量ヤコビアン、角運動量ヤコビアン(重心基準)
-    calcAngularMomentumJacobian(body, NULL, H_tmp);
-    M = body->mass() * M_tmp.block( 0,0, 3, body->numJoints() );
-    H = H_tmp.block( 0,0, 3, body->numJoints() );
+    MatrixXd M,H;
+    calcCMJacobian(body, NULL, M);// 運動量ヤコビアン、角運動量ヤコビアン(重心基準)
+    calcAngularMomentumJacobian(body, NULL, H);
 
-    Vector3d r = body->calcCenterOfMass() - body->rootLink()->p();
-    P = body->mass() * ( body->rootLink()->v() - r.cross( body->rootLink()->w() ) ) + M * dq;
-    L = Iw * body->rootLink()->w() + H * dq;
+    VectorXd velocityVec(6+dq.size());
+    velocityVec << dq, body->rootLink()->v(), body->rootLink()->w();
+    P = body->mass() * M * velocityVec;
+    L = H * velocityVec;
 }
 
 Matrix3d cnoid::D(Vector3d r)
@@ -592,26 +591,6 @@ Matrix3d cnoid::D(Vector3d r)
     return r_cross.transpose() * r_cross;
 }
 
-void cnoid::calcSubMass(Link* link, vector<SubMass>& subMasses)
-{
-    Matrix3d R = link->R();
-    SubMass& sub = subMasses[link->index()];
-    sub.m = link->m();
-    sub.mwc = link->m() * link->wc();
-
-    for(Link* child = link->child(); child; child = child->sibling()){
-        calcSubMass(child, subMasses);
-        SubMass& childSub = subMasses[child->index()];
-        sub.m += childSub.m;
-        sub.mwc += childSub.mwc;
-    }
-
-    sub.Iw = R * link->I() * R.transpose() + link->m() * D( link->wc() - sub.mwc/sub.m );
-    for(Link* child = link->child(); child; child = child->sibling()){
-        SubMass& childSub = subMasses[child->index()];
-        sub.Iw += childSub.Iw + childSub.m * D( childSub.mwc/childSub.m - sub.mwc/sub.m );
-    }
-}
 
 void cnoid::setSubItem(std::string seqName, const Vector3Seq& seq, BodyMotionItem* pBodyMotionItem)
 {

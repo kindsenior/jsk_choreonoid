@@ -29,18 +29,6 @@
 
 namespace cnoid{
 
-struct SubMass
-{
-    double m;
-    Vector3 mwc;
-    Matrix3d Iw;
-    SubMass& operator+=(const SubMass& rhs){
-        m += rhs.m;
-        mwc += rhs.mwc;
-        Iw += rhs.Iw;
-        return *this;
-    }
-};
 
 void generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::vector<Link*>& endEffectorLinkVector);
 
@@ -81,11 +69,10 @@ void updateBodyState(BodyPtr& body, const BodyMotion& motion, const int currentF
 
 void calcDifferential(const BodyMotion& motion, const int currentFrame, Vector3d& v, Vector3d& w, VectorXd&dq, VectorXd& ddq);
 
-void calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const Matrix3d& Iw, const VectorXd& dq);
+void calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const VectorXd& dq);
 
 Matrix3d D(Vector3d r);
 
-void calcSubMass(Link* link, std::vector<SubMass>& subMasses);
 
 void setSubItem(std::string seqName, const Vector3Seq& seq, BodyMotionItem* pBodyMotionItem);
 void setSubItem(std::string seqName, const MultiValueSeq& seq, BodyMotionItem* pBodyMotionItem);

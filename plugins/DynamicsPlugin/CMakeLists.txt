@@ -4,9 +4,9 @@ set(TARGET Cnoid${PLUGIN_NAME})
 message("TARGET: ${TARGET}")
 if(BUILD_DYNAMICS_PLUGIN)
 
-  set(headers DynamicsPlugin.h Jacobian.h)
+  set(headers DynamicsPlugin.h)
 
-  add_library(${TARGET} SHARED DynamicsPlugin Jacobian)
+  add_library(${TARGET} SHARED DynamicsPlugin)
 
   target_link_libraries(${TARGET} CnoidUtilPlugin)
 
