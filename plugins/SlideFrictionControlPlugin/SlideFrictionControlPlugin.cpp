@@ -394,30 +394,26 @@ Vector3d getFarthestVector(std::vector<Vector3d> pointVec, const Vector3d& refer
     return referencePoint + getLongestVector(pointVec);
 }
 
-std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx)
+std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx, const PosePtr& currentPosePtr)
 {
     // collision取得
-    const std::vector<CollisionLinkPairPtr>& collisions = bodyItemPtr->collisionsOfLink(linkIdx);
-
-    const Link* link = bodyItemPtr->body()->link(linkIdx);
-
     std::vector<Vector3d> collisionPointVec, vertexVec;
-    for(size_t i=0; i < collisions.size(); ++i){
-        CollisionLinkPair& collisionPair = *collisions[i];
-
-        for(std::vector<Collision>::iterator iter = collisionPair.collisions.begin(); iter != collisionPair.collisions.end(); ++iter){
-            collisionPointVec.push_back(link->R().transpose()*(iter->point - link->p()));
+    for(Pose::LinkInfoMap::iterator linkInfoIter = currentPosePtr->ikLinkBegin(); linkInfoIter != currentPosePtr->ikLinkEnd(); ++linkInfoIter){
+        if(linkInfoIter->first == linkIdx){
+            Pose::LinkInfo linkInfo = linkInfoIter->second;
+            for(auto contactPoint : linkInfo.contactPoints()){
+                collisionPointVec.push_back(linkInfo.R.transpose()*(contactPoint - linkInfo.p));
+            }
         }
-        vertexVec.push_back(getLongestVector(collisionPointVec));
-
-        std::vector<Vector3d> v;
-        v.push_back(vertexVec[0]);
-        vertexVec.push_back(getLongestVector(collisionPointVec, v));
-
-        vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[0]));
-        vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[1]));
-
     }
+
+    vertexVec.push_back(getLongestVector(collisionPointVec));
+    std::vector<Vector3d> v;
+    v.push_back(vertexVec[0]);
+    vertexVec.push_back(getLongestVector(collisionPointVec, v));
+
+    vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[0]));
+    vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[1]));
 
     return vertexVec;
 }
@@ -432,12 +428,19 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
 
-        std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, linkIdx);
+        std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, linkIdx, poseIter->get<Pose>());
+        Vector3d soleOffset = std::accumulate(contactPointVec.begin(), contactPointVec.end(), Vector3d::Zero().eval()) / contactPointVec.size();// center of contact face
+        std::vector<hrp::Vector2> vertexVec;
+        hrp::Vector2 vertex;
+        for(auto contactPoint : contactPointVec){
+            vertex << contactPoint.segment(0,2);
+            vertex -= soleOffset.segment(0,2);
+            vertexVec.push_back(vertex);
+        }
 
         int contactState = getPrevContactState(poseIter, poseSeqPtr, linkIdx, contactPointVec);
         // if(contactState < 2){// 接触フラグが0か1 要改良
         if(true){
-            std::vector<hrp::Vector2> vertexVec;
 
             if(contactState == 0){// static contact
                 // ccParamVec.push_back(new SimpleContactConstraintParam((*linkIter)->name(), vertexVec));
@@ -467,6 +470,9 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
                 cout << " " << "\x1b[31m" << (*linkIter)->name() << " is static float and this is not supported" << "\x1b[m" << endl;
             }
         }
+
+        if(contactState != 3) ccParamVec.back()->contactOffsetPos = soleOffset;
+
     }
     cout << endl << endl;
 }
@@ -515,10 +521,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
             }
         }
 
-        std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, body->link((*iter)->linkName)->index());
-        Vector3d soleOffset = std::accumulate(contactPointVec.begin(), contactPointVec.end(), Vector3d::Zero().eval()) / contactPointVec.size();// center of contact face
 
-        (*iter)->contactOffsetPos = soleOffset;// local position offset
         (*iter)->contactOffsetRot = body->link((*iter)->linkName)->R().transpose()*Matrix33::Identity();// link coordinate and contact coordinate is same
 
         (*iter)->p = body->link((*iter)->linkName)->p();
@@ -532,15 +535,7 @@ void generateSlideFrictionControlParam(SlideFrictionControlParam* sfcParam, Vect
         // (*iter)->v += (*iter)->w.cross((*iter)->contactOffsetRot*(*iter)->contactOffsetPos);// need check
 
 
-        std::vector<hrp::Vector2> vertexVec;
-        hrp::Vector2 vertex;// 頂点の2次元座標を代入 (要 足の形状取得)
-        for(auto contactPoint : contactPointVec){
-            vertex << contactPoint.segment(0,2);
-            vertex -= (*iter)->contactOffsetPos.segment(0,2);
-            vertexVec.push_back(vertex);
-        }
 
-        (*iter)->vertexVec = vertexVec;
 
         if(typeid(**iter) == typeid(SimpleContactConstraintParam)){
             sfcParam->ccParamVec.push_back(new SimpleContactConstraintParam(dynamic_cast<SimpleContactConstraintParam*>(*iter)));
@@ -769,8 +764,6 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     updateBodyState(body, motion, 0, contactLinkCandidateSet);
     body->calcForwardKinematics();// use end effector's velocity
 
-    bodyItemPtr->notifyKinematicStateChange(true);
-    eventLoop.processEvents();
 
     Vector3Seq refCMSeq = *(motionItem->findSubItem<Vector3SeqItem>("refCM")->seq());
     Vector3Seq refPSeq = *(motionItem->findSubItem<Vector3SeqItem>("refP")->seq());
@@ -792,8 +785,6 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
             updateBodyState(body, motion, min(i,numFrames-1), contactLinkCandidateSet);
             body->calcForwardKinematics();// use end effector's velocity
 
-            bodyItemPtr->notifyKinematicStateChange(true);
-            eventLoop.processEvents();
 
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
             Vector3d P = refPSeq.at(i);
