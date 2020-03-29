@@ -31,11 +31,11 @@ def get_all_items(item, class_type, ret=None):
 
 def get_robot(path_or_item):
     if type(path_or_item) is BodyPlugin.BodyItem:
-        print "get robot from robotItem"
+        print("get robot from robotItem")
         return path_or_item.body
     else:
         robot = Body.BodyLoader().load(str(path_or_item))
-        print "load " + str(path_or_item)
+        print("load " + str(path_or_item))
         return robot
 
 
@@ -69,18 +69,18 @@ class World(object):
     @classmethod
     def checkItem(cls, item):
         cls.itemTreeView.checkItem(item)
-        print "checked " + item.name
+        print("checked " + item.name)
 
     @classmethod
     def selectItem(cls, item):
         cls.itemTreeView.selectItem(item)
-        print "selected " + item.name
+        print("selected " + item.name)
 
     @classmethod
     def add_worldItem(cls):
         worldItem = BodyPlugin.WorldItem()
         cls.rootItem.addChildItem(worldItem)
-        print "worldItem add to rootItem"
+        print("worldItem add to rootItem")
         return worldItem
 
     # set item function
@@ -88,12 +88,12 @@ class World(object):
     def set_item(self, item, parent=None, name=None):
         # set name
         item_name = name if name else item.name.lower() + "Item"
-        print "set " + item_name
+        print("set " + item_name)
         setattr(self, item_name, item)
         # add child to parent
         if parent:
             parent.addChildItem(item)
-            print item_name + " add to " + parent.name + "Item"
+            print(item_name + " add to " + parent.name + "Item")
 
         return item
 
