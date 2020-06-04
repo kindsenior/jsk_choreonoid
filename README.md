@@ -2,18 +2,18 @@
 Introduction
 ------------
 This is a ros packge of [choreonoid](http://choreonoid.org/) plugin for controlling humanoid robots.  
-jsk_choreonid contains several controller: Multi Contact Stabilizer, Resolved Momentum Control, and Preview Control etc.  
+jsk_choreonoid contains several controller: Multi Contact Stabilizer, Resolved Momentum Control, and Preview Control etc.  
 
 Requirements
 ------------
 1. ros indigo or later
-1. [choreonid](https://github.com/kindsenior/choreonoid)
+1. [choreonoid](https://github.com/kindsenior/choreonoid)
 
 Install
 -------
 Go to ros workspace  
 Clone https://github.com/kindsenior/choreonoid and this package  
-catkin build jsk_choreonid --force-cmake  
+catkin build jsk_choreonoid --force-cmake  
 
 Usage
 -----
