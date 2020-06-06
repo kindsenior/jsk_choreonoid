@@ -97,14 +97,14 @@ namespace cnoid {
             drawArrowTipPreserve(endPos, directionVec, arrowLength, axisVec, arrowAngle, q*radiousVec);
         }
 
-        void drawLineArcArrow(Vector3f centerPos, Vector3f radiousVec, Vector3f axisVec, float rotAngle, float arrowLength, float arrowAngle){
+        void drawLineArcArrow(Vector3f centerPos, Vector3f radiousVec, Vector3f axisVec, float rotAngle, float arrowLength, float arrowAngle, float arcPosRate=0){
             axisVec.normalize();
             drawArrow(centerPos, centerPos+axisVec, arrowLength, radiousVec, arrowAngle);
-            drawArcPreserve(centerPos, radiousVec, axisVec, rotAngle);
+            drawArcPreserve(centerPos+arcPosRate*axisVec, radiousVec, axisVec, rotAngle);
             Quaternionf q(AngleAxisf(rotAngle*M_PI/180, axisVec));
             Vector3f endPos = centerPos + q*radiousVec;
             Vector3f directionVec = q*axisVec.cross(radiousVec);
-            drawArrowTipPreserve(endPos, directionVec, arrowLength, axisVec, arrowAngle, q*radiousVec);
+            drawArrowTipPreserve(endPos+arcPosRate*axisVec, directionVec, arrowLength, axisVec, arrowAngle, q*radiousVec);
         }
 
     private:
