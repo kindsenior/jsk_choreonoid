@@ -80,12 +80,12 @@ namespace cnoid {
         }
 
         void drawArrowTip(Vector3f posVec, Vector3f directionVec, float length, Vector3f axisVec, float angle){
-            drawArrowTipImpl(posVec, directionVec, length, axisVec, angle, false);
+            drawArrowTipImpl(posVec, directionVec, length, axisVec, angle, directionVec, false);
         }
 
         void drawArrow(Vector3f startPos, Vector3f endPos, float arrowLength, Vector3f axisVec, float angle){
             drawLine(startPos, endPos);
-            drawArrowTipPreserve(endPos, endPos-startPos, arrowLength, axisVec, angle);
+            drawArrowTipPreserve(endPos, endPos-startPos, arrowLength, axisVec, angle, endPos-startPos);
         }
 
         void drawArcArrow(Vector3f centerPos, Vector3f radiousVec, Vector3f axisVec, float rotAngle, float arrowLength, float arrowAngle){
@@ -94,7 +94,7 @@ namespace cnoid {
             Quaternionf q(AngleAxisf(rotAngle*M_PI/180, axisVec));
             Vector3f endPos = centerPos + q*radiousVec;
             Vector3f directionVec = q*axisVec.cross(radiousVec);
-            drawArrowTipPreserve(endPos, directionVec, arrowLength, axisVec, arrowAngle);
+            drawArrowTipPreserve(endPos, directionVec, arrowLength, axisVec, arrowAngle, q*radiousVec);
         }
 
         void drawLineArcArrow(Vector3f centerPos, Vector3f radiousVec, Vector3f axisVec, float rotAngle, float arrowLength, float arrowAngle){
@@ -104,7 +104,7 @@ namespace cnoid {
             Quaternionf q(AngleAxisf(rotAngle*M_PI/180, axisVec));
             Vector3f endPos = centerPos + q*radiousVec;
             Vector3f directionVec = q*axisVec.cross(radiousVec);
-            drawArrowTipPreserve(endPos, directionVec, arrowLength, axisVec, arrowAngle);
+            drawArrowTipPreserve(endPos, directionVec, arrowLength, axisVec, arrowAngle, q*radiousVec);
         }
 
     private:
@@ -143,11 +143,11 @@ namespace cnoid {
             }
         }
 
-        void drawArrowTipPreserve(Vector3f posVec, Vector3f directionVec, float length, Vector3f axisVec, float arrowAngle){
-            drawArrowTipImpl(posVec, directionVec, length, axisVec, arrowAngle, true);
+        void drawArrowTipPreserve(Vector3f posVec, Vector3f directionVec, float length, Vector3f axisVec, float arrowAngle, Vector3f radiousVec){
+            drawArrowTipImpl(posVec, directionVec, length, axisVec, arrowAngle, radiousVec, true);
         }
 
-        void drawArrowTipImpl(Vector3f posVec, Vector3f directionVec, float length, Vector3f axisVec, float arrowAngle, bool preserve){
+        void drawArrowTipImpl(Vector3f posVec, Vector3f directionVec, float length, Vector3f axisVec, float arrowAngle, Vector3f radiousVec, bool preserve){
             if (!preserve) reset();
             SgIndexArray& colorIndices = lineSet->colorIndices();
             int startIdx = vertices->size();
@@ -158,12 +158,12 @@ namespace cnoid {
 
             vertices->push_back(posVec);
 
-            Quaternionf q;
+            Quaternionf offet_q(AngleAxisf(-0.5*acos( radiousVec.normalized().dot((radiousVec+directionVec).normalized()) ), axisVec)); // for small radious arc
+
+            Quaternionf q(AngleAxisf(arrowAngle, axisVec));
             Vector3f v0, v1;
-            q = AngleAxisf(arrowAngle, axisVec);
-            vertices->push_back(posVec - q*directionVec);
-            q = AngleAxisf(-arrowAngle, axisVec);
-            vertices->push_back(posVec - q*directionVec);
+            vertices->push_back(posVec - offet_q*q*directionVec);
+            vertices->push_back(posVec - offet_q*q.inverse()*directionVec);
 
             lineSet->addLine(startIdx,startIdx+1);
             lineSet->addLine(startIdx,startIdx+2);
