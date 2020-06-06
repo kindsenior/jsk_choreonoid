@@ -48,7 +48,7 @@ class World(object):
         if self.is_choreonoid:  # use choreonoid
             # set world item
             if worldItem is None:
-                worldItems = get_all_items(Base.ItemTreeView.instance.rootItem, BodyPlugin.WorldItem)
+                worldItems = get_all_items(Base.RootItem.instance, BodyPlugin.WorldItem)
                 if len(worldItems) == 0:
                     self.set_worldItem()
                 else:
@@ -107,7 +107,9 @@ class World(object):
         return worldItem
 
     def set_modelItem(self, model_path, name=None):
-        modelItem = self.set_item(BodyPlugin.loadBodyItem(str(model_path)), self.worldItem, name)
+        bodyItem = BodyPlugin.BodyItem()
+        bodyItem.load(str(model_path), "CHOREONOID-BODY")
+        modelItem = self.set_item(bodyItem, self.worldItem, name)
         self.checkItem(modelItem)
         return modelItem
 
