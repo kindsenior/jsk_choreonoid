@@ -25,6 +25,7 @@
 #include <cnoid/FileUtil>
 #include <cnoid/ValueTree>
 
+#include "DrawInterface.h"
 #include "Filter.h"
 
 namespace cnoid{

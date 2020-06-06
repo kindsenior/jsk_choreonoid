@@ -8,12 +8,14 @@ if(BUILD_UTIL_PLUGIN)
     UtilPlugin.h
     Interpolator.h
     InverseKinematics.h
+    DrawInterface.h
     Filter.h
     ParamNode.h
     ParamWidget.h
     ParamSetupLayout.h
     ParamSetupDialog.h
-    SetupToolBar.h)
+    SetupToolBar.h
+    )
 
   add_library(${TARGET} SHARED UtilPlugin Interpolator InverseKinematics)
 
@@ -35,6 +37,7 @@ if(BUILD_UTIL_PLUGIN)
 		  RESULT_VARIABLE _copy_failed)
   endforeach()
 
+  add_subdirectory(python)
 else()
   message("Skip building ${TARGET}")
 endif()
