@@ -89,8 +89,8 @@ namespace cnoid {
         }
 
         void drawArcArrow(Vector3f centerPos, Vector3f radiousVec, Vector3f axisVec, float rotAngle, float arrowLength, float arrowAngle){
-            axisVec.normalize();
             drawArc(centerPos, radiousVec, axisVec, rotAngle);
+            axisVec.normalize();
             Quaternionf q(AngleAxisf(rotAngle*M_PI/180, axisVec));
             Vector3f endPos = centerPos + q*radiousVec;
             Vector3f directionVec = q*axisVec.cross(radiousVec);
@@ -98,13 +98,14 @@ namespace cnoid {
         }
 
         void drawLineArcArrow(Vector3f centerPos, Vector3f radiousVec, Vector3f axisVec, float rotAngle, float arrowLength, float arrowAngle, float arcPosRate=0){
-            axisVec.normalize();
             drawArrow(centerPos, centerPos+axisVec, arrowLength, radiousVec, arrowAngle);
-            drawArcPreserve(centerPos+arcPosRate*axisVec, radiousVec, axisVec, rotAngle);
+            centerPos += arcPosRate*axisVec;
+            drawArcPreserve(centerPos, radiousVec, axisVec, rotAngle);
+            axisVec.normalize();
             Quaternionf q(AngleAxisf(rotAngle*M_PI/180, axisVec));
             Vector3f endPos = centerPos + q*radiousVec;
             Vector3f directionVec = q*axisVec.cross(radiousVec);
-            drawArrowTipPreserve(endPos+arcPosRate*axisVec, directionVec, arrowLength, axisVec, arrowAngle, q*radiousVec);
+            drawArrowTipPreserve(endPos, directionVec, arrowLength, axisVec, arrowAngle, q*radiousVec);
         }
 
     private:
