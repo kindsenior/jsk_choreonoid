@@ -2,6 +2,8 @@
 
 from cnoid import Base, Body, BodyPlugin, PoseSeqPlugin
 
+def is_choreonoid():
+    return 'MessageViewOut' in globals().keys()
 
 def get_child_items(item, class_type=None):
     if item.childItem is None:
