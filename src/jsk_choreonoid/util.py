@@ -3,7 +3,10 @@
 from cnoid import Base, Body, BodyPlugin, PoseSeqPlugin
 
 def is_choreonoid():
-    return 'MessageViewOut' in globals().keys()
+    try: # python and choreonoid
+        return type(exit) == type(print)
+    except NameError: # ipython
+        return False
 
 def get_child_items(item, class_type=None):
     if item.childItem is None:
