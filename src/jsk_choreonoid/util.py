@@ -53,6 +53,10 @@ def getAncestorItems(self, target_item_types=None, ignore_item_types=None):
 Base.Item.getAncestorItems = getAncestorItems
 
 
+def get_all_poseseq_items():
+    return Base.RootItem.instance.getDescendantItems(target_item_types=[PoseSeqPlugin.PoseSeqItem])
+
+
 def get_child_items(item, class_type=None):
     if item.childItem is None:
         ret = []
