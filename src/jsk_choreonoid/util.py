@@ -2,6 +2,8 @@
 
 from cnoid import Base, Body, BodyPlugin, PoseSeqPlugin
 
+from logger import *
+
 def is_choreonoid():
     try: # python and choreonoid
         return type(exit) == type(print)
