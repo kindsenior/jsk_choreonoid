@@ -10,6 +10,49 @@ def is_choreonoid():
     except NameError: # ipython
         return False
 
+
+def __check_target_and_ignore_items(item, target_item_types, ignore_item_types):
+    return ((target_item_types is None) or (type(item) in target_item_types)) and (type(item) not in ignore_item_types)
+
+
+def __get_default_ignore_item_types(ignore_item_types):
+    return [Base.MultiValueSeqItem, Base.MultiSE3SeqItem] if ignore_item_types is None else ignore_item_types
+
+
+def getChildItems(self, target_item_types=None, ignore_item_types=None):
+    ignore_item_types = __get_default_ignore_item_types(ignore_item_types)
+
+    child_items = []
+    child_item = self.childItem
+    while child_item is not None:
+        if __check_target_and_ignore_items(child_item, target_item_types, ignore_item_types):
+            child_items.append(child_item)
+        child_item = child_item.nextItem
+    return child_items
+Base.Item.getChildItems = getChildItems
+
+
+def getDescendantItems(self, target_item_types=None, ignore_item_types=None):
+    ignore_item_types = __get_default_ignore_item_types(ignore_item_types)
+    child_items = self.getChildItems()
+    grand_child_items = []
+    for child_item in child_items:
+        grand_child_items += child_item.getDescendantItems()
+    return filter(lambda item: __check_target_and_ignore_items(item, target_item_types, ignore_item_types), child_items + grand_child_items)
+Base.Item.getDescendantItems = getDescendantItems
+
+
+def getAncestorItems(self, target_item_types=None, ignore_item_types=None):
+    ignore_item_types = __get_default_ignore_item_types(ignore_item_types)
+    parent_item = self.parentItem
+    parent_items = []
+    if parent_item is not None:
+        parent_items.append(parent_item)
+        parent_items += parent_item.getAncestorItems()
+    return filter(lambda item: __check_target_and_ignore_items(item, target_item_types, ignore_item_types), parent_items)
+Base.Item.getAncestorItems = getAncestorItems
+
+
 def get_child_items(item, class_type=None):
     if item.childItem is None:
         ret = []
