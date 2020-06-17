@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from cnoid import Base, Body, BodyPlugin, PoseSeqPlugin
+from cnoid import Base, Body, BodyPlugin, PoseSeqPlugin, QtCore
 
 from logger import *
 

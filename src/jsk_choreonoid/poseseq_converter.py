@@ -11,6 +11,8 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
     global poseseq_item
     global poseseq
 
+    event_loop = QtCore.QEventLoop()
+
     if poseseq_items is None: poseseq_items = tree.selectedItems(PoseSeqPlugin.PoseSeqItem)
     if type(poseseq_items) is not list: poseseq_items = [poseseq_item]
 
@@ -44,6 +46,7 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
             motion.frame(pose_idx) >> parent_body_item.body
             parent_body_item.body.calcForwardKinematics()
             parent_body_item.notifyKinematicStateChange()
+            event_loop.processEvents()
 
             # move temporarily
             parent_body_item.body.rootLink.p += tmp_offset_pos + move_offset_pos
