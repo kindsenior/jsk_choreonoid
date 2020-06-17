@@ -40,7 +40,7 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
             pose_time = pose_ref.time()
             pose_idx = int(pose_time * motion.frameRate)
 
-            logger.info("time: {} ({})".format(pose_time, pose_idx))
+            logger.info("\ntime: {} ({})".format(pose_time, pose_idx))
 
             # set current pose from BodyMotion
             motion.frame(pose_idx) >> parent_body_item.body
