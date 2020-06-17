@@ -6,7 +6,7 @@ from logger import *
 
 def is_choreonoid():
     try: # python and choreonoid
-        return type(exit) == type(print)
+        return type(exit) == type(dir)
     except NameError: # ipython
         return False
 
