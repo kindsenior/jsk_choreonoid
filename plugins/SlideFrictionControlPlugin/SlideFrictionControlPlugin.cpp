@@ -396,6 +396,7 @@ Vector3d getFarthestVector(std::vector<Vector3d> pointVec, const Vector3d& refer
 
 std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx, const PosePtr& currentPosePtr)
 {
+    cout << "getContactFace(" << linkIdx << ", " << poseIter->time() << ", poseSeqPtr)" << endl;
     // collision取得
     std::vector<Vector3d> collisionPointVec, vertexVec;
     for(Pose::LinkInfoMap::iterator linkInfoIter = currentPosePtr->ikLinkBegin(); linkInfoIter != currentPosePtr->ikLinkEnd(); ++linkInfoIter){
@@ -415,6 +416,7 @@ std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx
     vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[0]));
     vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[1]));
 
+    cout << " contact vertices: "; for(auto vertex : vertexVec) cout << " [" << vertex.transpose() << "]"; cout << std::endl;
     return vertexVec;
 }
 
@@ -453,7 +455,7 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));// 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 3,3, 0.5));// 3x3y 摩擦係数 要改良
                 // ccParamVec.push_back(new DistributedForceStaticContactConstraintParam((*linkIter)->name(), vertexVec, 4,2, 0.5));// 4x2y 摩擦係数 要改良
-                cout << " " << (*linkIter)->name() << ": Static" << endl;
+                cout << " " << "\x1b[33m" << (*linkIter)->name() << ": Static" << "\x1b[m" << endl;
             }else if(contactState == 1){// slide contact
                 // ccParamVec.push_back(new SlideContactConstraintParam((*linkIter)->name(), vertexVec, 0.5, getPrevDirection(poseIter, poseSeqPtr, linkIdx)));
                 ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, sfc->numXDivisions,sfc->numYDivisions, 0.6));
@@ -462,10 +464,10 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 2,2, 0.5));
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 3,3, 0.5));//3x3y
                 // ccParamVec.push_back(new DistributedForceSlideContactConstraintParam((*linkIter)->name(), vertexVec, 4,2, 0.5));//4x2y
-                cout << " " << (*linkIter)->name() << ": Slide" << endl;
+                cout << " " << "\x1b[33m" << (*linkIter)->name() << ": Slide" << "\x1b[m" << endl;
             }else if(contactState == 3){// float
                 // ccParamVec.push_back(new FloatConstraintParam((*linkIter)->name(), vertexVec));
-                cout << " " << (*linkIter)->name() << ": Float" << endl;
+                cout << " " << "\x1b[33m" << (*linkIter)->name() << ": Float" << "\x1b[m" << endl;
             }else{
                 cout << " " << "\x1b[31m" << (*linkIter)->name() << " is static float and this is not supported" << "\x1b[m" << endl;
             }
