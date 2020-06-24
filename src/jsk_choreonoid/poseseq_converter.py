@@ -34,6 +34,12 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
         parent_body_item = poseseq_item.getAncestorItems(target_item_types=[BodyPlugin.BodyItem])[0]
         motion = poseseq_item.bodyMotionItem().motion
 
+        # somehow need for updating first pose when robot does not make the first pose
+        motion.frame(0) >> parent_body_item.body
+        parent_body_item.body.calcForwardKinematics()
+        parent_body_item.notifyKinematicStateChange()
+        event_loop.processEvents()
+
         poseseq = poseseq_item.poseSeq()
         for pose_ref in poseseq:
             pose = pose_ref.getPose()
@@ -52,11 +58,13 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
             parent_body_item.body.rootLink.p += tmp_offset_pos + move_offset_pos
             parent_body_item.body.calcForwardKinematics()
             parent_body_item.notifyKinematicStateChange()
+            event_loop.processEvents()
 
             # move to target position
             parent_body_item.body.rootLink.p -= tmp_offset_pos
             parent_body_item.body.calcForwardKinematics()
             parent_body_item.notifyKinematicStateChange()
+            event_loop.processEvents()
 
             # update pose
             print_pose_info(parent_body_item.body, pose, pre_print="before update")
