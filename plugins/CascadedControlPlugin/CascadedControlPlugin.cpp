@@ -165,8 +165,9 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr)) return;
     BodyMotion& motion = *(mBodyMotionItemPtr->motion());
 
-    mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
-    cout << "PoseSeqPath: " << mPoseSeqPath << endl;
+    mLogPath = boost::filesystem::path(poseSeqItemPtr->filePath());
+    mLogPath = mLogPath.parent_path() / "log" / mLogPath.stem();
+    cout << "LogPath: " << mLogPath << endl;
 
     std::vector<Link*> endEffectorLinkVec;
     if(!getEndEffectorLinkVector(endEffectorLinkVec, body)) return;
@@ -217,8 +218,8 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     // }
     // childMcs->pushAllPreMPCParamFromRoot();
 
-    // sweepControl(mPoseSeqPath, childMcsLayout->getParamString(), childMcs, body, mBodyMotionItemPtr);// childモーション走査
-    // sweepControl(mPoseSeqPath, parentMcsLayout->getParamString(), parentMcs, body, mBodyMotionItemPtr);// parentモーション走査
+    // sweepControl(mLogPath, childMcsLayout->getParamString(), childMcs, body, mBodyMotionItemPtr);// childモーション走査
+    // sweepControl(mLogPath, parentMcsLayout->getParamString(), parentMcs, body, mBodyMotionItemPtr);// parentモーション走査
 
 
     SlideFrictionControl* parentSfc = new SlideFrictionControl();
@@ -257,7 +258,7 @@ void CascadedControlPlugin::execControl(bool loadFlg)
     parentSfc->numYDivisions = childSfc->numYDivisions;
 
     if(loadFlg){
-        loadExtraSeq(mPoseSeqPath ,childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
+        loadExtraSeq(mLogPath ,childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
     }else{
         generateVerticalTrajectory(body, poseSeqItemPtr, contactLinkCandidateSet, childSfcLayout->takeoffPhaseRatioSpinArray->value(),childSfcLayout->landingPhaseRatioSpinArray->value());
         generatePreModelPredictiveControlParamDeque(parentSfc, bodyItemPtr, poseSeqItemPtr, contactLinkCandidateSet);
@@ -268,10 +269,10 @@ void CascadedControlPlugin::execControl(bool loadFlg)
         }
         childSfc->pushAllPreMPCParamFromRoot();
 
-        sweepControl(mPoseSeqPath, childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// childモーション走査
+        sweepControl(mLogPath, childSfcLayout->getParamString(), childSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// childモーション走査
     }
     interpolateExtraSeq(mBodyMotionItemPtr, childSfc->dt);
-    // sweepControl(mPoseSeqPath, parentSfcLayout->getParamString(), parentSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// parentモーション走査
+    // sweepControl(mLogPath, parentSfcLayout->getParamString(), parentSfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);// parentモーション走査
 
     generateTorque(body, poseSeqItemPtr, endEffectorLinkVec);
 

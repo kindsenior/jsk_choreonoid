@@ -1,4 +1,5 @@
-load "../file-name-parse.plt"
+dirname(path)=strstrt(path, "/")!= 0 ? substr(path, 1, strstrlt(path,"/")-1)."/" : "./"
+load sprintf("%s../../file-name-parse.plt", dirname(ARG0))
 
 set title strsubst(motion._plugin._params._dt._fps,"_","\\_")
 

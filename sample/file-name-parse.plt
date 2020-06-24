@@ -35,7 +35,7 @@ ee=robot._motion."_RMC"."_EE"._fps."_0".ext
 
 # seq
 motion=substr_str_after(_motion,"_")
-wrenches=motion.".wrenches"
-pos=motion.".pos"
-hip=motion.".hip"
-opt=motion.".optionaldata"
+wrenches="../".motion.".wrenches"
+pos="../".motion.".pos"
+hip="../".motion.".hip"
+opt="../".motion.".optionaldata"

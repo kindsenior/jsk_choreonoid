@@ -15,7 +15,7 @@ bool SlideFrictionControlPlugin::initialize()
     return true;
 }
 
-void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
+void cnoid::loadExtraSeq(boost::filesystem::path logPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
 {
     cout << "loadExtraSeq()" << endl;
     cout << "contactLinkCandidateSet: ";
@@ -23,20 +23,20 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     cout << endl;
 
     stringstream fnamess;
-    fnamess << poseSeqPath.stem().string() << "_SFC_refPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_SFC_refPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ifstream refPLIfs;
-    refPLIfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::in);
+    refPLIfs.open(fnamess.str().c_str(), ios::in);
 
     fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ifstream wrenchIfs;
-    wrenchIfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::in);
+    wrenchIfs.open(fnamess.str().c_str(), ios::in);
     cout << " file: " << fnamess.str() << endl;
 
     fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ifstream contactIfs;
-    contactIfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    contactIfs.open(fnamess.str().c_str(), ios::out);
 
     BodyMotion& motion = *(bodyMotionItemPtr->motion());
     const double dt = ((double)1)/motion.frameRate();
@@ -131,12 +131,12 @@ void cnoid::loadExtraSeq(boost::filesystem::path poseSeqPath ,std::string paramS
     setSubItem("wrenches", refWrenchesSeq, bodyMotionItemPtr);
 }
 
-void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
+void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
 {
     stringstream fnamess; fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_refPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_SFC_refPL" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream refPLOfs;
-    refPLOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    refPLOfs.open(fnamess.str().c_str(), ios::out);
 
     const double dt = sfc->dt;
     const int cycle = sfc->dt*bodyMotionItemPtr->motion()->frameRate();
@@ -159,9 +159,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     std::vector<std::vector<string>> limbKeysVec{{"rleg"},{"lleg"},{"rarm"},{"larm"}};
 
     fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_SFC_contact_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream contactOfs;
-    contactOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    contactOfs.open(fnamess.str().c_str(), ios::out);
     // contactOfs << "time lpx lpy lpz lvx lvy lvz lwx lwy lwz rpx rpy rpz rvx rvy rvz rwx rwy rwz" << endl;
     contactOfs << "time";
     std::vector<string> contactStringVec{"px","py","pz", "vx","vy","vz", "wx","wy","wz"};
@@ -172,9 +172,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     contactOfs << endl;
 
     fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_SFC_wrench" << paramStr << "_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream wrenchOfs;
-    wrenchOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    wrenchOfs.open(fnamess.str().c_str(), ios::out);
     // wrenchOfs << "time lfx lfy lfz lnx lny lnz rfx rfy rfz rnx rny rnz" << endl;
     std::vector<string> wrenchStringVec{"fx","fy","fz", "nx","ny","nz"};
     wrenchOfs << "time";
@@ -185,9 +185,9 @@ void cnoid::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramS
     wrenchOfs << endl;
 
     fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_SFC_inputPL_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_SFC_inputPL_" << sfc->dt << "dt_" << (int) 1/sfc->rootController()->dt << "fps.dat";
     ofstream inputPLOfs;
-    inputPLOfs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+    inputPLOfs.open(fnamess.str().c_str(), ios::out);
     inputPLOfs << "time inputCMx inputCMy inputCMz inputPx inputPy inputPz inputLx inputLy inputLz inputFx inputFy inputFz" << endl;
 
     for(int i=0; i < numFrames + sfc->numWindows(); ++i){
@@ -730,11 +730,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
     refLSeq.at(numFrames-1) = refLSeq.at(numFrames-2);
 
     {
-        boost::filesystem::path poseSeqPath = boost::filesystem::path(poseSeqItem->filePath());
+        boost::filesystem::path logPath = getLogPath( boost::filesystem::path(poseSeqItem->filePath()) );
         stringstream fnamess; fnamess.str("");
-        fnamess << poseSeqPath.stem().string() << "_SFC_prePL" << "_" << frameRate << "fps.dat";
+        fnamess << logPath.string() << "_SFC_prePL" << "_" << frameRate << "fps.dat";
         ofstream ofs;
-        ofs.open(((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out);
+        ofs.open(fnamess.str().c_str(), ios::out);
         ofs << "time preCMx preCMy preCMz prePx prePy prePz preLx preLy preLz processTime" << endl;
         for(int i=0; i<numFrames; ++i){
             ofs << i*dt << " " << refCMSeq.at(i).transpose() << " " << refPSeq.at(i).transpose() << " " << refLSeq.at(i).transpose() << endl;
@@ -826,8 +826,8 @@ void SlideFrictionControlPlugin::execControl()
     if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr)) return;
     BodyMotion& motion = *(mBodyMotionItemPtr->motion());
 
-    mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
-    cout << "PoseSeqPath: " << mPoseSeqPath << endl;
+    mLogPath = getLogPath( boost::filesystem::path(poseSeqItemPtr->filePath()) );
+    cout << "LogPath: " << mLogPath << endl;
 
     std::vector<Link*> endEffectorLinkVec;
     if(!getEndEffectorLinkVector(endEffectorLinkVec, body)) return;
@@ -868,7 +868,7 @@ void SlideFrictionControlPlugin::execControl()
 
     generatePreModelPredictiveControlParamDeque(sfc, bodyItemPtr, poseSeqItemPtr, contactLinkCandidateSet);
 
-    sweepControl(mPoseSeqPath, mBar->dialog->layout()->getParamString(), sfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
+    sweepControl(mLogPath, mBar->dialog->layout()->getParamString(), sfc, body, mBodyMotionItemPtr, contactLinkCandidateSet);
 
     cout << "\x1b[31m" << "Finished SlideFrictionControl" << "\x1b[m" << endl;
 }

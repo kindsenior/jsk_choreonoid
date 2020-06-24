@@ -8,6 +8,11 @@ using namespace boost;
 using namespace cnoid;
 using namespace std;
 
+boost::filesystem::path cnoid::getLogPath(const boost::filesystem::path& poseSeqPath)
+{
+    return poseSeqPath.parent_path() / "log" / poseSeqPath.stem();
+}
+
 // 特定のリンクの次のポーズを求める
 PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
@@ -101,7 +106,8 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
 {
     cout << "generateInitSeq()" << endl;
 
-    boost::filesystem::path poseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
+    boost::filesystem::path logPath = getLogPath( boost::filesystem::path(poseSeqItemPtr->filePath()) );
+    boost::filesystem::create_directory( logPath.parent_path().string().c_str() );
     BodyMotionItemPtr bodyMotionItemPtr = poseSeqItemPtr->bodyMotionItem();
     BodyMotion& motion = *(bodyMotionItemPtr->motion());
     const int frameRate = motion.frameRate();
@@ -110,13 +116,13 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
     const int numJoints = body->numJoints();
 
     stringstream ss;
-    ss << poseSeqPath.stem().string() << "_initCM_" << frameRate << "fps.dat";
-    ofstream ofs( ((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str() );
+    ss << logPath.string() << "_initCM_" << frameRate << "fps.dat";
+    ofstream ofs( ss.str().c_str() );
     ofs << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
 
     ss.str("");
-    ss << poseSeqPath.stem().string() << "_initEE_" << frameRate << "fps.dat";
-    ofstream eeOfs( ((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str() );
+    ss << logPath.string() << "_initEE_" << frameRate << "fps.dat";
+    ofstream eeOfs( ss.str().c_str() );
     eeOfs << "time";
     std::vector<string> columnHeadKeyVec={"px","py","pz", "vx","vy","vz", "wx","wy","wz"};
     for(auto link : endEffectorLinkVec) for(auto columnHeadKey : columnHeadKeyVec) eeOfs << " init" << link->name() << columnHeadKey;

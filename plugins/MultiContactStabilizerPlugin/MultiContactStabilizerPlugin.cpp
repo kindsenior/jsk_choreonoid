@@ -15,12 +15,12 @@ bool MultiContactStabilizerPlugin::initialize()
     return true;
 }
 
-void cnoid::sweepControl(boost::filesystem::path poseSeqPath, std::string paramStr, MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr)
+void cnoid::sweepControl(boost::filesystem::path logPath, std::string paramStr, MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr)
 {
     stringstream fnamess; fnamess.str("");
-    fnamess << poseSeqPath.stem().string() << "_MCS_refPL" << paramStr << "_" << (int) 1/mcs->rootController()->dt << "fps.dat";
+    fnamess << logPath.string() << "_MCS_refPL" << paramStr << "_" << (int) 1/mcs->rootController()->dt << "fps.dat";
     ofstream ofs;
-    ofs.open( ((filesystem::path) poseSeqPath.parent_path() / fnamess.str()).string().c_str(), ios::out );
+    ofs.open( fnamess.str().c_str(), ios::out );
 
     const double dt = mcs->dt;
     const int numFrames = bodyMotionItemPtr->motion()->numFrames()*mcs->rootController()->dt/mcs->dt;
@@ -187,8 +187,8 @@ void MultiContactStabilizerPlugin::execControl()
     if(!getSelectedPoseSeqSet(bodyItemPtr, body, poseSeqItemPtr, poseSeqPtr, mBodyMotionItemPtr)) return;
     BodyMotion& motion = *(mBodyMotionItemPtr->motion());
 
-    mPoseSeqPath = boost::filesystem::path(poseSeqItemPtr->filePath());
-    cout << "PoseSeqPath: " << mPoseSeqPath << endl;
+    mLogPath = getLogPath( boost::filesystem::path(poseSeqItemPtr->filePath()) );
+    cout << "LogPath: " << mLogPath << endl;
 
     // BodyMotion作成
     generateBodyMotionFromBar(body, poseSeqItemPtr, mBodyMotionItemPtr);
@@ -216,7 +216,7 @@ void MultiContactStabilizerPlugin::execControl()
 
     generatePreModelPredictiveControlParamDeque(mcs, body, poseSeqPtr, motion, contactLinkCandidateSet);
 
-    sweepControl(mPoseSeqPath, mBar->dialog->layout()->getParamString(), mcs, body, mBodyMotionItemPtr);
+    sweepControl(mLogPath, mBar->dialog->layout()->getParamString(), mcs, body, mBodyMotionItemPtr);
 
     cout << "Finished MultiContactStabilizer" << endl;
 }

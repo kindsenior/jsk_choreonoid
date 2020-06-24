@@ -93,12 +93,12 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     Vector3Seq refLSeq = *(motionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL"));
 
     stringstream ss,fnamess;
-    fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion.frameRate() << "fps.dat";
+    fnamess << mLogPath.string() << "_RMC_refPL_" << motion.frameRate() << "fps.dat";
     ofstream ofs(fnamess.str().c_str());
     ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
 
     fnamess.str("");
-    fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_initPL_" << motion.frameRate() << "fps.dat";
+    fnamess << mLogPath.string() << "_RMC_initPL_" << motion.frameRate() << "fps.dat";
     ofstream ofs1(fnamess.str().c_str());
     ofs1 << "time initCMx initCMy initCMz initPx initPy initPz initLx initLy initLz" << endl;
 
@@ -294,7 +294,7 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
     const BodyMotion& motion = *(motionItem->motion());
 
     stringstream ss,fnamess;
-    fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_refPL_" << motion.frameRate() << "fps.dat";
+    fnamess << mLogPath.string() << "_RMC_refPL_" << motion.frameRate() << "fps.dat";
     ofstream ofs(fnamess.str().c_str());
     ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz" << endl;
     const double dt = 1.0/motion.frameRate();
@@ -428,7 +428,7 @@ void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const
     }
 }
 
-void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItem, const std::vector<Link*>& endEffectorLinkVec)
+void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItem, const std::vector<Link*>& endEffectorLinkVec)
 {
     BodyMotion& motion = *(bodyMotionItem->motion());
 
@@ -450,13 +450,13 @@ void RMControlPlugin::sweepControl(boost::filesystem::path poseSeqPath ,std::str
     // for(int i = 0; i < 3; ++i){
     for(int i = 0; i < 1; ++i){
         fnamess.str("");
-        fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_PL_" << motion.frameRate() << "fps_" << i << ".dat";
+        fnamess << mLogPath.string() << "_RMC_PL_" << motion.frameRate() << "fps_" << i << ".dat";
         ofstream ofs( fnamess.str().c_str() );
         if(!ofs){ cerr << "File Open Error: " << fnamess.str() << endl; return;}
         ofs << "time CMx CMy CMz Px Py Pz Lx Ly Lz" << endl;
 
         fnamess.str("");
-        fnamess << mPoseSeqPath.parent_path().string() << "/" << getBasename(mPoseSeqPath) << "_RMC_EE_" << motion.frameRate() << "fps_" << i << ".dat";
+        fnamess << mLogPath.string() << "_RMC_EE_" << motion.frameRate() << "fps_" << i << ".dat";
         ofstream eeOfs( fnamess.str().c_str() );
         if(!eeOfs){ cerr << "File Open Error: " << fnamess.str() << endl; return;}
         eeOfs << "time";
@@ -691,8 +691,8 @@ void RMControlPlugin::execControl()
     if(!getSelectedPoseSeqSet(bodyItem, mBody, poseSeqItem, poseSeq, bodyMotionItem)) return;
     BodyMotion& motion = *(bodyMotionItem->motion());
 
-    mPoseSeqPath = boost::filesystem::path(poseSeqItem->filePath());
-    cout << "PoseSeqPath: " << mPoseSeqPath << endl;
+    mLogPath = getLogPath( boost::filesystem::path(poseSeqItem->filePath()) );
+    cout << "LogPath: " << mLogPath << endl;
 
     std::vector<Link*> endEffectorLinkVec;
     if(!getEndEffectorLinkVector(endEffectorLinkVec, mBody)) return;
@@ -722,7 +722,7 @@ void RMControlPlugin::execControl()
         cout << " Loaded ref P/L" << endl;
     }
 
-    sweepControl(mPoseSeqPath , "", mBody, bodyMotionItem, endEffectorLinkVec);// ParamString is not gotten from ParamSetupLayout and is empty
+    sweepControl(mLogPath , "", mBody, bodyMotionItem, endEffectorLinkVec);// ParamString is not gotten from ParamSetupLayout and is empty
 
     cout << "\x1b[31m" << "Finished RMControl" << "\x1b[m" << endl;
 }

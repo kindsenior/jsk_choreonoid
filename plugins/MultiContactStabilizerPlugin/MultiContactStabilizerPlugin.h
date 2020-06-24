@@ -50,7 +50,7 @@
 
 namespace cnoid{
     void generatePreModelPredictiveControlParamDeque(hrp::MultiContactStabilizer* mcs, BodyPtr body, const PoseSeqPtr poseSeqPtr, const BodyMotion& motion, const std::set<Link*>& contactLinkCandidateSet);
-    void sweepControl(boost::filesystem::path poseSeqPath, std::string paramStr, hrp::MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr);
+    void sweepControl(boost::filesystem::path logPath, std::string paramStr, hrp::MultiContactStabilizer* mcs, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr);
 
     class MultiContactStabilizerBar;
 
@@ -67,7 +67,7 @@ namespace cnoid{
         BodyMotionItemPtr mBodyMotionItemPtr;
         MultiContactStabilizerBar* mBar;
 
-        boost::filesystem::path mPoseSeqPath;
+        boost::filesystem::path mLogPath;
 
         int frameRate;
         double dt;

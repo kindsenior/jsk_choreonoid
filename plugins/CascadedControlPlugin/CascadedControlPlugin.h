@@ -45,7 +45,7 @@ namespace cnoid{
         BodyMotionItemPtr mBodyMotionItemPtr;
         CascadedControlBar* mBar;
 
-        boost::filesystem::path mPoseSeqPath;
+        boost::filesystem::path mLogPath;
 
         int frameRate;
         double dt;

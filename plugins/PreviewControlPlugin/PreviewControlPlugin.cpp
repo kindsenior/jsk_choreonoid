@@ -54,8 +54,7 @@ void PreviewControlPlugin::execControl()
     Link *lFootLink, *rFootLink;
     UtilPlugin::getFootLink( &lFootLink, &rFootLink, body );
 
-    boost::filesystem::path poseSeqPath(poseSeqItemPtr->filePath());
-    cout << " parent_path:" << poseSeqPath.parent_path().string() << " basename:" << getBasename(poseSeqPath) << endl;
+    boost::filesystem::path logPath = getLogPath(boost::filesystem::path(poseSeqItemPtr->filePath()));
 
     Link* rootLink = body->rootLink();
     JointPath jpl, jpr;
@@ -89,10 +88,10 @@ void PreviewControlPlugin::execControl()
     // 目標zmp・初期zmp・初期重心軌道書き出し
     {
         stringstream ss;
-        ss << poseSeqPath.stem().string() << "_PC";
+        ss << logPath.string() << "_PC";
         if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) ss << mBar->dialog->getParamString();
         ss << "_" << motion.frameRate() << "fps.dat";
-        ofstream ofs(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
+        ofstream ofs(ss.str().c_str());
         Vector3d lastPosVec = body->rootLink()->p();
         Vector3d lastVelVec = VectorXd::Zero(3);
         ofs << "time initZMPx initZMPy initZMPz refZMPx refZMPy refZMPz initCMx initCMy initCMz rootPosX rootPosY rootPosZ rootVelX rootVelY rootVelZ rootAccX rootAccY rootAccZ" << endl;
@@ -230,11 +229,11 @@ void PreviewControlPlugin::execControl()
         // zmpファイル書き出し
         {
             stringstream ss;
-            ss << poseSeqPath.stem().string() << "_PC";
+            ss << logPath.string() << "_PC";
             if(mBar->dialog->saveParameterInFileNameCheck.isChecked()) ss << mBar->dialog->getParamString();
             ss << "_" << motion.frameRate() << "fps_" << loopNum << ".dat";
             ofstream ofs;
-            ofs.open(((filesystem::path) poseSeqPath.parent_path() / ss.str()).string().c_str());
+            ofs.open(ss.str().c_str());
 
             calcZMP(body, motion, zmpSeq, true);
             ofs << "time  inputZMPx inputZMPy inputZMPz outputZMPx outputZMPy outputZMPz outputCMx outputCMy outputCMz actZMPx actZMPy actZMPz actCMx actCMy actCMz rootPosX rootPosY rootPosZ" << endl;

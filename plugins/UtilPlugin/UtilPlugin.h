@@ -30,6 +30,7 @@
 
 namespace cnoid{
 
+boost::filesystem::path getLogPath(const boost::filesystem::path& poseSeqPath);
 
 void generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::vector<Link*>& endEffectorLinkVector);
 

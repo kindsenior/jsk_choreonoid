@@ -64,7 +64,7 @@ public:
     Link* mLFootLink;
     Link* mRFootLink;
     WholeBodyConstraintPtr wholeBodyConstraintPtr;
-    boost::filesystem::path mPoseSeqPath;
+    boost::filesystem::path mLogPath;
 
     RMControlPlugin() : Plugin("RMControl")
     {
@@ -90,7 +90,7 @@ public:
 
     void modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet);
 
-    void sweepControl(boost::filesystem::path poseSeqPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::vector<Link*>& endEffectorLinkVec);
+    void sweepControl(boost::filesystem::path logPath ,std::string paramStr, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::vector<Link*>& endEffectorLinkVec);
 
     // 分解運動量制御
     void execControl();
