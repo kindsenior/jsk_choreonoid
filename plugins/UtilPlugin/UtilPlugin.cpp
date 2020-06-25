@@ -242,7 +242,7 @@ int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPt
     std::cout << "getNextContactState(" << poseIter->time() << " s linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator nextPoseIter = getNextPose( poseIter, poseSeq, linkId );
     if(poseIter == nextPoseIter){std::cout << " this is final pose" << std::endl; return -1;}
-    return getContactState( getPrevPose( nextPoseIter, poseSeq, linkId )->get<Pose>(), nextPoseIter->get<Pose>(), linkId, contactPointVec );
+    return ::getContactState( getPrevPose( nextPoseIter, poseSeq, linkId )->get<Pose>(), nextPoseIter->get<Pose>(), linkId, contactPointVec );
 }
 
 int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId, const std::vector<Vector3d>& contactPointVec)
@@ -250,7 +250,7 @@ int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPt
     std::cout << "getPrevContactState(" << poseIter->time() << " s linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator prevPoseIter = getPrevPose( poseIter, poseSeq, linkId );
     if(poseIter == prevPoseIter){std::cout << " this is first pose" << std::endl; return -1;}
-    return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId, contactPointVec );
+    return ::getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId, contactPointVec );
 }
 
 // 特定の接触状態のLinkSetを取得
