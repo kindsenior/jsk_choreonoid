@@ -364,36 +364,6 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
 }
 
 namespace {
-// bool operator>(const Vector3d& vec1, const Vector3d& vec2) {return vec1.norm() > vec2.norm();}
-// bool operator<(const Vector3d& vec1, const Vector3d& vec2) {return vec1.norm() < vec2.norm();}
-bool compVector(const Vector3d& vec1, const Vector3d& vec2) {return vec1.norm() > vec2.norm();}
-
-Vector3d getLongestVector(std::vector<Vector3d> pointVec, const std::vector<Vector3d>& exceptionalPointVec = std::vector<Vector3d>(), const double distanceThresh = 0.05)
-{
-    // remove neighbor points of exceptionalPointVec
-    if(exceptionalPointVec.size() > 0){
-        for(auto exceptionalPoint : exceptionalPointVec){
-            auto iter = pointVec.begin();
-            while(iter != pointVec.end()){
-                if(((*iter) - exceptionalPoint).norm() < distanceThresh) iter = pointVec.erase(iter);
-                else ++iter;
-            }
-        }
-    }
-
-    // std::sort(pointVec.begin(), pointVec.end());
-    // std::sort(pointVec.begin(), pointVec.end(), std::greater<Vector3d>());
-    std::sort(pointVec.begin(), pointVec.end(), compVector);
-
-    return pointVec[0];
-}
-
-Vector3d getFarthestVector(std::vector<Vector3d> pointVec, const Vector3d& referencePoint)
-{
-    for(auto& point : pointVec) point -= referencePoint;
-    return referencePoint + getLongestVector(pointVec);
-}
-
 std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx, const PosePtr& currentPosePtr)
 {
     cout << "getContactFace(" << linkIdx << ", " << poseIter->time() << ", poseSeqPtr)" << endl;

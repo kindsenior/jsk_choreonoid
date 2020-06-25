@@ -10,6 +10,7 @@ if(BUILD_UTIL_PLUGIN)
     InverseKinematics.h
     DrawInterface.h
     Filter.h
+    GeometricUtil.h
     ParamNode.h
     ParamWidget.h
     ParamSetupLayout.h
@@ -17,7 +18,7 @@ if(BUILD_UTIL_PLUGIN)
     SetupToolBar.h
     )
 
-  add_library(${TARGET} SHARED UtilPlugin Interpolator InverseKinematics)
+  add_library(${TARGET} SHARED UtilPlugin GeometricUtil Interpolator InverseKinematics)
 
   # -l
   target_link_libraries(${TARGET} CnoidPoseSeqPlugin ${CHOREONOID_BASE_LIBRARIES})
