@@ -57,31 +57,28 @@ namespace {
 int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId, const std::vector<Vector3d>& contactPointVec)
 {
     // std::cout << "getContactState()";
-    int state = 0;
+    int state = 1;// 2^0
 
-    // 滑り判定(静止0 滑り1)
+    // check slide (stop: 0, slide: 1)*2^0
     const double deltaPos = 0.01, deltaAngle = 0.02;// 要検討 10[mm] 0.02[rad]=1.15[deg]
     const Pose::LinkInfo *linkInfo1 = pose1->ikLinkInfo(linkId), *linkInfo2 = pose2->ikLinkInfo(linkId);
-    if(contactPointVec.size() == 0){
-        if((linkInfo1->p - linkInfo2->p).norm() > deltaPos || AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() > deltaAngle){
-            cout << "  posdiff = " << (linkInfo1->p - linkInfo2->p).norm() << " > " << deltaPos << " or angle diff = " << AngleAxis(linkInfo1->R.transpose()*linkInfo2->R).angle() << " > " << deltaAngle << endl;
-            state += 1;// 2^0
-        }
-    }else{
-        state = 1;// 2^0
-        for(auto contactPoint : contactPointVec){
-            double diff = ((linkInfo1->p + linkInfo1->R*contactPoint) - (linkInfo2->p + linkInfo2->R*contactPoint)).norm();
-            if(diff < deltaPos){
-                state = 0;
-                break;
-            }else{
-                cout << "  posdiff = " << diff << " > " << deltaPos << ", ";
-            }
-            cout << endl;
+    std::vector<Vector3d> tmpVec;
+    if(contactPointVec.size() == 0) reduceConvexHullToQuadrangle(tmpVec, linkInfo1->contactPoints());// use linkInfo1 and reduce to quadrangle
+    const std::vector<Vector3d>& contactPointVec_ =  contactPointVec.size() == 0 ? tmpVec : contactPointVec;
+    cout << "  slide ckeck";
+    for(auto contactPoint : contactPointVec_){
+        double diff = ((linkInfo1->p + linkInfo1->R*contactPoint) - (linkInfo2->p + linkInfo2->R*contactPoint)).norm();
+        if(diff < deltaPos){
+            state = 0;// set to static
+            cout << "  posdiff = " << diff << " < " << deltaPos << " !";
+            break;
+        }else{
+            cout << "  posdiff = " << diff << " >= " << deltaPos << ", ";
         }
     }
+    cout << endl;
 
-    // 遊脚判定(接触0 非接触1)
+    // check contact (contact: 0, swing: 1)*2^1
     if(!linkInfo1->isTouching() || !linkInfo2->isTouching()){
         cout << "  pose1: " << linkInfo1->isTouching() << "  " << " pose2: " << linkInfo2->isTouching() << endl;
         state += 2;// 2^1
@@ -405,7 +402,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
     for(auto link: linkVec){
         for(PoseSeq::iterator frontPoseIter = (++poseSeqPtr->begin()),backPoseIter = poseSeqPtr->begin(); frontPoseIter != poseSeqPtr->end(); incContactPose(frontPoseIter,poseSeqPtr,link)){
             if(!isContactStateChanging(frontPoseIter, poseSeqPtr, link)) continue;
-            int contactState = getPrevContactState(frontPoseIter, poseSeqPtr, link->index());// note!!!: toe/heel contact is mistaken as sliding
+            int contactState = getPrevContactState(frontPoseIter, poseSeqPtr, link->index());
             int optionalDataState;
             if(contactState == 0) optionalDataState = 1;// 0:静止接触
             if(contactState == 1) optionalDataState = -1;// 1:滑り接触

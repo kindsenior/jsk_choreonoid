@@ -27,6 +27,7 @@
 
 #include "DrawInterface.h"
 #include "Filter.h"
+#include "GeometricUtil.h"
 
 namespace cnoid{
 
