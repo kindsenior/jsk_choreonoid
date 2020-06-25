@@ -378,13 +378,9 @@ std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx
         }
     }
 
-    vertexVec.push_back(getLongestVector(collisionPointVec));
-    std::vector<Vector3d> v;
-    v.push_back(vertexVec[0]);
-    vertexVec.push_back(getLongestVector(collisionPointVec, v));
 
-    vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[0]));
-    vertexVec.push_back(getFarthestVector(collisionPointVec, vertexVec[1]));
+    // reduce the number of points to 4
+    if(collisionPointVec.size() > 4) reduceConvexHullToQuadrangle(vertexVec, collisionPointVec);
 
     cout << " contact vertices: "; for(auto vertex : vertexVec) cout << " [" << vertex.transpose() << "]"; cout << std::endl;
     return vertexVec;

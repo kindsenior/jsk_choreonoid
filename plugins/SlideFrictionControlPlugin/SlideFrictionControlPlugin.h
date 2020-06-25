@@ -23,6 +23,7 @@
 #include <QEventLoop>
 
 #include <UtilPlugin/UtilPlugin.h>
+#include <UtilPlugin/GeometricUtil.h>
 #include <UtilPlugin/Interpolator.h>
 
 #include "SlideFrictionControl.h"
