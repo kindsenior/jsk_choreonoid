@@ -385,7 +385,7 @@ std::vector<Vector3d> getPoseContactFace(const int linkIdx, PoseSeq::iterator po
     }
 
     // reduce the number of points to 4
-    if(collisionPointVec.size() > 4) reduceConvexHullToQuadrangle(vertexVec, collisionPointVec);
+    reduceConvexHullToQuadrangle(vertexVec, collisionPointVec);
 
     cout << " contact vertices: "; for(auto vertex : vertexVec) cout << " [" << vertex.transpose() << "]"; cout << std::endl;
     return vertexVec;

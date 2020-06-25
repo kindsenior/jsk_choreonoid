@@ -37,11 +37,13 @@ Vector3d cnoid::getFarthestVector(std::vector<Vector3d> pointVec, const Vector3d
 
 void cnoid::reduceConvexHullToQuadrangle(std::vector<Vector3d>& quadrangleVec, const std::vector<Vector3d>& convexHullVec)
 {
-    quadrangleVec.push_back(getLongestVector(convexHullVec));
-    std::vector<Vector3d> v;
-    v.push_back(quadrangleVec[0]);
-    quadrangleVec.push_back(getLongestVector(convexHullVec, v));
+    if(convexHullVec.size() > 4){
+        quadrangleVec.push_back(getLongestVector(convexHullVec));
+        std::vector<Vector3d> v;
+        v.push_back(quadrangleVec[0]);
+        quadrangleVec.push_back(getLongestVector(convexHullVec, v));
 
-    quadrangleVec.push_back(getFarthestVector(convexHullVec, quadrangleVec[0]));
-    quadrangleVec.push_back(getFarthestVector(convexHullVec, quadrangleVec[1]));
+        quadrangleVec.push_back(getFarthestVector(convexHullVec, quadrangleVec[0]));
+        quadrangleVec.push_back(getFarthestVector(convexHullVec, quadrangleVec[1]));
+    }
 }
