@@ -16,7 +16,7 @@ boost::filesystem::path cnoid::getLogPath(const boost::filesystem::path& poseSeq
 // 特定のリンクの次のポーズを求める
 PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
-    // std::cout << "getNextPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
+    // std::cout << "getNextPose(" << poseIter->time() << " s linkId:" << linkId << ")";
     PoseSeq::iterator iter;
     for(iter = (++poseIter); iter != poseSeq->end(); ++iter){
         // std::cout << " " << iter->time() << "sec";
@@ -35,7 +35,7 @@ PoseSeq::iterator cnoid::getNextPose(PoseSeq::iterator poseIter, PoseSeqPtr pose
 // 特定リンクの前のポーズを求める
 PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, int linkId)
 {
-    // std::cout << "getPrevPose(" << poseIter->time() << "[sec] linkId:" << linkId << ")";
+    // std::cout << "getPrevPose(" << poseIter->time() << " s linkId:" << linkId << ")";
     PoseSeq::iterator iter;
     for(iter = (--poseIter); iter != (--poseSeq->begin()); --iter){
         // std::cout << " " << iter->time() << "sec";
@@ -242,7 +242,7 @@ void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq
 // poseIterが最後のポーズの時は-1を返す
 int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId, const std::vector<Vector3d>& contactPointVec)
 {
-    std::cout << "getNextContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
+    std::cout << "getNextContactState(" << poseIter->time() << " s linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator nextPoseIter = getNextPose( poseIter, poseSeq, linkId );
     if(poseIter == nextPoseIter){std::cout << " this is final pose" << std::endl; return -1;}
     return getContactState( getPrevPose( nextPoseIter, poseSeq, linkId )->get<Pose>(), nextPoseIter->get<Pose>(), linkId, contactPointVec );
@@ -250,7 +250,7 @@ int cnoid::getNextContactState(const PoseSeq::iterator poseIter, const PoseSeqPt
 
 int cnoid::getPrevContactState(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId, const std::vector<Vector3d>& contactPointVec)
 {
-    std::cout << "getPrevContactState(" << poseIter->time() << "[sec] linkId:" << linkId << ")" << std::endl ;
+    std::cout << "getPrevContactState(" << poseIter->time() << " s linkId:" << linkId << ")" << std::endl ;
     PoseSeq::iterator prevPoseIter = getPrevPose( poseIter, poseSeq, linkId );
     if(poseIter == prevPoseIter){std::cout << " this is first pose" << std::endl; return -1;}
     return getContactState( prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkId )->get<Pose>(), linkId, contactPointVec );
@@ -267,7 +267,7 @@ void cnoid::getNextTargetContactLinkSet(std::set<Link*>& linkSet, BodyPtr& body,
 
 Vector3d cnoid::getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkId)
 {
-    std::cout << "getPrevDirection(" << poseIter->time() << "[sec] linkid:" << linkId << ")" << std::endl;
+    std::cout << "getPrevDirection(" << poseIter->time() << " s linkid:" << linkId << ")" << std::endl;
     PoseSeq::iterator prevPoseIter = getPrevPose(poseIter, poseSeq, linkId);
     if(poseIter == prevPoseIter){std::cout << " this is first pose" << std::endl; return Vector3d::Zero();}
     return getDirection(prevPoseIter->get<Pose>(), getNextPose(prevPoseIter, poseSeq, linkId)->get<Pose>(), linkId);
@@ -276,7 +276,7 @@ Vector3d cnoid::getPrevDirection(const PoseSeq::iterator poseIter, const PoseSeq
 // 足の接触状態しか見ていない lgh要改良
 bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, BodyPtr body)
 {
-    std::cout << "isContactStateChanging(" << poseIter->time() <<  "[sec])" << std::endl;
+    std::cout << "isContactStateChanging(" << poseIter->time() <<  " s)" << std::endl;
 
     PosePtr prevPose,curPose,nextPose;
     PoseSeq::iterator prevIter,nextIter;
@@ -289,7 +289,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
             if(lbh->footLink(i)->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
                 int prevState,nextState;
                 if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
-                    std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state changing at " << poseIter->time() << "[sec]: " << prevState << "->" << nextState << std::endl;
+                    std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state changing at " << poseIter->time() << " s: " << prevState << "->" << nextState << std::endl;
                     return true;
                 }else{
                     std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state is not changing or not touching at " << poseIter->time() << std::endl;
@@ -304,7 +304,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
 
 bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSeq, const Link* link)
 {
-    std::cout << "isContactStateChanging(" << poseIter->time() <<  "[sec], " << link->name() << ")" << std::endl;
+    std::cout << "isContactStateChanging(" << poseIter->time() <<  " s, " << link->name() << ")" << std::endl;
 
     PosePtr prevPose,curPose,nextPose;
     PoseSeq::iterator prevIter,nextIter;
@@ -315,7 +315,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
         if(link->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
             int prevState,nextState;
             if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
-                std::cout << " " << link->name() << "'s state changing at " << poseIter->time() << "[sec]: " << prevState << "->" << nextState << std::endl;
+                std::cout << " " << link->name() << "'s state changing at " << poseIter->time() << " s: " << prevState << "->" << nextState << std::endl;
                 return true;
             }else{
                 std::cout << " " << link->name() << "'s state is not changing or not touching at " << poseIter->time() << std::endl;
