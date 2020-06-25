@@ -364,26 +364,61 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
 }
 
 namespace {
-std::vector<Vector3d> getContactFace(BodyItemPtr& bodyItemPtr, const int linkIdx, const PosePtr& currentPosePtr)
+std::vector<Vector3d> getPoseContactFace(const int linkIdx, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
 {
-    cout << "getContactFace(" << linkIdx << ", " << poseIter->time() << ", poseSeqPtr)" << endl;
+    cout << "getPoseContactFace(" << linkIdx << ", " << poseIter->time() << " s, poseSeqPtr)" << endl;
     // collision取得
     std::vector<Vector3d> collisionPointVec, vertexVec;
-    for(Pose::LinkInfoMap::iterator linkInfoIter = currentPosePtr->ikLinkBegin(); linkInfoIter != currentPosePtr->ikLinkEnd(); ++linkInfoIter){
-        if(linkInfoIter->first == linkIdx){
-            Pose::LinkInfo linkInfo = linkInfoIter->second;
-            for(auto contactPoint : linkInfo.contactPoints()){
-                collisionPointVec.push_back(linkInfo.R.transpose()*(contactPoint - linkInfo.p));
-            }
+    Pose::LinkInfo* linkInfo;
+    auto point_push_func = [&](){
+        for(auto contactPoint : linkInfo->contactPoints()){
+            // collisionPointVec.push_back(linkInfo->R.transpose()*(contactPoint - linkInfo->p));// convert to points in the local coordinate frame
+            collisionPointVec.push_back(contactPoint);// points are specified in the local coordinate frame
         }
-    }
+    };
 
+    linkInfo = poseIter->get<Pose>()->ikLinkInfo(linkIdx);
+    if(linkInfo) point_push_func();
+    else{// use next pose when current pose has no target LinkInfo
+        linkInfo = getNextPose(poseIter, poseSeqPtr, linkIdx)->get<Pose>()->ikLinkInfo(linkIdx);
+        point_push_func();
+    }
 
     // reduce the number of points to 4
     if(collisionPointVec.size() > 4) reduceConvexHullToQuadrangle(vertexVec, collisionPointVec);
 
     cout << " contact vertices: "; for(auto vertex : vertexVec) cout << " [" << vertex.transpose() << "]"; cout << std::endl;
     return vertexVec;
+}
+
+std::vector<Vector3d> getPrevTermContactFace(const int linkIdx, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
+{
+    cout << "getPrevTermContactFace(" << linkIdx << ", " << poseIter->time() << " s, poseSeqPtr)" << endl;
+    std::vector<Vector3d> curContactPointVec = getPoseContactFace(linkIdx, poseIter, poseSeqPtr);
+    std::vector<Vector3d> prevContactPointVec = getPoseContactFace(linkIdx, getPrevPose(poseIter, poseSeqPtr, linkIdx), poseSeqPtr);
+
+    // filter near points between current pose and previous pose
+    std::vector<Vector3d> commonContactPointVec;
+    auto nearPointFilterFunc = [](std::vector<Vector3d>& operandPointVec, std::vector<Vector3d>& filterPointVec, std::vector<Vector3d>& resultPointVec){
+        std::copy_if(operandPointVec.begin(), operandPointVec.end(), std::back_inserter(resultPointVec),
+                     [&](Vector3d curPoint){
+                         return filterPointVec.end() != std::find_if(filterPointVec.begin(), filterPointVec.end(),
+                                                                     [&](Vector3d prevPoint){
+                                                                         return (curPoint - prevPoint).norm() < 0.01;
+                                                                     });
+                     });
+    };
+    nearPointFilterFunc(curContactPointVec, prevContactPointVec, commonContactPointVec);
+    nearPointFilterFunc(prevContactPointVec, curContactPointVec, commonContactPointVec);
+
+    // reduce the number of points to 4
+    std::vector<Vector3d> retContactPointVec;
+    if(commonContactPointVec.size() > 4) reduceConvexHullToQuadrangle(retContactPointVec, commonContactPointVec);
+    else retContactPointVec = commonContactPointVec;
+    if(retContactPointVec.size() != 4 && retContactPointVec.size() != 0) cout << "\x1b[31m" << "!!! The number of Term's contact points is not 0 or 4 !!!" << "\x1b[m" << endl;
+
+    cout << " common contact vertices: "; for(auto retPoint : retContactPointVec) cout << " [" << retPoint.transpose() << "]"; cout << std::endl;
+    return retContactPointVec;
 }
 
 void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccParamVec, BodyItemPtr& bodyItemPtr, const SlideFrictionControl* const sfc, const std::set<Link*>& contactLinkCandidateSet, PoseSeq::iterator poseIter, const PoseSeqPtr& poseSeqPtr)
@@ -396,7 +431,7 @@ void generateContactConstraintParamVec(std::vector<ContactConstraintParam*>& ccP
     for(std::set<Link*>::iterator linkIter = contactLinkCandidateSet.begin(); linkIter != contactLinkCandidateSet.end(); ++linkIter){
         int linkIdx = (*linkIter)->index();
 
-        std::vector<Vector3d> contactPointVec = getContactFace(bodyItemPtr, linkIdx, poseIter->get<Pose>());
+        std::vector<Vector3d> contactPointVec = getPrevTermContactFace(linkIdx, poseIter, poseSeqPtr);
         Vector3d soleOffset = std::accumulate(contactPointVec.begin(), contactPointVec.end(), Vector3d::Zero().eval()) / contactPointVec.size();// center of contact face
         std::vector<hrp::Vector2> vertexVec;
         hrp::Vector2 vertex;
