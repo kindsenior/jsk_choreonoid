@@ -30,15 +30,10 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
     for poseseq_item in poseseq_items:
         logger.info("PoseSeqItem: {}".format(poseseq_item.name))
         tree.selectItem(poseseq_item)
+        event_loop.processEvents()
 
         parent_body_item = poseseq_item.getAncestorItems(target_item_types=[BodyPlugin.BodyItem])[0]
         motion = poseseq_item.bodyMotionItem().motion
-
-        # somehow need for updating first pose when robot does not make the first pose
-        motion.frame(0) >> parent_body_item.body
-        parent_body_item.body.calcForwardKinematics()
-        parent_body_item.notifyKinematicStateChange()
-        event_loop.processEvents()
 
         poseseq = poseseq_item.poseSeq()
         for pose_ref in poseseq:
@@ -74,6 +69,9 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
             poseseq.endPoseModification(pose_ref)
             # poseseq_item.endEditing() # needless ?
             print_pose_info(parent_body_item.body, pose, pre_print="after update")
+
+        tree.selectItem(poseseq_item, False)
+        event_loop.processEvents()
 
 def move_poseseq_robot(move_offset_pos, poseseq_items=None, **kwargs):
     logger.info("update_poseseq_contact_iklinks()")
