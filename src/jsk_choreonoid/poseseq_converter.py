@@ -28,7 +28,7 @@ def __update_poseseq_impl(poseseq_items=None, move_offset_pos=None, tmp_offset_p
         tree.selectItem(poseseq_item, False)
 
     for poseseq_item in poseseq_items:
-        logger.info("PoseSeqItem: {}".format(poseseq_item.name))
+        logger.critical("update PoseSeqItem: {}".format(poseseq_item.name))
         tree.selectItem(poseseq_item)
         event_loop.processEvents()
 
