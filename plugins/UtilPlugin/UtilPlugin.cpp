@@ -52,6 +52,33 @@ PoseSeq::iterator cnoid::getPrevPose(PoseSeq::iterator poseIter, PoseSeqPtr pose
 }
 
 namespace {
+void getContactPoints(std::vector<Vector3d>& contactPointVec, const PosePtr pose1, const PosePtr pose2, const int linkIdx)
+{
+    std::vector<Vector3d> contactPointVec1, contactPointVec2;
+    reduceConvexHullToQuadrangle(contactPointVec1, pose1->ikLinkInfo(linkIdx)->contactPoints());
+    reduceConvexHullToQuadrangle(contactPointVec2, pose2->ikLinkInfo(linkIdx)->contactPoints());
+
+    // filter near points between current pose and previous pose
+    auto nearPointFilterFunc = [](const std::vector<Vector3d>& operandPointVec, const std::vector<Vector3d>& filterPointVec, std::vector<Vector3d>& resultPointVec){
+        std::copy_if(operandPointVec.begin(), operandPointVec.end(), std::back_inserter(resultPointVec),
+                     [&](Vector3d operandPoint){
+                         return filterPointVec.end() != std::find_if(filterPointVec.begin(), filterPointVec.end(),
+                                                                     [&](Vector3d filterPoint){
+                                                                         return (operandPoint - filterPoint).norm() < 0.01;
+                                                                     });
+                     });
+    };
+    std::vector<Vector3d> tmpContactPointVec;
+    nearPointFilterFunc(contactPointVec1, contactPointVec2, tmpContactPointVec);
+    nearPointFilterFunc(contactPointVec2, contactPointVec1, tmpContactPointVec);
+
+    // reduce the number of points to 4
+    reduceConvexHullToQuadrangle(contactPointVec, tmpContactPointVec);
+    if(contactPointVec.size() != 4 && contactPointVec.size() != 0) std::cout << "\x1b[31m" << "!!! The number of Term's contact points is not 0 or 4 !!!" << "\x1b[m" << std::endl;
+
+    std::cout << " contact vertices: "; for(auto point : contactPointVec) cout << " [" << point.transpose() << "]"; cout << std::endl;
+}
+
 // 2つのPose間の接触状態を2進数で表す
 // 0:静止接触 1:滑り接触 (2:静止遊脚) 3:遊脚
 int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId, const std::vector<Vector3d>& contactPointVec)
@@ -234,6 +261,24 @@ void cnoid::incContactPose(PoseSeq::iterator& poseIter, const PoseSeqPtr poseSeq
     poseIter = iter;
     std::cout << " next contact pose not found. return pose time:" << poseIter->time() << std::endl;
     return;
+}
+
+bool cnoid::getNextTermContactPoints(std::vector<Vector3d>& contactPointVec, const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkIdx)
+{
+    std::cout << "getNextTermContactPoints(" << poseIter->time() << " s linkIdx:" << linkIdx << ")" << std::endl ;
+    PoseSeq::iterator nextPoseIter = getNextPose( poseIter, poseSeq, linkIdx );
+    if(poseIter == nextPoseIter){std::cout << " this is final pose" << std::endl; return false;}
+    ::getContactPoints(contactPointVec, getPrevPose( nextPoseIter, poseSeq, linkIdx )->get<Pose>(), nextPoseIter->get<Pose>(), linkIdx );
+    return true;
+}
+
+bool cnoid::getPrevTermContactPoints(std::vector<Vector3d>& contactPointVec, const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkIdx)
+{
+    std::cout << "getPrevTermContactPoints(" << poseIter->time() << " s linkIdx:" << linkIdx << ")" << std::endl ;
+    PoseSeq::iterator prevPoseIter = getPrevPose( poseIter, poseSeq, linkIdx );
+    if(poseIter == prevPoseIter){std::cout << " this is first pose" << std::endl; return false;}
+    ::getContactPoints(contactPointVec, prevPoseIter->get<Pose>(), getNextPose( prevPoseIter, poseSeq, linkIdx )->get<Pose>(), linkIdx );
+    return true;
 }
 
 // poseIterが最後のポーズの時は-1を返す
