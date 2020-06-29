@@ -123,6 +123,34 @@ Vector3d getDirection(const PosePtr pose1, const PosePtr pose2, const int linkId
     return ret;
 }
 
+bool isContactStateChanging(const PoseSeq::iterator poseIter, const PoseSeqPtr poseSeq, const int linkIdx, const string linkName){
+    int prevState = getPrevContactState(poseIter, poseSeq, linkIdx);
+    int nextState = getNextContactState(poseIter, poseSeq, linkIdx);
+    if(prevState == nextState){
+        if( (prevState == 0 && nextState == 0) || (prevState == 1 && nextState == 1) ){
+            std::vector<Vector3d> prevPoints, nextPoints;
+            getPrevTermContactPoints(prevPoints, poseIter, poseSeq, linkIdx);
+            getNextTermContactPoints(nextPoints, poseIter, poseSeq, linkIdx);
+            auto hasMovingPointsFunc = [](const std::vector<Vector3d>& points1, const std::vector<Vector3d>& points2){
+                return points1.end() != std::find_if(points1.begin(), points1.end(),// has point with no near point
+                                                     [&points2](Vector3d point1){
+                                                         return points2.end() == std::find_if(points2.begin(), points2.end(),// not have near points
+                                                                                              [&](Vector3d point2){ return (point2 - point1).norm() < 0.01; });
+                                                     }
+                                                     );
+            };
+            if( hasMovingPointsFunc(prevPoints, nextPoints) || hasMovingPointsFunc(nextPoints, prevPoints) ){
+                std::cout << " " << "\x1b[33m" << linkName << "'s contact points are changing at " << poseIter->time() << " s" << "\x1b[m" << std::endl;
+                return true;
+            }
+        }
+        std::cout << " " << linkName << "'s state is not changing at " << poseIter->time() << std::endl;
+        return false;
+    }
+    std::cout << " " << "\x1b[33m" << linkName << "'s contact state is changing at " << poseIter->time() << " s: " << prevState << "->" << nextState << "\x1b[m" << std::endl;
+    return true;
+}
+
 }
 
 // calc COM, Momentum, Angular Momentum
@@ -329,12 +357,8 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
         std::cout << "  linkID:" << linkInfoIter->first << " link name:" << body->link(linkInfoIter->first)->name() << " isTouching:" << linkInfoIter->second.isTouching() << std::endl;
         for(int i = 0; i < lbh->numFeet(); ++i){
             if(lbh->footLink(i)->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
-                int prevState,nextState;
-                if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
-                    std::cout << " " << "\x1b[33m" << body->link(linkInfoIter->first)->name() << "'s state changing at " << poseIter->time() << " s: " << prevState << "->" << nextState << "\x1b[m" << std::endl;
+                if(::isContactStateChanging(poseIter, poseSeq, linkInfoIter->first, body->link(linkInfoIter->first)->name())){// 前後の接触状態比較
                     return true;
-                }else{
-                    std::cout << " " << body->link(linkInfoIter->first)->name() << "'s state is not changing or not touching at " << poseIter->time() << std::endl;
                 }
             }
         }
@@ -354,13 +378,9 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
 
     for(Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter){
         std::cout << "  linkID:" << linkInfoIter->first << " link name:" << link->name() << " isTouching:" << linkInfoIter->second.isTouching() << std::endl;
-        if(link->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){// 足先リンクで且つ接触している
-            int prevState,nextState;
-            if((prevState = getPrevContactState(poseIter, poseSeq, linkInfoIter->first)) != (nextState = getNextContactState(poseIter, poseSeq, linkInfoIter->first))){// 前後の接触状態比較
-                std::cout << " " << "\x1b[33m" << link->name() << "'s state changing at " << poseIter->time() << " s: " << prevState << "->" << nextState << "\x1b[m" << std::endl;
+        if(link->index() == linkInfoIter->first && linkInfoIter->second.isTouching()){
+            if(::isContactStateChanging(poseIter, poseSeq, linkInfoIter->first, link->name())){// 前後の接触状態比較
                 return true;
-            }else{
-                std::cout << " " << link->name() << "'s state is not changing or not touching at " << poseIter->time() << std::endl;
             }
         }
     }
