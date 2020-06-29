@@ -65,12 +65,12 @@ int getContactState(const PosePtr pose1, const PosePtr pose2, const int linkId, 
     std::vector<Vector3d> tmpVec;
     if(contactPointVec.size() == 0) reduceConvexHullToQuadrangle(tmpVec, linkInfo1->contactPoints());// use linkInfo1 and reduce to quadrangle
     const std::vector<Vector3d>& contactPointVec_ =  contactPointVec.size() == 0 ? tmpVec : contactPointVec;
-    cout << "  slide ckeck";
+    cout << "  slide check";
     for(auto contactPoint : contactPointVec_){
         double diff = ((linkInfo1->p + linkInfo1->R*contactPoint) - (linkInfo2->p + linkInfo2->R*contactPoint)).norm();
         if(diff < deltaPos){
             state = 0;// set to static
-            cout << "  posdiff = " << diff << " < " << deltaPos << " !";
+            cout << "  posdiff = " << diff << " < " << deltaPos << " : Static contact!";
             break;
         }else{
             cout << "  posdiff = " << diff << " >= " << deltaPos << ", ";
