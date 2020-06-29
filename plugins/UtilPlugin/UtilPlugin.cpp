@@ -348,9 +348,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
 {
     std::cout << "isContactStateChanging(" << poseIter->time() <<  " s)" << std::endl;
 
-    PosePtr prevPose,curPose,nextPose;
-    PoseSeq::iterator prevIter,nextIter;
-    curPose = poseIter->get<Pose>();
+    PosePtr curPose = poseIter->get<Pose>();
 
     LeggedBodyHelperPtr lbh = getLeggedBodyHelper(body);
     for(Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter){
@@ -372,9 +370,7 @@ bool cnoid::isContactStateChanging(PoseSeq::iterator poseIter, PoseSeqPtr poseSe
 {
     std::cout << "isContactStateChanging(" << poseIter->time() <<  " s, " << link->name() << ")" << std::endl;
 
-    PosePtr prevPose,curPose,nextPose;
-    PoseSeq::iterator prevIter,nextIter;
-    curPose = poseIter->get<Pose>();
+    PosePtr curPose = poseIter->get<Pose>();
 
     for(Pose::LinkInfoMap::iterator linkInfoIter = curPose->ikLinkBegin(); linkInfoIter != curPose->ikLinkEnd(); ++linkInfoIter){
         std::cout << "  linkID:" << linkInfoIter->first << " link name:" << link->name() << " isTouching:" << linkInfoIter->second.isTouching() << std::endl;
