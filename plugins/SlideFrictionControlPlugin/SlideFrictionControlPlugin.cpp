@@ -147,9 +147,9 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
 
     refPLOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
 
-    Vector3Seq refCMSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM"));// 上書き確認
-    Vector3Seq refPSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP"));
-    Vector3Seq refLSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL"));
+    Vector3Seq refCMSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refCM")->seq());
+    Vector3Seq refPSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refP")->seq());
+    Vector3Seq refLSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refL")->seq());
     // Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
     // Vector3SeqPtr refZmpSeqPtr = getOrCreateZMPSeq(*(bodyMotionItemPtr->motion()));
     Vector3Seq refZmpSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq());
