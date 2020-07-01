@@ -494,12 +494,13 @@ void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string 
 
         // motion loop 計算 step 2 〜 6
         // for(int currentFrame = 0; currentFrame < 1; ++currentFrame){
+        stringstream debugstream;
         for(int currentFrame = 0; currentFrame < motion.numFrames(); ++currentFrame){
 
             ofs << currentFrame * dt;
             eeOfs << currentFrame * dt;
             // ss << "###########################################################" << endl;
-            cout << "\x1b[34m" << "time " << currentFrame * dt << "\x1b[m" << endl;
+            // cout << "\x1b[34m" << "time " << currentFrame * dt << "\x1b[m" << endl;
 
             // prevFrame,nextFrame設定
             int prevFrame = std::max(currentFrame - 1, 0);
@@ -528,7 +529,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string 
             mBody->calcForwardKinematics(true,true);// 状態更新
             mBody->calcCenterOfMass(); // update wc
 
-            wholeBodyConstraintPtr->update();
+            wholeBodyConstraintPtr->update(debugstream);
 
             // step 2
             // cout << " step2";
@@ -606,7 +607,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string 
             mBody->rootLink()->p() += dq.segment(mBody->numJoints(),3) * dt;
             Vector3d omega = mBody->rootLink()->R().transpose() * dq.segment(mBody->numJoints()+3,3);// w is in world frame, omega is in body frame
             if(omega.norm() != 0) mBody->rootLink()->R() = mBody->rootLink()->R() * AngleAxisd(omega.norm()*dt, omega.normalized());
-            else cout << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
+            else debugstream << "RootLink orientation is not modified (idx:" << currentFrame << ")"<< endl;
 
             // q更新
             for(int i = 0; i < mBody->numJoints(); ++i){
@@ -643,6 +644,12 @@ void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string 
                     else eeOfs << " " << link->v().transpose() << " " << link->w().transpose();
                 }
                 eeOfs << endl;
+            }
+
+            if(debugstream.str().size() > 0){
+                cout << "\x1b[34m" << "time: " << currentFrame * dt << " s" << "\x1b[m" << endl;
+                cout << debugstream.str();
+                debugstream.str("");
             }
 
         }// end motion loop

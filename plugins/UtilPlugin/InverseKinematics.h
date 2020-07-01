@@ -4,6 +4,7 @@
 #pragma once
 
 #include <iostream>
+#include <sstream>
 #include <set>
 
 #include <cnoid/src/Util/EigenTypes.h>
@@ -63,9 +64,9 @@ public:
         updateWeight();
     }
 
-    void update() {
+    void update(std::stringstream& debugstream) {
         // update jacobian
-        updateJacobian();
+        updateJacobian(debugstream);
 
         // update weight
         updateWeight();
@@ -111,7 +112,7 @@ protected:
     // FirstOrderLowPassFilter<VectorXd> twistFilter_;
     MovingAverageFilter<VectorXd> twistFilter_;
 
-    void updateJacobian() {
+    void updateJacobian(std::stringstream& debugstream) {
         // jacobianWholeBody
         MatrixXd J;
         J.resize(6,numJoints()); this->calcJacobian(J);
@@ -141,7 +142,7 @@ protected:
         double manipulability_thresh = 0.06;
         MatrixXd srInvJ2_ = SRInverse(J2_,1,manipulability_thresh);
         double manipulability = calcManipulability(J2_);
-        if( manipulability < manipulability_thresh ) std::cout << "low manipulability of J2_:" << manipulability << " < " << manipulability_thresh << std::endl;
+        if( manipulability < manipulability_thresh ) debugstream << "low manipulability of J2_:" << manipulability << " < " << manipulability_thresh << std::endl;
 
         MatrixXd invJ1 = pseudoJ1 - nullJ1*srInvJ2_*J2*pseudoJ1;
         MatrixXd invJ2 = nullJ1*srInvJ2_;
@@ -178,10 +179,10 @@ public:
         numTotalJoints_ = numBodyJoints_ + numVirtualBaseJoints_;
     }
 
-    void update() {
+    void update(std::stringstream& debugstream) {
         exclusiveJointIdSet_.clear();
         for(auto jointPathPtr : constraintJointPathVec) {
-            jointPathPtr->update();
+            jointPathPtr->update(debugstream);
             for(int i=0; i<jointPathPtr->numJoints(); ++i) exclusiveJointIdSet_.insert(jointPathPtr->joint(i)->jointId());
         }
 
