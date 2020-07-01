@@ -31,47 +31,47 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     const double dt = 1.0/motion.frameRate();
     const int cycle = T/dt;
     const int numFrames = motion.numFrames();
-    Vector3Seq refZmpSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq());
-    Vector3Seq refCMSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refCM")->seq());
-    Vector3Seq refPSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refP")->seq());
-    Vector3Seq refLSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refL")->seq());
-    MultiValueSeq refWrenchesSeq = *(bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq());
-    MultiValueSeq optionalDataSeq = *(bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("optionaldata")->seq());
+    std::shared_ptr<Vector3Seq> refZmpSeq = getOrCreateVector3SeqOfBodyMotionItem("ZMP", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", bodyMotionItemPtr);
+    std::shared_ptr<MultiValueSeq> refWrenchesSeq = getOrCreateMultiValueSeqOfBodyMotionItem("wrenches", bodyMotionItemPtr);
+    std::shared_ptr<MultiValueSeq> optionalDataSeq = getOrCreateMultiValueSeqOfBodyMotionItem("optionaldata", bodyMotionItemPtr);
 
     const double wrenchDim = 6;
-    const int numContacts = refWrenchesSeq.frame(0).size()/wrenchDim;
+    const int numContacts = refWrenchesSeq->frame(0).size()/wrenchDim;
     for(int i=0; i<numFrames-cycle; i+=cycle){
-        Vector3d frontZmp = refZmpSeq.at(i);
-        Vector3d diffZmp = refZmpSeq.at(i+cycle) - frontZmp;
-        Vector3d frontCM = refCMSeq.at(i);
-        Vector3d diffCM = refCMSeq.at(i+cycle) - frontCM;
-        Vector3d frontP = refPSeq.at(i);
-        Vector3d diffP = refPSeq.at(i+cycle) - frontP;
-        Vector3d frontL = refLSeq.at(i);
-        Vector3d diffL = refLSeq.at(i+cycle) - frontL;
+        Vector3d frontZmp = refZmpSeq->at(i);
+        Vector3d diffZmp = refZmpSeq->at(i+cycle) - frontZmp;
+        Vector3d frontCM = refCMSeq->at(i);
+        Vector3d diffCM = refCMSeq->at(i+cycle) - frontCM;
+        Vector3d frontP = refPSeq->at(i);
+        Vector3d diffP = refPSeq->at(i+cycle) - frontP;
+        Vector3d frontL = refLSeq->at(i);
+        Vector3d diffL = refLSeq->at(i+cycle) - frontL;
         for(int j=1; j<cycle; ++j){
             double r = ((double)j/cycle);
-            refZmpSeq.at(i+j) = frontZmp + r*diffZmp;
+            refZmpSeq->at(i+j) = frontZmp + r*diffZmp;
             Vector3d CM = frontCM + r*diffCM;
-            CM.z() = refCMSeq.at(i+j).z(); // keep z coodinates
-            refCMSeq.at(i+j) = CM;
+            CM.z() = refCMSeq->at(i+j).z(); // keep z coodinates
+            refCMSeq->at(i+j) = CM;
             Vector3d P = frontP + r*diffP;
-            P.z() = refPSeq.at(i+j).z(); // keep z coodinates
-            refPSeq.at(i+j) = P;
-            refLSeq.at(i+j) = frontL + r*diffL;
+            P.z() = refPSeq->at(i+j).z(); // keep z coodinates
+            refPSeq->at(i+j) = P;
+            refLSeq->at(i+j) = frontL + r*diffL;
         }
 
-        MultiValueSeq::Frame frontWrenches = refWrenchesSeq.frame(i);
-        MultiValueSeq::Frame nextWrenches = refWrenchesSeq.frame(i+cycle);
+        MultiValueSeq::Frame frontWrenches = refWrenchesSeq->frame(i);
+        MultiValueSeq::Frame nextWrenches = refWrenchesSeq->frame(i+cycle);
         std::vector<VectorXd> frontWrenchVec, nextWrenchVec;
         std::vector<int> frontIdxVec, nextIdxVec;
         for(int k=0; k<numContacts; ++k){// find front wrench
             frontWrenchVec.push_back(VectorXd::Zero(wrenchDim));
             for(int ii=0; ii<wrenchDim; ++ii) frontWrenchVec[k](ii) = frontWrenches[k*wrenchDim+ii];
             frontIdxVec.push_back(0);
-            if(!optionalDataSeq.frame(i+0)[k]){
+            if(!optionalDataSeq->frame(i+0)[k]){
                 for(int j=1; j<cycle; ++j){
-                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeq.frame(i+j);
+                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeq->frame(i+j);
                     if(optionalDataFrame[k] == 0){
                         frontWrenchVec[k] = VectorXd::Zero(wrenchDim);
                         frontIdxVec[k] = j;
@@ -83,9 +83,9 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             nextWrenchVec.push_back(VectorXd::Zero(wrenchDim));
             for(int ii=0; ii<wrenchDim; ++ii) nextWrenchVec[k](ii) = nextWrenches[k*wrenchDim+ii];
             nextIdxVec.push_back(cycle);
-            if(!optionalDataSeq.frame(i+cycle)[k]){
+            if(!optionalDataSeq->frame(i+cycle)[k]){
                 for(int j=cycle; j>1; --j){
-                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeq.frame(i+j);
+                    MultiValueSeq::Frame optionalDataFrame = optionalDataSeq->frame(i+j);
                     if(optionalDataFrame[k] == 0){
                         nextWrenchVec[k] = VectorXd::Zero(wrenchDim);
                         nextIdxVec[k] = j;
@@ -97,15 +97,15 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
             for(int j=frontIdxVec[k]+1; j<nextIdxVec[k]; ++j){
                 double r= ((double)(j-frontIdxVec[k])/(nextIdxVec[k]-frontIdxVec[k]));
                 for(int ii=0; ii<wrenchDim; ++ii){
-                    refWrenchesSeq.frame(i+j)[k*wrenchDim+ii] = (1-r)*frontWrenchVec[k](ii) + r*nextWrenchVec[k](ii);
+                    refWrenchesSeq->frame(i+j)[k*wrenchDim+ii] = (1-r)*frontWrenchVec[k](ii) + r*nextWrenchVec[k](ii);
                 }
             }
         }
         // overwrite optionalData (slide contact -1 -> 0 or 1)
         for(int j=0; j<cycle; ++j){
             for(int k=0; k<numContacts; ++k){
-                // if(optionalDataSeq.frame(i+j)[k] == -1) optionalDataSeq.frame(i+j)[k] = 0;// single foot slide
-                if(optionalDataSeq.frame(i+j)[k] == -1) optionalDataSeq.frame(i+j)[k] = 1;// both feet slide (temporally toe/heel contact)
+                // if(optionalDataSeq->frame(i+j)[k] == -1) optionalDataSeq->frame(i+j)[k] = 0;// single foot slide
+                if(optionalDataSeq->frame(i+j)[k] == -1) optionalDataSeq->frame(i+j)[k] = 1;// both feet slide (temporally toe/heel contact)
             }
         }
     }
@@ -113,13 +113,13 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     {
         int finalDivisibleIdx = ((int) numFrames/cycle)*cycle;
         cout << "Remainder frame is from " << finalDivisibleIdx << " (" << finalDivisibleIdx*dt << "[sec]) to " << numFrames << " (" << numFrames*dt << "[sec])" << endl;
-        MultiValueSeq::Frame lastWrenchFrame = refWrenchesSeq.frame(finalDivisibleIdx);
+        MultiValueSeq::Frame lastWrenchFrame = refWrenchesSeq->frame(finalDivisibleIdx);
         for(int i=finalDivisibleIdx+1; i<numFrames; ++i){
-            refZmpSeq.at(i) = refZmpSeq.at(finalDivisibleIdx);
-            refCMSeq.at(i) = refCMSeq.at(finalDivisibleIdx);
-            refPSeq.at(i) = refPSeq.at(finalDivisibleIdx);
-            refLSeq.at(i) = refLSeq.at(finalDivisibleIdx);
-            for(int k=0; k<lastWrenchFrame.size(); ++k) refWrenchesSeq.frame(i)[k] = lastWrenchFrame[k];
+            refZmpSeq->at(i) = refZmpSeq->at(finalDivisibleIdx);
+            refCMSeq->at(i) = refCMSeq->at(finalDivisibleIdx);
+            refPSeq->at(i) = refPSeq->at(finalDivisibleIdx);
+            refLSeq->at(i) = refLSeq->at(finalDivisibleIdx);
+            for(int k=0; k<lastWrenchFrame.size(); ++k) refWrenchesSeq->frame(i)[k] = lastWrenchFrame[k];
         }
     }
 
@@ -127,22 +127,22 @@ void cnoid::interpolateExtraSeq(BodyMotionItemPtr& bodyMotionItemPtr, double T)
     Vector3d prevZmp;
     int prevIdx;
     for(int i=0; i<numFrames; ++i){
-        Vector3d zmp = refZmpSeq.at(i);
+        Vector3d zmp = refZmpSeq->at(i);
         if(std::isnan(zmp.x())){ // check x coordinate
             int nextVaridIdx = i;
-            while(std::isnan(refZmpSeq.at(nextVaridIdx).x())) ++nextVaridIdx; // check x coordinate
-            Vector3d diffZmp = refZmpSeq.at(nextVaridIdx) - prevZmp;
+            while(std::isnan(refZmpSeq->at(nextVaridIdx).x())) ++nextVaridIdx; // check x coordinate
+            Vector3d diffZmp = refZmpSeq->at(nextVaridIdx) - prevZmp;
             cout << "jumping phase(nan check): " << prevIdx << " -> " << nextVaridIdx << endl;
             int startInterpolationIdx = prevIdx + cycle;
             int stopInterpolationIdx = nextVaridIdx - cycle;
             for(int j=prevIdx+1; j<startInterpolationIdx; ++j){
-                refZmpSeq.at(j) = prevZmp;
+                refZmpSeq->at(j) = prevZmp;
             }
             for(int j=startInterpolationIdx; j<stopInterpolationIdx; ++j){
-                refZmpSeq.at(j) = ((double)(j - startInterpolationIdx))/(stopInterpolationIdx - startInterpolationIdx)*diffZmp + prevZmp;
+                refZmpSeq->at(j) = ((double)(j - startInterpolationIdx))/(stopInterpolationIdx - startInterpolationIdx)*diffZmp + prevZmp;
             }
             for(int j=stopInterpolationIdx; j<nextVaridIdx; ++j){
-                refZmpSeq.at(j) = prevZmp + diffZmp;
+                refZmpSeq->at(j) = prevZmp + diffZmp;
             }
 
             i = nextVaridIdx;

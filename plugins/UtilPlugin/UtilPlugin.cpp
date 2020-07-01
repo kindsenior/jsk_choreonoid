@@ -151,6 +151,23 @@ bool isContactStateChanging(const PoseSeq::iterator poseIter, const PoseSeqPtr p
     return true;
 }
 
+template <class SeqType, class ItemType>
+std::shared_ptr<SeqType> getOrCreateSeqOfBodyMotionItem(std::string seqName, cnoid::BodyMotionItemPtr bodyMotionItem)
+{
+    std::shared_ptr<SeqType> seq;
+    auto seqItemPtr = bodyMotionItem->findSubItem<ItemType>(seqName);
+    // ItemType* seqItemPtr = bodyMotionItem->findSubItem<ItemType>(seqName);
+    if(!seqItemPtr){
+        seq = bodyMotionItem->motion()->getOrCreateExtraSeq<SeqType>(seqName);
+        seqItemPtr = new ItemType(seq);
+        seqItemPtr->setName(seqName);
+        bodyMotionItem->addSubItem(seqItemPtr);
+    }else{
+        seq = seqItemPtr->seq();
+    }
+    return seq;
+}
+
 }
 
 // calc COM, Momentum, Angular Momentum
@@ -180,11 +197,11 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
     for(auto link : endEffectorLinkVec) for(auto columnHeadKey : columnHeadKeyVec) eeOfs << " init" << link->name() << columnHeadKey;
     eeOfs << endl;
 
-    Vector3Seq& initCMSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initCM"));
-    Vector3Seq& initPSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initP"));
-    Vector3Seq& initLSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("initL"));
-    MultiValueSeq& initdqSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("initdq"));
-    initdqSeq.setNumParts(numJoints,true);
+    std::shared_ptr<Vector3Seq> initCMSeq = getOrCreateVector3SeqOfBodyMotionItem("initCM", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> initPSeq = getOrCreateVector3SeqOfBodyMotionItem("initP", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> initLSeq = getOrCreateVector3SeqOfBodyMotionItem("initL", bodyMotionItemPtr);
+    std::shared_ptr<MultiValueSeq> initdqSeq = getOrCreateMultiValueSeqOfBodyMotionItem("initdq", bodyMotionItemPtr);
+    initdqSeq->setNumParts(numJoints,true);
     int numFrames = motion.numFrames();
 
     cout << " numFrames: " << numFrames << endl;
@@ -199,13 +216,13 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
         L -= CM.cross(P);// convert to around CoM
         // L << 0,0,0; // overwrite L to 0,0,0
 
-        initCMSeq.at(i) = CM;
+        initCMSeq->at(i) = CM;
         // calculate momentum in simple model
-        P = filter.update(m*(CM - initCMSeq.at(max(i-1,0)))/dt); //use median filter
-        initPSeq.at(i) = P;
-        initLSeq.at(i) = L;
+        P = filter.update(m*(CM - initCMSeq->at(max(i-1,0)))/dt); //use median filter
+        initPSeq->at(i) = P;
+        initLSeq->at(i) = L;
 
-        MultiValueSeq::Frame frame = initdqSeq.frame(i);
+        MultiValueSeq::Frame frame = initdqSeq->frame(i);
         for(int j=0; j<numJoints; ++j) frame[j] = body->link(j)->dq();
 
         ofs << i*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << endl;
@@ -215,10 +232,6 @@ void cnoid::generateInitSeq(BodyPtr body, PoseSeqItemPtr& poseSeqItemPtr, std::v
         }
         eeOfs << endl;
     }
-    setSubItem("initCM", initCMSeq, bodyMotionItemPtr);
-    setSubItem("initP", initPSeq, bodyMotionItemPtr);
-    setSubItem("initL", initLSeq, bodyMotionItemPtr);
-    setSubItem("initdq", initdqSeq, bodyMotionItemPtr);
 
     ofs.close();
     eeOfs.close();
@@ -456,8 +469,8 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
 
     int linkNum = linkVec.size();
     int frameRate = motion.frameRate();
-    MultiValueSeq& optionalDataSeq = *(motion.getOrCreateExtraSeq<MultiValueSeq>("optionaldata"));
-    optionalDataSeq.setNumParts(linkNum*2,true);
+    std::shared_ptr<MultiValueSeq> optionalDataSeq = getOrCreateMultiValueSeqOfBodyMotionItem("optionaldata", bodyMotionItemPtr);
+    optionalDataSeq->setNumParts(linkNum*2,true);
 
     int j = 0;
     for(auto link: linkVec){
@@ -470,7 +483,7 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
             if(contactState > 1)  optionalDataState = 0;
 
             for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
-                MultiValueSeq::Frame frame = optionalDataSeq.frame(i);
+                MultiValueSeq::Frame frame = optionalDataSeq->frame(i);
                 frame[j] = optionalDataState;
                 frame[j+linkNum] = frontPoseIter->time() - i/(double)frameRate;
             }
@@ -482,13 +495,12 @@ void cnoid::generateOptionalData(BodyPtr& body, const PoseSeqItemPtr& poseSeqIte
 
     // final frame is the same with the previous frame
     {
-        MultiValueSeq::Frame finalFrame = optionalDataSeq.frame(motion.numFrames()-1);
-        MultiValueSeq::Frame preFinalFrame = optionalDataSeq.frame(motion.numFrames()-2);
+        MultiValueSeq::Frame finalFrame = optionalDataSeq->frame(motion.numFrames()-1);
+        MultiValueSeq::Frame preFinalFrame = optionalDataSeq->frame(motion.numFrames()-2);
         for(int j=0; j<linkNum*2; ++j) finalFrame[j] = preFinalFrame[j];
     }
     cout << endl << endl;
 
-    setSubItem("optionaldata", optionalDataSeq, bodyMotionItemPtr);
 }
 
 // 接触力によるトルクのみ計算 リンクの慣性力によるトルクは含まれていない
@@ -500,10 +512,10 @@ void cnoid::generateTorque(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, 
     BodyMotionItemPtr bodyMotionItemPtr = poseSeqItemPtr->bodyMotionItem();
     BodyMotion& motion = *(bodyMotionItemPtr->motion());
 
-    MultiValueSeq& torqueSeq = *(motion.getOrCreateExtraSeq<MultiValueSeq>("torque"));
-    torqueSeq.setNumParts(body->numJoints(),true);
+    std::shared_ptr<MultiValueSeq> torqueSeq = getOrCreateMultiValueSeqOfBodyMotionItem("torque", bodyMotionItemPtr);
+    torqueSeq->setNumParts(body->numJoints(),true);
 
-    MultiValueSeq& wrenchSeq = *(bodyMotionItemPtr->findSubItem<MultiValueSeqItem>("wrenches")->seq());
+    std::shared_ptr<MultiValueSeq> wrenchSeq = getOrCreateMultiValueSeqOfBodyMotionItem("wrenches", bodyMotionItemPtr);
 
     const int wrenchDim = 6;
     std::vector<std::shared_ptr<JointPath>> jointPathVec;
@@ -514,8 +526,8 @@ void cnoid::generateTorque(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, 
         updateBodyState(body, motion, i);
         body->calcForwardKinematics();
 
-        MultiValueSeq::Frame torqueFrame = torqueSeq.frame(i);
-        MultiValueSeq::Frame wrenchFrame = wrenchSeq.frame(i);
+        MultiValueSeq::Frame torqueFrame = torqueSeq->frame(i);
+        MultiValueSeq::Frame wrenchFrame = wrenchSeq->frame(i);
         int idxOffset = 0;
         for(auto jointPathPtr : jointPathVec){
             VectorXd wrench(wrenchDim);
@@ -531,7 +543,6 @@ void cnoid::generateTorque(BodyPtr& body, const PoseSeqItemPtr& poseSeqItemPtr, 
     }
     cout << endl << endl;
 
-    setSubItem("torque", torqueSeq, bodyMotionItemPtr);
 }
 
 bool cnoid::getEndEffectorLinkVector(std::vector<Link*>& endEffectorLinkVec, BodyPtr& body)
@@ -656,28 +667,12 @@ Matrix3d cnoid::D(Vector3d r)
 }
 
 
-void cnoid::setSubItem(std::string seqName, const Vector3Seq& seq, BodyMotionItem* pBodyMotionItem)
-{
-    Vector3SeqItemPtr seqItemPtr = pBodyMotionItem->findSubItem<Vector3SeqItem>(seqName);
-    if(!seqItemPtr){
-        seqItemPtr = new Vector3SeqItem(std::make_shared<Vector3Seq>(seq));
-        seqItemPtr->setName(seqName);
-        pBodyMotionItem->addSubItem(seqItemPtr);
-    }else{
-        seqItemPtr->seq() = std::make_shared<Vector3Seq>(seq);
-    }
+std::shared_ptr<MultiValueSeq> cnoid::getOrCreateMultiValueSeqOfBodyMotionItem(std::string seqName, BodyMotionItemPtr bodyMotionItem){
+    return ::getOrCreateSeqOfBodyMotionItem<MultiValueSeq, MultiValueSeqItem>(seqName, bodyMotionItem);
 }
 
-void cnoid::setSubItem(std::string seqName, const MultiValueSeq& seq, BodyMotionItem* pBodyMotionItem)
-{
-    MultiValueSeqItemPtr seqItemPtr = pBodyMotionItem->findSubItem<MultiValueSeqItem>(seqName);
-    if(!seqItemPtr){
-        seqItemPtr = new MultiValueSeqItem(std::make_shared<MultiValueSeq>(seq));
-        seqItemPtr->setName(seqName);
-        pBodyMotionItem->addSubItem(seqItemPtr);
-    }else{
-        seqItemPtr->seq() = std::make_shared<MultiValueSeq>(seq);
-    }
+std::shared_ptr<Vector3Seq> cnoid::getOrCreateVector3SeqOfBodyMotionItem(std::string seqName, BodyMotionItemPtr bodyMotionItem){
+    return ::getOrCreateSeqOfBodyMotionItem<Vector3Seq, Vector3SeqItem>(seqName, bodyMotionItem);
 }
 
 double cnoid::thresh(double x, double thresh, double target){return fabs(x) > thresh ? x : target;}

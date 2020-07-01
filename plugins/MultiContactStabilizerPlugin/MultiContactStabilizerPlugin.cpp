@@ -30,9 +30,9 @@ void cnoid::sweepControl(boost::filesystem::path logPath, std::string paramStr, 
 
     ofs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
 
-    Vector3Seq refCMSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM"));
-    Vector3Seq refPSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP"));
-    Vector3Seq refLSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL"));
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", bodyMotionItemPtr);
 
     for(int i=0; i < numFrames + mcs->numWindows(); ++i){
         // if(i > mcs->numWindows() + 1) goto BREAK;
@@ -51,9 +51,9 @@ void cnoid::sweepControl(boost::filesystem::path logPath, std::string paramStr, 
             P << x0[1],x0[3],0;
             L << x0[4],x0[5],0;
             CM /= body->mass();
-            refCMSeq.at(i - mcs->numWindows()) = CM;
-            refPSeq.at(i - mcs->numWindows()) = P;
-            refLSeq.at(i - mcs->numWindows()) = L;
+            refCMSeq->at(i - mcs->numWindows()) = CM;
+            refPSeq->at(i - mcs->numWindows()) = P;
+            refLSeq->at(i - mcs->numWindows()) = L;
             ofs << (i - mcs->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
         }
     }
@@ -65,9 +65,6 @@ void cnoid::sweepControl(boost::filesystem::path logPath, std::string paramStr, 
     // }
  // BREAK:
 
-    setSubItem("refCM", refCMSeq, bodyMotionItemPtr);
-    setSubItem("refP", refPSeq, bodyMotionItemPtr);
-    setSubItem("refL", refLSeq, bodyMotionItemPtr);
 
     ofs.close();
 

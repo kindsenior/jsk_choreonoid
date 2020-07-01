@@ -41,14 +41,12 @@ void cnoid::loadExtraSeq(boost::filesystem::path logPath ,std::string paramStr, 
     BodyMotion& motion = *(bodyMotionItemPtr->motion());
     const double dt = ((double)1)/motion.frameRate();
 
-    Vector3Seq refCMSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM"));
-    Vector3Seq refPSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refP"));
-    Vector3Seq refLSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("refL"));
-    // Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
-    // Vector3SeqPtr refZmpSeqPtr = getOrCreateZMPSeq(*motion);// motionのZMP
-    Vector3Seq refZmpSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq());
-    MultiValueSeq refWrenchesSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches"));
-    refWrenchesSeq.setNumParts(6*4,true);
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refZmpSeq = getOrCreateVector3SeqOfBodyMotionItem("ZMP", bodyMotionItemPtr);
+    std::shared_ptr<MultiValueSeq> refWrenchesSeq = getOrCreateMultiValueSeqOfBodyMotionItem("wrenches", bodyMotionItemPtr);
+    refWrenchesSeq->setNumParts(6*4,true);
 
     std::vector<std::vector<string>> limbKeysVec{{"rleg"},{"lleg"},{"rarm"},{"larm"}};
 
@@ -92,15 +90,15 @@ void cnoid::loadExtraSeq(boost::filesystem::path logPath ,std::string paramStr, 
             zmp.x() += -n.y()+p.x()*f.z();// 遊脚の場合は発散する
             zmp.y() +=  n.x()+p.y()*f.z();
         }
-        refCMSeq.at(i*cycle) = CM;
-        refPSeq.at(i*cycle) = P;
-        refLSeq.at(i*cycle) = L;
+        refCMSeq->at(i*cycle) = CM;
+        refPSeq->at(i*cycle) = P;
+        refLSeq->at(i*cycle) = L;
         zmp /= Fz;
-        refZmpSeq.at(i*cycle) = zmp;
+        refZmpSeq->at(i*cycle) = zmp;
 
         // refWrenchsSeq
         {
-            MultiValueSeq::Frame wrenches = refWrenchesSeq.frame(i*cycle);
+            MultiValueSeq::Frame wrenches = refWrenchesSeq->frame(i*cycle);
             int idx = 0;
             for(auto limbKeys : limbKeysVec){
                 VectorXd wrenchVec = VectorXd::Zero(6);
@@ -122,13 +120,9 @@ void cnoid::loadExtraSeq(boost::filesystem::path logPath ,std::string paramStr, 
                 for(int j=0; j<6; ++j) wrenches[idx+j] = wrenchVec[j];
                 idx += 6;
             }
-            refWrenchesSeq.frame(i*cycle) = wrenches;
+            refWrenchesSeq->frame(i*cycle) = wrenches;
         }
     }
-    setSubItem("refCM", refCMSeq, bodyMotionItemPtr);
-    setSubItem("refP", refPSeq, bodyMotionItemPtr);
-    setSubItem("refL", refLSeq, bodyMotionItemPtr);
-    setSubItem("wrenches", refWrenchesSeq, bodyMotionItemPtr);
 }
 
 void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, SlideFrictionControl* sfc, BodyPtr& body, BodyMotionItemPtr& bodyMotionItemPtr, const std::set<Link*>& contactLinkCandidateSet)
@@ -147,14 +141,12 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
 
     refPLOfs << "time refCMx refCMy refCMz refPx refPy refPz refLx refLy refLz processTime" << endl;
 
-    Vector3Seq refCMSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refCM")->seq());
-    Vector3Seq refPSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refP")->seq());
-    Vector3Seq refLSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("refL")->seq());
-    // Vector3SeqPtr refZmpSeqPtr = bodyMotionItemPtr->motion()->getOrCreateExtraSeq<Vector3Seq>("ZMP");
-    // Vector3SeqPtr refZmpSeqPtr = getOrCreateZMPSeq(*(bodyMotionItemPtr->motion()));
-    Vector3Seq refZmpSeq = *(bodyMotionItemPtr->findSubItem<Vector3SeqItem>("ZMP")->seq());
-    MultiValueSeq refWrenchesSeq = *(bodyMotionItemPtr->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches"));
-    refWrenchesSeq.setNumParts(6*4,true);
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", bodyMotionItemPtr);
+    std::shared_ptr<Vector3Seq> refZmpSeq = getOrCreateVector3SeqOfBodyMotionItem("ZMP", bodyMotionItemPtr);
+    std::shared_ptr<MultiValueSeq> refWrenchesSeq = getOrCreateMultiValueSeqOfBodyMotionItem("wrenches", bodyMotionItemPtr);
+    refWrenchesSeq->setNumParts(6*4,true);
 
     std::vector<std::vector<string>> limbKeysVec{{"rleg"},{"lleg"},{"rarm"},{"larm"}};
 
@@ -204,12 +196,12 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
 
             int motionIdx = (i - sfc->numWindows())*cycle;
             Vector3d CM,P,L;
-            CM << x0[0]/body->mass(),x0[2]/body->mass(),refCMSeq.at(motionIdx).z(); // keep z coordinate
-            P << x0[1],x0[3],refPSeq.at(motionIdx).z(); // keep z coordinate
+            CM << x0[0]/body->mass(),x0[2]/body->mass(),refCMSeq->at(motionIdx).z(); // keep z coordinate
+            P << x0[1],x0[3],refPSeq->at(motionIdx).z(); // keep z coordinate
             L << x0[4],x0[5],x0[6];
-            refCMSeq.at(motionIdx) = CM;
-            refPSeq.at(motionIdx) = P;
-            refLSeq.at(motionIdx) = L;
+            refCMSeq->at(motionIdx) = CM;
+            refPSeq->at(motionIdx) = P;
+            refLSeq->at(motionIdx) = L;
             refPLOfs << (i - sfc->numWindows())*dt << " " << CM.transpose() <<  " " << P.transpose() << " " << L.transpose() << " " << processedTime << endl;
 
             SlideFrictionControlParam sfcParam = *(sfc->prevMpcParam);
@@ -271,14 +263,14 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
             }
             zmp.segment(0,2)/= thresh(Fz,1e-5);
             zmp(2) /= numContacts;
-            refZmpSeq.at(motionIdx) = zmp;
+            refZmpSeq->at(motionIdx) = zmp;
             contactOfs << endl;
             wrenchOfs << endl;
 
             // refWrenchsSeq: limbKeysVec's limb order(for sequence file) is not same with contactLinkCandidateSet
             {
                 cout << "wrenches in " << (i - sfc->numWindows())*dt << " sec :";
-                MultiValueSeq::Frame wrenches = refWrenchesSeq.frame(motionIdx);
+                MultiValueSeq::Frame wrenches = refWrenchesSeq->frame(motionIdx);
                 int idx = 0;
                 for(auto limbKeys : limbKeysVec){
                     VectorXd wrenchVec = VectorXd::Zero(6);
@@ -301,22 +293,22 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
                     for(int i=0; i<6; ++i) wrenches[idx+i] = wrenchVec[i];
                     idx += 6;
                 }
-                refWrenchesSeq.frame(motionIdx) = wrenches;
+                refWrenchesSeq->frame(motionIdx) = wrenches;
                 cout << endl;
             }
         }
     }
     {// for final frame's SeqPtr and log file
         int finalMotionIdx = numFrames*cycle;
-        refCMSeq.at(finalMotionIdx) = refCMSeq.at(finalMotionIdx-cycle);
-        refPSeq.at(finalMotionIdx) = refPSeq.at(finalMotionIdx-cycle);
-        refLSeq.at(finalMotionIdx) = refLSeq.at(finalMotionIdx-cycle);
-        refZmpSeq.at(finalMotionIdx) = refZmpSeq.at(finalMotionIdx-cycle);
-        // refWrenchesSeq.frame(finalMotionIdx) = refWrenchesSeq.frame(finalMotionIdx-cycle); // cannot copy frame
-        for(int j=0; j<refWrenchesSeq.getNumParts(); ++j) refWrenchesSeq.frame(finalMotionIdx)[j] = refWrenchesSeq.frame(finalMotionIdx-cycle)[j];
+        refCMSeq->at(finalMotionIdx) = refCMSeq->at(finalMotionIdx-cycle);
+        refPSeq->at(finalMotionIdx) = refPSeq->at(finalMotionIdx-cycle);
+        refLSeq->at(finalMotionIdx) = refLSeq->at(finalMotionIdx-cycle);
+        refZmpSeq->at(finalMotionIdx) = refZmpSeq->at(finalMotionIdx-cycle);
+        // refWrenchesSeq->frame(finalMotionIdx) = refWrenchesSeq->frame(finalMotionIdx-cycle); // cannot copy frame
+        for(int j=0; j<refWrenchesSeq->getNumParts(); ++j) refWrenchesSeq->frame(finalMotionIdx)[j] = refWrenchesSeq->frame(finalMotionIdx-cycle)[j];
 
         double finalTime = numFrames*dt;
-        refPLOfs << finalTime << " " << refCMSeq.at(finalMotionIdx).transpose() << " " << refPSeq.at(finalMotionIdx).transpose() << " " << refLSeq.at(finalMotionIdx).transpose() << " 0" << endl;
+        refPLOfs << finalTime << " " << refCMSeq->at(finalMotionIdx).transpose() << " " << refPSeq->at(finalMotionIdx).transpose() << " " << refLSeq->at(finalMotionIdx).transpose() << " 0" << endl;
         const SlideFrictionControlParam* const finalMpcParam = sfc->mpcParamDeque[0];
         inputPLOfs << finalTime << " " << finalMpcParam->CM.transpose() << " " << finalMpcParam->P.transpose() << " " << finalMpcParam->L.transpose() << " " << finalMpcParam->F.transpose() << endl;
         // contactOfs, wrenchOfs
@@ -343,12 +335,6 @@ void cnoid::sweepControl(boost::filesystem::path logPath ,std::string paramStr, 
         // contact log file is not used in loadExtraSeq
     }
  // BREAK:
-
-    setSubItem("refCM", refCMSeq, bodyMotionItemPtr);
-    setSubItem("refP", refPSeq, bodyMotionItemPtr);
-    setSubItem("refL", refLSeq, bodyMotionItemPtr);
-    // setSubItem("ZMP", refZmpSeq, bodyMotionItemPtr);
-    setSubItem("wrenches", refWrenchesSeq, bodyMotionItemPtr);
 
     refPLOfs.close();
     contactOfs.close();
@@ -534,13 +520,15 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
     const double g = 9.80665;
 
     // initial trajectories
-    Vector3Seq initCMSeq = *(bodyMotionItem->findSubItem<Vector3SeqItem>("initCM")->seq());
-    Vector3Seq initPSeq = *(bodyMotionItem->findSubItem<Vector3SeqItem>("initP")->seq());
-    Vector3Seq initLSeq = *(bodyMotionItem->findSubItem<Vector3SeqItem>("initL")->seq());
 
-    Vector3Seq refCMSeq = *(bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM"));
-    Vector3Seq refPSeq = *(bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP"));
-    Vector3Seq refLSeq = *(bodyMotionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL"));
+
+    std::shared_ptr<Vector3Seq> initCMSeq = getOrCreateVector3SeqOfBodyMotionItem("initCM", bodyMotionItem);
+    std::shared_ptr<Vector3Seq> initPSeq = getOrCreateVector3SeqOfBodyMotionItem("initP", bodyMotionItem);
+    std::shared_ptr<Vector3Seq> initLSeq = getOrCreateVector3SeqOfBodyMotionItem("initL", bodyMotionItem);
+
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", bodyMotionItem);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", bodyMotionItem);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", bodyMotionItem);
 
     Vector3d takeoffdCM, landingdCM;
     double jumpTime;
@@ -573,7 +561,7 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 takeoffIter = frontPoseIter;
                 landingIter = frontPoseIter; incContactPose(landingIter,poseSeq,body);
                 jumpTime = landingIter->time() - takeoffIter->time() + jumpFrameOffset*dt;// add jumpFrameOffset
-                Vector3d takeoffCM = initCMSeq.at(takeoffIter->time()*frameRate), landingCM = initCMSeq.at(landingIter->time()*frameRate + jumpFrameOffset);// add jumpFrameOffset
+                Vector3d takeoffCM = initCMSeq->at(takeoffIter->time()*frameRate), landingCM = initCMSeq->at(landingIter->time()*frameRate + jumpFrameOffset);// add jumpFrameOffset
                 takeoffdCM = (landingCM - takeoffCM) / jumpTime;
                 landingdCM = takeoffdCM;
                 takeoffdCM.z() = 0.5 * g * jumpTime + (landingCM.z() - takeoffCM.z()) / jumpTime;
@@ -583,8 +571,8 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 endPoseIter = frontPoseIter;
                 startFrame = startPoseIter->time()*frameRate; endFrame = endPoseIter->time()*frameRate;
                 startTime = startFrame*dt; endTime = endFrame*dt;
-                startCM = initCMSeq.at(startFrame); endCM = initCMSeq.at(endFrame);
-                startP = initPSeq.at(startFrame);   endP = initPSeq.at(endFrame); // use simple model momentum calculated by UtilPlugin
+                startCM = initCMSeq->at(startFrame); endCM = initCMSeq->at(endFrame);
+                startP = initPSeq->at(startFrame);   endP = initPSeq->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
                 // interpolator.calcCoefficients(startCM,startP/m, endCM,takeoffdCM, endTime - startTime);// spline
                 interpolator.calcCoefficients(startCM,startP/m,Vector3d::Zero(), endCM,takeoffdCM,Vector3(0,0,-g), endTime - startTime, 0,takeoffPhaseRatioVec);// acc
@@ -599,8 +587,8 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 startFrame = startPoseIter->time()*frameRate + jumpFrameOffset; endFrame = min((int)(endPoseIter->time()*frameRate) + delayOffset, numFrames-1);// add jumpFrameOffset for fz differential or delay
                 startTime = startFrame*dt; endTime = endFrame*dt;// add delay
 
-                startCM = initCMSeq.at(startFrame); endCM = initCMSeq.at(endFrame);
-                startP = initPSeq.at(startFrame);   endP = initPSeq.at(endFrame); // use simple model momentum calculated by UtilPlugin
+                startCM = initCMSeq->at(startFrame); endCM = initCMSeq->at(endFrame);
+                startP = initPSeq->at(startFrame);   endP = initPSeq->at(endFrame); // use simple model momentum calculated by UtilPlugin
 
                 // interpolator.calcCoefficients(startCM,landingdCM, endCM,endP/m, endTime - startTime);// spline
                 interpolator.calcCoefficients(startCM,landingdCM,Vector3(0,0,-g), endCM,endP/m,Vector3d::Zero(), endTime - startTime, 0,landingPhaseRatioVec);// acc
@@ -614,10 +602,10 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             // for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
             cout << "  set init value: " << copyStartFrame << " -> " << copyEndFrame << endl;
             for(int i=copyStartFrame; i < copyEndFrame; ++i){
-                refCMSeq.at(i) = initCMSeq.at(i);
-                refPSeq.at(i) = initPSeq.at(i);
-                // refLSeq.at(i) = Vector3d(0,0,0);
-                refLSeq.at(i) = initLSeq.at(i);
+                refCMSeq->at(i) = initCMSeq->at(i);
+                refPSeq->at(i) = initPSeq->at(i);
+                // refLSeq->at(i) = Vector3d(0,0,0);
+                refLSeq->at(i) = initLSeq->at(i);
             }
             // for(int i=startPoseIter->time()*frameRate; i < endPoseIter->time()*frameRate; ++i){
             // for(int i=startPoseIter->time()*frameRate; i < endFrame; ++i){ // use endFrame including delay
@@ -631,30 +619,30 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
                 // CM.z() = (a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5).z(); // only overwrite z coordinate
                 // P.z() = m*(a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4).z();
 
-                refCMSeq.at(i) = CM;
-                refPSeq.at(i) = P;
-                // refLSeq.at(i) = Vector3d(0,0,0);
-                refLSeq.at(i) = initLSeq.at(i);
+                refCMSeq->at(i) = CM;
+                refPSeq->at(i) = P;
+                // refLSeq->at(i) = Vector3d(0,0,0);
+                refLSeq->at(i) = initLSeq->at(i);
             }
         }else if(isJumping){// jumping phases
             // cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: jumping phase\x1b[m" << endl;
             startFrame = backPoseIter->time()*frameRate; endFrame = frontPoseIter->time()*frameRate + jumpFrameOffset;// add  jumpFrameOffset for fz differential
             double startTime = startFrame*dt, endTime = endFrame*dt;// add delay
-            Vector3d startCM = initCMSeq.at(startFrame), endCM = initCMSeq.at(endFrame);
-            Vector3d startP = initPSeq.at(startFrame),   endP = initPSeq.at(endFrame); // use simple model momentum calculated by UtilPlugin
+            Vector3d startCM = initCMSeq->at(startFrame), endCM = initCMSeq->at(endFrame);
+            Vector3d startP = initPSeq->at(startFrame),   endP = initPSeq->at(endFrame); // use simple model momentum calculated by UtilPlugin
             double jumptime = endTime - startTime;
             cout << " \x1b[34m" << startTime << "[sec](" << startFrame << ") -> " << endTime << "[sec](" << endFrame << "): jumping phase\x1b[m" << endl;
             // for(int i=backPoseIter->time()*frameRate; i < frontPoseIter->time()*frameRate; ++i){
             for(int i=startFrame; i < endFrame; ++i){
                 double t = i*dt;
-                Vector3d CM = initCMSeq.at(i), P = initPSeq.at(i);
-                refCMSeq.at(i) = startCM + (endCM - startCM) * (t - startTime) /jumptime; // xy
-                refCMSeq.at(i).z() = - 0.5 * g * (t - startTime) * (t - endTime)
+                Vector3d CM = initCMSeq->at(i), P = initPSeq->at(i);
+                refCMSeq->at(i) = startCM + (endCM - startCM) * (t - startTime) /jumptime; // xy
+                refCMSeq->at(i).z() = - 0.5 * g * (t - startTime) * (t - endTime)
                     + (endCM.z()* (t - startTime) - startCM.z()* (t - endTime)) / jumptime; //z
-                refPSeq.at(i) = m*takeoffdCM; // xy
-                refPSeq.at(i).z() = - m * g * (t - startTime) + m*takeoffdCM.z(); // z
-                // refLSeq.at(i) = Vector3d(0,0,0);
-                refLSeq.at(i) = initLSeq.at(i);
+                refPSeq->at(i) = m*takeoffdCM; // xy
+                refPSeq->at(i).z() = - m * g * (t - startTime) + m*takeoffdCM.z(); // z
+                // refLSeq->at(i) = Vector3d(0,0,0);
+                refLSeq->at(i) = initLSeq->at(i);
             }
         }else{// other phases
             cout << " \x1b[34m" << backPoseIter->time() << "[sec] -> " << frontPoseIter->time() << "[sec]: normal phase\x1b[m" << endl;
@@ -662,18 +650,18 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
             endFrame = (int) (frontPoseIter->time()*frameRate);
             cout << "  set init value: " << startFrame << " -> " << endFrame << endl;
             for(int i=startFrame; i < endFrame; ++i){
-                refCMSeq.at(i) = initCMSeq.at(i);
-                refPSeq.at(i) = initPSeq.at(i);
-                // refLSeq.at(i) = Vector3d(0,0,0);
-                refLSeq.at(i) = initLSeq.at(i);
+                refCMSeq->at(i) = initCMSeq->at(i);
+                refPSeq->at(i) = initPSeq->at(i);
+                // refLSeq->at(i) = Vector3d(0,0,0);
+                refLSeq->at(i) = initLSeq->at(i);
             }
         }
 
         backPoseIter = frontPoseIter;
     }
-    refCMSeq.at(numFrames-1) = refCMSeq.at(numFrames-2);// final frame
-    refPSeq.at(numFrames-1) = refPSeq.at(numFrames-2);
-    refLSeq.at(numFrames-1) = refLSeq.at(numFrames-2);
+    refCMSeq->at(numFrames-1) = refCMSeq->at(numFrames-2);// final frame
+    refPSeq->at(numFrames-1) = refPSeq->at(numFrames-2);
+    refLSeq->at(numFrames-1) = refLSeq->at(numFrames-2);
 
     {
         boost::filesystem::path logPath = getLogPath( boost::filesystem::path(poseSeqItem->filePath()) );
@@ -683,14 +671,11 @@ void cnoid::generateVerticalTrajectory(BodyPtr& body, const PoseSeqItemPtr& pose
         ofs.open(fnamess.str().c_str(), ios::out);
         ofs << "time preCMx preCMy preCMz prePx prePy prePz preLx preLy preLz processTime" << endl;
         for(int i=0; i<numFrames; ++i){
-            ofs << i*dt << " " << refCMSeq.at(i).transpose() << " " << refPSeq.at(i).transpose() << " " << refLSeq.at(i).transpose() << endl;
+            ofs << i*dt << " " << refCMSeq->at(i).transpose() << " " << refPSeq->at(i).transpose() << " " << refLSeq->at(i).transpose() << endl;
         }
         ofs.close();
     }
 
-    setSubItem("refCM", refCMSeq, bodyMotionItem);
-    setSubItem("refP", refPSeq, bodyMotionItem);
-    setSubItem("refL", refLSeq, bodyMotionItem);
 
 }
 
@@ -713,9 +698,9 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
     body->calcForwardKinematics();// use end effector's velocity
 
 
-    Vector3Seq refCMSeq = *(motionItem->findSubItem<Vector3SeqItem>("refCM")->seq());
-    Vector3Seq refPSeq = *(motionItem->findSubItem<Vector3SeqItem>("refP")->seq());
-    Vector3Seq refLSeq = *(motionItem->findSubItem<Vector3SeqItem>("refL")->seq());
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", motionItem);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", motionItem);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", motionItem);
 
     // cnoidのクラス(BodyMotion)からmpcParamDequeを生成
     int index = 0;
@@ -735,20 +720,20 @@ void cnoid::generatePreModelPredictiveControlParamDeque(SlideFrictionControl* sf
 
 
             SlideFrictionControlParam* sfcParam = new SlideFrictionControlParam(index, sfc);
-            Vector3d P = refPSeq.at(i);
-            Vector3d L = refLSeq.at(i);
+            Vector3d P = refPSeq->at(i);
+            Vector3d L = refLSeq->at(i);
             // 動作軌道に依存するパラメータの設定
             if(i == backPoseIter->time()*frameRate){ // 接触状態の変わり目だけ別処理
-                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq.at(i), P, thresh((P - refPSeq.at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq->at(i), P, thresh((P - refPSeq->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, prevCcParamVec, dt);
                 // forward-difference for jump
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeq.at(i), P, L, thresh((refPSeq.at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), bodyItemPtr, ccParamVec, prevCcParamVec, dt);
-                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq.at(i), P, (P - refPSeq.at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
+                ::generateSlideFrictionControlParam(sfcParam, refCMSeq->at(i), P, L, thresh((refPSeq->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), bodyItemPtr, ccParamVec, prevCcParamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq->at(i), P, (P - refPSeq->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, prevCcParamVec, dt);
             }else{
                 std::vector<ContactConstraintParam*> dummyCcparamVec;
-                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq.at(i), P, thresh((P - refPSeq.at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq->at(i), P, thresh((P - refPSeq->at(max(i-1,0)))/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), body, ccParamVec, dummyCcparamVec, dt);
                 // forward-difference for jump
-                ::generateSlideFrictionControlParam(sfcParam, refCMSeq.at(i), P, L, thresh((refPSeq.at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), bodyItemPtr, ccParamVec, dummyCcparamVec, dt);
-                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq.at(i), P, (P - refPSeq.at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, dummyCcparamVec, dt);
+                ::generateSlideFrictionControlParam(sfcParam, refCMSeq->at(i), P, L, thresh((refPSeq->at(min(i+1,numFrames-1))-P)/dt+body->mass()*gVec, 0.0001, Vector3d::Zero(3)), bodyItemPtr, ccParamVec, dummyCcparamVec, dt);
+                // ::generateSlideFrictionControlParam(sfcParam, refCMSeq->at(i), P, (P - refPSeq->at(max(i-1,0)))/dt+body->mass()*gVec, body, ccParamVec, dummyCcparamVec, dt);
             }
 
             sfc->preMpcParamDeque.push_back((SlideFrictionControlParam*) sfcParam);

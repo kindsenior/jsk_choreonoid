@@ -80,8 +80,8 @@ void calcTotalMomentum(Vector3d& P, Vector3d& L, BodyPtr& body, const VectorXd& 
 Matrix3d D(Vector3d r);
 
 
-void setSubItem(std::string seqName, const Vector3Seq& seq, BodyMotionItem* pBodyMotionItem);
-void setSubItem(std::string seqName, const MultiValueSeq& seq, BodyMotionItem* pBodyMotionItem);
+std::shared_ptr<MultiValueSeq> getOrCreateMultiValueSeqOfBodyMotionItem(std::string seqName, BodyMotionItemPtr bodyMotionItem);
+std::shared_ptr<Vector3Seq> getOrCreateVector3SeqOfBodyMotionItem(std::string seqName, BodyMotionItemPtr bodyMotionItem);
 
 double thresh(double x, double thresh, double target = 0);
 VectorXd thresh(VectorXd x, double thresh, VectorXd target = VectorXd::Zero(3));

@@ -88,9 +88,9 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 {
     const BodyMotion& motion = *(motionItem->motion());
 
-    Vector3Seq refCMSeq = *(motionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refCM"));
-    Vector3Seq refPSeq = *(motionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refP"));
-    Vector3Seq refLSeq = *(motionItem->motion()->getOrCreateExtraSeq<Vector3Seq>("refL"));
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", motionItem);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", motionItem);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", motionItem);
 
     stringstream ss,fnamess;
     fnamess << mLogPath.string() << "_RMC_refPL_" << motion.frameRate() << "fps.dat";
@@ -187,7 +187,7 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     for(int i = 0; i < motion.numFrames(); ++i){
         (BodyMotion::ConstFrame) motion.frame(i) >> *mBody;
         mBody->calcForwardKinematics();
-        refCMSeq.at(i) = mBody->calcCenterOfMass();
+        refCMSeq->at(i) = mBody->calcCenterOfMass();
 
         Vector3d v,w;
         VectorXd dq,ddq;
@@ -198,11 +198,11 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
         calcTotalMomentum(P, L, mBody, dq);
 
         ofs1 << dt*i;
-        ofs1 << " " << refCMSeq.at(i).transpose();//重心 2,3,4
+        ofs1 << " " << refCMSeq->at(i).transpose();//重心 2,3,4
         ofs1 << " " << P.transpose();// 運動量 5,6,7
         ofs1 << " " << L.transpose();// 角運動量 8,9,10
         ofs1 << endl;
-        if(i == 1000)cout << "refCM " << refCMSeq.at(i).transpose() << endl;
+        if(i == 1000)cout << "refCM " << refCMSeq->at(i).transpose() << endl;
     }
 
     // 目標運動量 motion loop
@@ -213,15 +213,15 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
     for(int i = 0; i < motion.numFrames(); ++i){
 
         // 角運動量
-        refLSeq.at(i) = Vector3d::Zero(); // overwrite angular momentum to 0
+        refLSeq->at(i) = Vector3d::Zero(); // overwrite angular momentum to 0
 
         // 運動量
         if(takeoffFrame < i && i < landingFrame){// 跳躍期
-            refCMSeq.at(i) = takeoffCM + (landingCM - takeoffCM) * (i-takeoffFrame)*dt /jumptime;
-            refCMSeq.at(i).z() = - 0.5 * g * (i-takeoffFrame)*dt * (i-landingFrame)*dt
+            refCMSeq->at(i) = takeoffCM + (landingCM - takeoffCM) * (i-takeoffFrame)*dt /jumptime;
+            refCMSeq->at(i).z() = - 0.5 * g * (i-takeoffFrame)*dt * (i-landingFrame)*dt
                 + (landingCM.z()* (i-takeoffFrame)*dt - takeoffCM.z()* (i-landingFrame)*dt) / jumptime;
-            refPSeq.at(i) = m * takeoffDCM;
-            refPSeq.at(i).z() = - m * g * (i - takeoffFrame)*dt + m * takeoffDCM.z();
+            refPSeq->at(i) = m * takeoffDCM;
+            refPSeq->at(i).z() = - m * g * (i - takeoffFrame)*dt + m * takeoffDCM.z();
         }else if(initRMCFrame <= i && i <= endRMCFrame){// 接地期
 
             // スプライン補間/躍度最小補間
@@ -240,50 +240,47 @@ void RMControlPlugin::generateRefPLSeq(BodyMotionItem* motionItem ,const PoseSeq
 
             // if(i <= takeoffFrame){
             if(i <= takeoffFrame || true){
-                // refCMSeq.at(i) = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
-                // refPSeq.at(i) = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
-                refCMSeq.at(i) = a[0] + a[1] * (i-startFrame)*dt + a[2] * pow ( (i-startFrame)*dt , 2 ) + a[3] * pow( (i-startFrame)*dt, 3 );
-                refPSeq.at(i) = ( a[1] + 2 * a[2] * (i-startFrame)*dt + 3 * a[3] * pow ( (i-startFrame)*dt , 2 ) ) * m;
+                // refCMSeq->at(i) = a0 + a1 * (i-startFrame)*dt + a2 * pow ( (i-startFrame)*dt , 2 ) + a3 * pow( (i-startFrame)*dt, 3 );
+                // refPSeq->at(i) = ( a1 + 2 * a2 * (i-startFrame)*dt + 3 * a3 * pow ( (i-startFrame)*dt , 2 ) ) * m;
+                refCMSeq->at(i) = a[0] + a[1] * (i-startFrame)*dt + a[2] * pow ( (i-startFrame)*dt , 2 ) + a[3] * pow( (i-startFrame)*dt, 3 );
+                refPSeq->at(i) = ( a[1] + 2 * a[2] * (i-startFrame)*dt + 3 * a[3] * pow ( (i-startFrame)*dt , 2 ) ) * m;
             }else{
                 double dT = (i-startFrame)*dt;
                 double dT2 = pow(dT,2), dT3 = pow(dT,3), dT4 = pow(dT,4), dT5 = pow(dT,5);
-                refCMSeq.at(i) = a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5;
-                refPSeq.at(i) = (a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4) * m;
+                refCMSeq->at(i) = a[0] + a[1]*dT + a[2]*dT2 + a[3]*dT3 + a[4]*dT4 + a[5]*dT5;
+                refPSeq->at(i) = (a[1] + 2*a[2]*dT + 3*a[3]*dT2 + 4*a[4]*dT3 + 5*a[5]*dT4) * m;
             }
 
             // 境界条件表示
             if(i == initRMCFrame || i == landingFrame){
                 cout << "time " << i*dt << endl;
                 // cout << "f0 " << f0.transpose() << endl;
-                cout << "refCMSeq " << refCMSeq.at(i).transpose() << endl;
+                cout << "refCMSeq " << refCMSeq->at(i).transpose() << endl;
                 // cout << "v0 " << v0.transpose() << endl;
-                cout << "refPSeq " << refPSeq.at(i).transpose() << endl;
+                cout << "refPSeq " << refPSeq->at(i).transpose() << endl;
                 cout << endl;
             }else if(i == takeoffFrame || i == endRMCFrame){
                 cout << "time " << i*dt << endl;
                 // cout << "f1 " << f1.transpose() << endl;
-                cout << "refCMSeq " << refCMSeq.at(i).transpose() << endl;
+                cout << "refCMSeq " << refCMSeq->at(i).transpose() << endl;
                 // cout << "v1 " << v1.transpose() << endl;
-                cout << "refPSeq " << refPSeq.at(i).transpose() << endl;
+                cout << "refPSeq " << refPSeq->at(i).transpose() << endl;
                 cout << endl;
             }
 
         }else{// 非制御期
             int nextFrame = std::min(i + 1, motion.numFrames() - 1);
-            refPSeq.at(i) = m * (refCMSeq.at(nextFrame) - refCMSeq.at(i)) /dt;
+            refPSeq->at(i) = m * (refCMSeq->at(nextFrame) - refCMSeq->at(i)) /dt;
         }
 
         ofs << i*dt ;
-        ofs <<  " " << refCMSeq.at(i).transpose();// 重心 2,3,4
-        ofs <<  " " << refPSeq.at(i).transpose();// 運動量 5,6,7
-        ofs <<  " " << refLSeq.at(i).transpose();// 角運動量 8,9,10
+        ofs <<  " " << refCMSeq->at(i).transpose();// 重心 2,3,4
+        ofs <<  " " << refPSeq->at(i).transpose();// 運動量 5,6,7
+        ofs <<  " " << refLSeq->at(i).transpose();// 角運動量 8,9,10
         ofs << endl;
 
     }// end motion loop
 
-    setSubItem("refCM", refCMSeq, motionItem);
-    setSubItem("refP", refPSeq, motionItem);
-    setSubItem("refL", refLSeq, motionItem);
 
     ofs.close();
 }
@@ -302,23 +299,23 @@ void RMControlPlugin::loadRefPLSeq(BodyMotionItem* motionItem ,const PoseSeqPtr 
     const double m = mBody->mass();
 
     // 目標重心位置
-    Vector3Seq refCMSeq = *(motionItem->findSubItem<Vector3SeqItem>("refCM")->seq());
-    Vector3Seq refPSeq = *(motionItem->findSubItem<Vector3SeqItem>("refP")->seq());
-    Vector3Seq refLSeq = *(motionItem->findSubItem<Vector3SeqItem>("refL")->seq());
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", motionItem);
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", motionItem);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", motionItem);
 
     // 目標運動量 motion loop
     for(int i = 0; i < motion.numFrames(); ++i){
         // refLSeq[i] = Vector3d::Zero();
-        // refLSeq.at(i) = refLSeq.at(i);
+        // refLSeq->at(i) = refLSeq->at(i);
 
         int nextFrame = std::min( i + 1, motion.numFrames() - 1 );
-        // refPSeq[i] = ( refCMSeq.at(nextFrame) - refCMSeq.at(i) ) / dt;
-        // refPSeq.at(i) = refPSeq.at(i);
+        // refPSeq[i] = ( refCMSeq->at(nextFrame) - refCMSeq->at(i) ) / dt;
+        // refPSeq->at(i) = refPSeq->at(i);
 
         ofs << i*dt;
-        ofs << " " << refCMSeq.at(i).transpose();// 重心 2,3,4
-        ofs << " " << refPSeq.at(i).transpose();// 運動量 5,6,7
-        ofs << " " << refLSeq.at(i).transpose();// 角運動量 8,9,10
+        ofs << " " << refCMSeq->at(i).transpose();// 重心 2,3,4
+        ofs << " " << refPSeq->at(i).transpose();// 運動量 5,6,7
+        ofs << " " << refLSeq->at(i).transpose();// 角運動量 8,9,10
         ofs << endl;
 
     }// end motion loop
@@ -337,10 +334,10 @@ void RMControlPlugin::generateRefWrenchSeq(BodyPtr& body, PoseSeqItemPtr& poseSe
     BodyMotion& motion = *(bodyMotionItem->motion());
 
     int numLinks = endEffectorLinkVec.size();
-    MultiValueSeq refWrenchesSeq = *(bodyMotionItem->motion()->getOrCreateExtraSeq<MultiValueSeq>("wrenches"));
-    refWrenchesSeq.setNumParts(6*numLinks,true);
+    std::shared_ptr<MultiValueSeq> refWrenchesSeq = getOrCreateMultiValueSeqOfBodyMotionItem("wrenches", bodyMotionItem);
+    refWrenchesSeq->setNumParts(6*numLinks,true);
 
-    Vector3Seq refPSeq = *(bodyMotionItem->findSubItem<Vector3SeqItem>("refP")->seq());
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", bodyMotionItem);
 
     const int numFrames = motion.numFrames();
     const int frameRate = motion.frameRate();
@@ -359,9 +356,9 @@ void RMControlPlugin::generateRefWrenchSeq(BodyPtr& body, PoseSeqItemPtr& poseSe
         }
 
         for(int i=backPoseIter->time()*frameRate; (i < frontPoseIter->time()*frameRate) && (i < numFrames); ++i){
-            MultiValueSeq::Frame wrenches = refWrenchesSeq.frame(i);
+            MultiValueSeq::Frame wrenches = refWrenchesSeq->frame(i);
             int idx = 0;
-            Vector3d f = (refPSeq.at(i+1) - refPSeq.at(i))/dt + m*Vector3d(0,0,g);
+            Vector3d f = (refPSeq->at(i+1) - refPSeq->at(i))/dt + m*Vector3d(0,0,g);
             for(int contactState: contactStateVec){// in the order of endEffectorLinkVec
                 switch (contactState){
                 case 0: // stopped contact foot
@@ -381,13 +378,12 @@ void RMControlPlugin::generateRefWrenchSeq(BodyPtr& body, PoseSeqItemPtr& poseSe
                     break;
                 }
             }
-            refWrenchesSeq.frame(i) = wrenches;
+            refWrenchesSeq->frame(i) = wrenches;
         }
 
         backPoseIter = frontPoseIter;
     }
-    refWrenchesSeq.frame(numFrames) = refWrenchesSeq.frame(numFrames-1);// final frame
-    setSubItem("wrenches", refWrenchesSeq, bodyMotionItem);
+    refWrenchesSeq->frame(numFrames) = refWrenchesSeq->frame(numFrames-1);// final frame
 }
 
 void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const std::set<Link*>& contactLinkCandidateSet)
@@ -395,7 +391,7 @@ void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const
     PoseSeqPtr poseSeq = poseSeqItem->poseSeq();
     BodyMotion& motion = *(poseSeqItem->bodyMotionItem()->motion());
 
-    Vector3Seq refCMSeq = *(poseSeqItem->bodyMotionItem()->findSubItem<Vector3SeqItem>("refCM")->seq());
+    std::shared_ptr<Vector3Seq> refCMSeq = getOrCreateVector3SeqOfBodyMotionItem("refCM", poseSeqItem->bodyMotionItem());
 
     const int frameRate = motion.frameRate();
     // const int numFrames = motion.numFrames();
@@ -412,7 +408,7 @@ void RMControlPlugin::modifyJumpingTrajectory(PoseSeqItemPtr& poseSeqItem, const
                 (BodyMotion::ConstFrame) motion.frame(i) >> *mBody;
                 mBody->calcForwardKinematics();
                 Vector3d initCM = mBody->calcCenterOfMass();
-                Vector3d refCM = refCMSeq.at(i);
+                Vector3d refCM = refCMSeq->at(i);
                 // Vector3d rootPos = mBody->rootLink()->p();
                 // for(auto swingLink: swingLinkSet){
                 //     Link* targetLink = mBody->link(swingLink->name());
@@ -432,9 +428,9 @@ void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string 
 {
     BodyMotion& motion = *(bodyMotionItem->motion());
 
-    Vector3Seq refPSeq = *(bodyMotionItem->findSubItem<Vector3SeqItem>("refP")->seq());
-    Vector3Seq refLSeq = *(bodyMotionItem->findSubItem<Vector3SeqItem>("refL")->seq());
-    MultiValueSeq initdqSeq = *(bodyMotionItem->findSubItem<MultiValueSeqItem>("initdq")->seq());
+    std::shared_ptr<Vector3Seq> refPSeq = getOrCreateVector3SeqOfBodyMotionItem("refP", bodyMotionItem);
+    std::shared_ptr<Vector3Seq> refLSeq = getOrCreateVector3SeqOfBodyMotionItem("refL", bodyMotionItem);
+    std::shared_ptr<MultiValueSeq> initdqSeq = getOrCreateMultiValueSeqOfBodyMotionItem("initdq", bodyMotionItem);
 
     stringstream ss,fnamess;
 
@@ -545,7 +541,7 @@ void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string 
             // 目標関節・足先速度
             VectorXd refdq(mBody->numJoints()+6);
             // for(int i=0; i<mBody->numJoints(); ++i) refdq(i) = mBody->joint(i)->dq();
-            MultiValueSeq::Frame frame = initdqSeq.frame(currentFrame);
+            MultiValueSeq::Frame frame = initdqSeq->frame(currentFrame);
             for(int i=0; i<mBody->numJoints(); ++i){
                 refdq[i] = frame[mBody->joint(i)->index()];
             }
@@ -555,8 +551,8 @@ void RMControlPlugin::sweepControl(boost::filesystem::path logPath ,std::string 
             VectorXd y(numSelects);
             {
                 VectorXd tmpy(6);
-                tmpy.block(0,0, 3,1) = refPSeq.at(currentFrame);
-                tmpy.block(3,0, 3,1) = refLSeq.at(currentFrame);
+                tmpy.block(0,0, 3,1) = refPSeq->at(currentFrame);
+                tmpy.block(3,0, 3,1) = refLSeq->at(currentFrame);
                 for(auto jointPathPtr : wholeBodyConstraintPtr->constraintJointPathVec) {
                     int numJoints = jointPathPtr->numJoints();
                     MatrixXd MH(6,numJoints);
