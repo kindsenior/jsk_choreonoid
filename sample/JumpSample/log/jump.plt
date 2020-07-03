@@ -13,14 +13,14 @@ dcmxscale=1
 dcmzscale=0.5
 copscale=10
 copoffset=-1
+contactoffset=0.5
 Lscale=0.1
 xscale=cmxscale
 dxscale=0.5
 zscale=5
 dxscale=dcmxscale
 dzscale=1
-plot contact u 1:3, contact u 1:12, contact u 1:($2+0.5),contact u 1:($5+0.4),contact u 1:($10/10),  contact u 1:($11-0.5),contact u 1:($14-0.4),contact u 1:($19/10)
-replot init u 1:($2*cmxscale),    pre u 1:($2*cmxscale),    input u 1:($2*cmxscale), ref u 1:($2*cmxscale) # CMx
+plot init u 1:($2*cmxscale),    pre u 1:($2*cmxscale),    input u 1:($2*cmxscale), ref u 1:($2*cmxscale) # CMx
 replot init u 1:($5/M)*dcmxscale, pre u 1:($5/M)*dcmxscale, input u 1:($5/M)*dcmxscale t "input dCMx", ref u 1:($5/M)*dcmxscale t "ref dCMx" # dCMx
 replot input u 1:3, ref u 1:3 # CMy
 replot input u 1:($6/M) t "input dCMy",ref u 1:($6/M) t "ref dCMy" # dCMy
@@ -33,15 +33,19 @@ replot ref u 1:($10/100)
 
 replot input u 1:($13/1000) # Fz
 
-replot wrench u 1:(-$6/$4)*copscale+copoffset t "lCOPx",wrench u 1:(-$12/$10)*copscale+copoffset t "rCOPx", wrench u 1:($5/$4)*copscale+copoffset t "lCOPy",wrench u 1:($11/$10)*copscale+copoffset t "rCOPy"
+replot wrenches u 1:(-$6/$4)*copscale+copoffset   t "rCOPx", wrench u 1:(-$12/$10)*copscale+copoffset t "rCOPx"
+replot wrenches u 1:(-$12/$10)*copscale+copoffset t "lCOPx", wrench u 1:(-$6/$4)*copscale+copoffset   t "lCOPx"
+replot wrench u 1:($5/$4)*copscale+copoffset t "lCOPy",wrench u 1:($11/$10)*copscale+copoffset t "rCOPy"
 # replot wrenches u 1:($4/1000) t "rfz"
 replot wrench u 1:($2/1000+0.2), wrench u 1:($8/1000-0.2) # Fx
 replot wrench u 1:($3/1000+0.2), wrench u 1:($9/1000-0.2) # Fy
 replot wrench u 1:($4/1000), wrench u 1:($10/1000) # Fz
 
-replot iee u 1:($2*xscale),iee u 1:($5*dxscale)# , iee u 1:($11*xscale), iee u 1:($14*dxscale) # px vx
-replot iee u 1:($4*zscale),iee u 1:($7*dzscale)# , iee u 1:($13*zscale), iee u 1:($16*dzscale) # pz vz
-# replot iee u 1:($4*c),ee u 1:($4*c) t "ref lz",iee u 1:($7*dzscale),iee u 1:($16*dzscale)
+replot iee u 1:($2*xscale+contactoffset),  contact u 1:($2+contactoffset), contact u 1:($11-contactoffset), contact u 1:($14-contactoffset) # px
+replot iee u 1:($5*dxscale+contactoffset), contact u 1:($5+contactoffset) # vx
+replot iee u 1:($4*zscale),iee u 1:($7*dzscale) # pz vz
+replot contact u 1:3, contact u 1:12 # py
+replot contact u 1:($10/10), contact u 1:($19/10) # wz
 
 replot opt u 1:2, opt u 1:3
 
