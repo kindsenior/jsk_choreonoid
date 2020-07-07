@@ -17,9 +17,9 @@ contactoffset=0.5
 Lscale=0.1
 xscale=cmxscale
 dxscale=0.5
-zscale=5
+zscale=1
 dxscale=dcmxscale
-dzscale=1
+dzscale=dcmzscale
 plot init u 1:($2*cmxscale),    pre u 1:($2*cmxscale),    input u 1:($2*cmxscale), ref u 1:($2*cmxscale) # CMx
 replot init u 1:($5/M)*dcmxscale, pre u 1:($5/M)*dcmxscale, input u 1:($5/M)*dcmxscale t "input dCMx", ref u 1:($5/M)*dcmxscale t "ref dCMx" # dCMx
 replot input u 1:3, ref u 1:3 # CMy
@@ -41,10 +41,11 @@ replot wrench u 1:($2/1000+0.2), wrench u 1:($8/1000-0.2) # Fx
 replot wrench u 1:($3/1000+0.2), wrench u 1:($9/1000-0.2) # Fy
 replot wrench u 1:($4/1000), wrench u 1:($10/1000) # Fz
 
-replot iee u 1:($2*xscale+contactoffset),  contact u 1:($2+contactoffset), contact u 1:($11-contactoffset), contact u 1:($14-contactoffset) # px
-replot iee u 1:($5*dxscale+contactoffset), contact u 1:($5+contactoffset) # vx
+replot iee u 1:($2*xscale+contactoffset),  contact u 1:($2+contactoffset), contact u 1:($11-contactoffset) # px
+replot iee u 1:($5*dxscale+contactoffset), contact u 1:($5*dxscale+contactoffset), contact u 1:($14*dxscale-contactoffset) # vx
 replot iee u 1:($4*zscale),iee u 1:($7*dzscale) # pz vz
 replot contact u 1:3, contact u 1:12 # py
+replot iee u 1:($9/10),  contact u 1:($9/10) # wy
 replot contact u 1:($10/10), contact u 1:($19/10) # wz
 
 replot opt u 1:2, opt u 1:3
@@ -54,6 +55,8 @@ hip_p_dq=udiff(4)
 replot pos @hip_p_dq t "r-hip-p dq*".sprintf("%.2f",a)
 knee_dq=udiff(5)
 replot pos @knee_dq t "r-knee dq*".sprintf("%.2f",a)
+ankle_dq=udiff(6)
+replot pos @ankle_dq t "r-ankle dq*".sprintf("%.2f",a)
 
 root_dp=udiff(3)
 replot hip @root_dp t "root pitch vel*".sprintf("%.2f",a)
