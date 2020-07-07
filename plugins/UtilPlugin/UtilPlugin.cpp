@@ -64,7 +64,7 @@ void getContactPoints(std::vector<Vector3d>& contactPointVec, const PosePtr pose
                      [&](Vector3d operandPoint){
                          return filterPointVec.end() != std::find_if(filterPointVec.begin(), filterPointVec.end(),
                                                                      [&](Vector3d filterPoint){
-                                                                         return (operandPoint - filterPoint).norm() < 0.01;
+                                                                         return fabs((operandPoint - filterPoint).segment(0,2).norm()) < 0.03;
                                                                      });
                      });
     };
